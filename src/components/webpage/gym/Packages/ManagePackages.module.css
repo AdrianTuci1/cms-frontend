@@ -1,0 +1,111 @@
+/* Base structure adapted from HistoryList.module.css */
+.packageList {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px; /* Reduced padding compared to history */
+    min-height: 0;
+  }
+  
+  .packageList::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .packageList::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+  }
+  
+  .packageList::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+  }
+  
+  .packageList::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+  }
+  
+  .packageItem {
+    background-color: #ffffff; /* Lighter background for packages */
+    border-radius: 8px;
+    padding: 1rem 1.5rem;
+    transition: all 0.3s ease;
+    border: 1px solid #e0e0e0; /* Lighter border */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+  
+  .packageItem:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .packageContent {
+    display: grid;
+    /* Adjust grid columns for package info */
+    grid-template-columns: 40px 1fr auto auto; /* Icon, Name/Details, Price, Actions */
+    gap: 1.5rem;
+    align-items: center;
+  }
+  
+  .packageIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem; /* Adjust icon size if needed */
+  }
+
+  .packageDetails {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .packageName {
+    font-size: 1.1rem;
+    color: #333; /* Darker text */
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+  }
+  
+  .packageMeta {
+    color: #757575; /* Grey text for meta */
+    font-size: 0.9rem;
+  }
+    
+  .packagePrice {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #333;
+    text-align: right;
+  }
+  
+  .packageActions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+/* Tier-specific borders (optional) */
+.tierGold {
+    border-left: 4px solid gold;
+  }
+  
+.tierSilver {
+    border-left: 4px solid silver;
+  }
+  
+.tierBlack {
+    border-left: 4px solid #333; /* Dark grey/black */
+  }
+
+.tierService {
+    border-left: 4px solid #8b5cf6; /* Purple like history service */
+}
+
+.noResults {
+    text-align: center;
+    padding: 15px;
+    color: #888888;
+  } 

@@ -1,0 +1,144 @@
+.packageCard {
+  flex: 0 0 calc(33.333% - 1.33rem);
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  aspect-ratio: 4/3;
+  border: 1px solid #e0e0e0;
+  position: relative;
+  transform-origin: center;
+}
+
+.packageCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.packageCard.partial {
+  opacity: 0.5;
+  pointer-events: none;
+  transform: scale(0.9);
+}
+
+.packageCard.left {
+  transform: translateX(-25%) scale(0.9);
+}
+
+.packageCard.right {
+  transform: translateX(25%) scale(0.9);
+}
+
+.packageCard.center {
+  transform: scale(1);
+  opacity: 1;
+  z-index: 1;
+}
+
+.packageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 1rem;
+}
+
+.packageName {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.priceContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.price {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #333;
+}
+
+.period {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.packageDetails {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.featuresList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem 0;
+}
+
+.feature {
+  margin-bottom: 0.5rem;
+  color: #555;
+  font-size: 0.95rem;
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.feature:before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #666;
+}
+
+.entryInfo {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+.selectButton {
+  background-color: #333;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.selectButton:hover {
+  background-color: #444;
+}
+
+/* Tier-specific styles */
+.gold {
+  border-top: 4px solid #FFD700;
+}
+
+.silver {
+  border-top: 4px solid #C0C0C0;
+}
+
+.black {
+  border-top: 4px solid #000;
+}
+
+.service {
+  border-top: 4px solid #666;
+}
+
+.none {
+  border-top: 4px solid #e0e0e0;
+} 
