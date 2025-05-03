@@ -3,6 +3,7 @@ import { getBusinessType } from '../config/businessTypes';
 import DashboardNavbar from '../components/navbar/DashboardNavbar';
 import DashboardSidebar from '../components/sidebar/DashboardSidebar';
 import { Outlet } from 'react-router-dom';
+import styles from './DashboardLayout.module.css';
 
 const STORAGE_KEYS = {
   SECTION: 'dashboard_current_section',
@@ -15,12 +16,12 @@ const DashboardLayout = () => {
   // Initialize state with values from localStorage or defaults
   const [currentSection, setCurrentSection] = useState(() => {
     const savedSection = localStorage.getItem(STORAGE_KEYS.SECTION);
-    return savedSection || 'home';
+    return savedSection || 'dashboard';
   });
 
   const [currentView, setCurrentView] = useState(() => {
     const savedView = localStorage.getItem(STORAGE_KEYS.VIEW);
-    return savedView || 'timeline';
+    return savedView || 'analytics';
   });
 
   // Save state to localStorage whenever it changes
@@ -33,21 +34,18 @@ const DashboardLayout = () => {
   }, [currentView]);
 
   return (
-    <div className="dashboard-layout">
+    <div className={styles.dashboardLayout}>
       <DashboardNavbar 
-        businessType={businessType} 
-        currentSection={currentSection}
-        setCurrentSection={setCurrentSection}
+        currentView={currentView}
+        setCurrentView={setCurrentView}
       />
-      <div className="dashboard-content">
-        {currentSection === 'home' && (
-          <DashboardSidebar 
-            businessType={businessType} 
-            currentView={currentView}
-            setCurrentView={setCurrentView}
-          />
-        )}
-        <main className="dashboard-main">
+      <div className={styles.dashboardContent}>
+        <DashboardSidebar 
+          businessType={businessType} 
+          currentSection={currentSection}
+          setCurrentSection={setCurrentSection}
+        />
+        <main className={styles.dashboardMain}>
           <Outlet context={{ 
             currentSection, 
             setCurrentSection,

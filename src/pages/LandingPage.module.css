@@ -8,7 +8,6 @@
   display: flex;
   flex-direction: column;
   margin-block: 10px;
-  margin-inline: 50px;
   gap: 40px;
   width: 100%;
 }

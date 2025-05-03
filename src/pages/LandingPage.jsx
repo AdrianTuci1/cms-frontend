@@ -1,10 +1,11 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import styles from './LandingPage.module.css';
+import LocationMap from '../components/webpage/general/LocationMap/LocationMap';
 import InvertedCard from '../components/webpage/general/Hero/InvertedCard';
 import MembershipCard from '../components/webpage/gym/MembershipCard/MembershipCard';
 import Facilities from '../components/webpage/gym/Facilities/Facilities';
-import Packages from '../components/webpage/gym/Packages/PackagesView';
+import Packages from '../components/webpage/gym/landingpackages/Packages';
 import Classes from '../components/webpage/gym/Classes/Classes';
 import PhotoGallery from '../components/webpage/general/PhotoGallery/PhotoGallery';
 import Footer from '../components/webpage/general/Footer/Footer';
@@ -28,6 +29,7 @@ const LandingPage = () => {
   
   const title = businessType.name;
   const identifier = getBusinessIdentifier(businessType.name);
+  const position = [44.4268, 26.1025]; // Default coordinates (Bucharest, Romania)
   
   const renderBusinessSpecificContent = () => {
     switch (businessType.name) {
@@ -88,7 +90,7 @@ const LandingPage = () => {
         </div>
         
         <div className={styles.map}>
-          {/* <LocationMap position={position} /> */}
+          <LocationMap position={position} />
         </div>
       </section>
 

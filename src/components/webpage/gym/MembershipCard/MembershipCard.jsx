@@ -1,6 +1,6 @@
 import React from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { MdExpandMore } from 'react-icons/md';
 import styles from './MembershipCard.module.css';
 
 const MembershipCard = ({ membershipType, expiryDate, memberName, accessLevel }) => {
@@ -38,7 +38,7 @@ const MembershipCard = ({ membershipType, expiryDate, memberName, accessLevel })
     <div className={styles.card}>
       <div className={styles.cardContent}>
         <div className={styles.expandIndicator}>
-          <ExpandMoreIcon />
+          <MdExpandMore />
         </div>
         <div className={styles.cardInfo}>
           <div className={styles.cardHeader}>

@@ -1,0 +1,25 @@
+.dashboardLayout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.dashboardContent {
+  display: flex;
+  flex: 1;
+  margin-top: 60px; /* Height of navbar */
+  min-height: calc(100vh - 60px);
+  position: relative;
+}
+
+.dashboardMain {
+  flex: 1;
+  padding: 24px;
+  margin-left: 80px; /* Width of sidebar */
+  background-color: #a09e9e;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  overflow-y: auto;
+  height: calc(100vh - 60px - 48px); /* Viewport height - navbar - padding */
+  position: relative;
+} 

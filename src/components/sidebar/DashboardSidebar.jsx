@@ -1,25 +1,32 @@
-import { BUSINESS_TYPES } from '../../config/businessTypes';
+import styles from './DashboardSidebar.module.css';
+import { FaHome, FaRobot, FaHistory, FaUsers } from 'react-icons/fa';
 
-const DashboardSidebar = ({ businessType, currentView, setCurrentView }) => {
+const DashboardSidebar = ({ businessType, currentSection, setCurrentSection }) => {
   const getSidebarItems = () => {
     return [
-      { id: 'timeline', label: 'Timeline' },
-      { id: 'sales', label: 'Sales' },
-      { id: 'clients', label: 'Clients' },
-      { id: 'stocks', label: 'Stocks' }
+      { id: 'dashboard', label: 'Dashboard', icon: <FaHome className={styles.icon} /> },
+      { id: 'automations', label: 'Automations', icon: <FaRobot className={styles.icon} /> },
+      { id: 'activities', label: 'Activities', icon: <FaHistory className={styles.icon} /> },
+      { id: 'team', label: 'Team', icon: <FaUsers className={styles.icon} /> }
     ];
   };
 
   return (
-    <aside className="dashboard-sidebar">
-      <div className="sidebar-menu">
+    <aside className={styles.dashboardSidebar}>
+      <div className={styles.sidebarHeader}>
+        <span>{businessType.name} Dashboard</span>
+      </div>
+      <div className={styles.sidebarMenu}>
         {getSidebarItems().map((item) => (
           <button
             key={item.id}
-            className={`sidebar-item ${currentView === item.id ? 'active' : ''}`}
-            onClick={() => setCurrentView(item.id)}
+            className={`${styles.sidebarItem} ${currentSection === item.id ? styles.active : ''}`}
+            onClick={() => setCurrentSection(item.id)}
           >
-            {item.label}
+            <div className={styles.iconWrapper}>
+              {item.icon}
+            </div>
+            <span className={styles.label}>{item.label}</span>
           </button>
         ))}
       </div>

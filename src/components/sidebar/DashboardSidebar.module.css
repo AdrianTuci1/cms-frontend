@@ -1,0 +1,102 @@
+.dashboardSidebar {
+  width: 80px;
+  height: calc(100vh - 60px);
+  background-color: #1a1a1a;
+  padding: 20px 0;
+  position: fixed;
+  left: 0;
+  top: 60px;
+  transition: width 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebarHeader {
+  padding: 0 20px;
+  margin-bottom: 20px;
+  color: #ffffff;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.dashboardSidebar:hover .sidebarHeader {
+  opacity: 1;
+}
+
+.sidebarMenu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.sidebarFooter {
+  margin-top: auto;
+  padding-top: 20px;
+}
+
+.sidebarItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  color: #ffffff;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  text-align: left;
+  position: relative;
+  height: 50px;
+}
+
+.sidebarItem:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebarItem:hover .label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.sidebarItem.active {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.sidebarItem.active .iconWrapper {
+  background-color: #ffffff;
+  color: #1a1a1a;
+}
+
+.iconWrapper {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  position: absolute;
+  left: 20px;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  color: currentColor;
+}
+
+.label {
+  position: absolute;
+  left: 70px;
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: all 0.3s ease;
+  white-space: nowrap;
+} 

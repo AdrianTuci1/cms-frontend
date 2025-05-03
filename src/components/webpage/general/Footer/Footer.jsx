@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import InstagramIcon from '@mui/icons-material/Instagram';
-import FacebookIcon from '@mui/icons-material/Facebook';
-import YouTubeIcon from '@mui/icons-material/YouTube';
+import { FaInstagram } from 'react-icons/fa';
+import { FaFacebook } from 'react-icons/fa';
+import { FaYoutube } from 'react-icons/fa';
 import styles from './Footer.module.css';
 
 const Footer = () => {
@@ -18,13 +18,13 @@ const Footer = () => {
           </p>
           <div className={styles.socialLinks}>
             <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
-              <InstagramIcon />
+              <FaInstagram />
             </a>
             <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
-              <FacebookIcon />
+              <FaFacebook />
             </a>
             <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
-              <YouTubeIcon />
+              <FaYoutube />
             </a>
           </div>
         </div>

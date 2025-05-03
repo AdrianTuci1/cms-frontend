@@ -1,23 +1,23 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
-  faHome,
-  faDumbbell,
-  faHotel,
-  faHospital,
-  faDoorOpen,
-  faUsers,
-  faStethoscope,
-  faCalendarAlt,
-  faUser,
-  faCog,
-  faSignOutAlt,
-  faIdCard,
-  faDatabase
-} from '@fortawesome/free-solid-svg-icons';
+  FaHome,
+  FaDumbbell,
+  FaHotel,
+  FaHospital,
+  FaDoorOpen,
+  FaUsers,
+  FaStethoscope,
+  FaCalendarAlt,
+  FaUser,
+  FaCog,
+  FaSignOutAlt,
+  FaIdCard,
+  FaDatabase
+} from 'react-icons/fa';
 import useAuthStore from '../../store/authStore';
 import { BUSINESS_TYPES } from '../../config/businessTypes';
+
 import styles from './PublicNavbar.module.css';
 
 const PublicNavbar = ({ businessType }) => {
@@ -52,17 +52,17 @@ const PublicNavbar = ({ businessType }) => {
     switch (businessType.name) {
       case BUSINESS_TYPES.DENTAL_CLINIC.name:
         return [
-          { path: '/medics', label: 'Medics', icon: faUsers },
-          { path: '/treatments', label: 'Treatments', icon: faStethoscope }
+          { path: '/medics', label: 'Medics', icon: FaUsers },
+          { path: '/treatments', label: 'Treatments', icon: FaStethoscope }
         ];
       case BUSINESS_TYPES.GYM.name:
         return [
-          { path: '/packages', label: 'Packages', icon: faIdCard },
-          { path: '/classes', label: 'Classes', icon: faCalendarAlt }
+          { path: '/packages', label: 'Packages', icon: FaIdCard },
+          { path: '/classes', label: 'Classes', icon: FaCalendarAlt }
         ];
       case BUSINESS_TYPES.HOTEL.name:
         return [
-          { path: '/rooms', label: 'Rooms', icon: faDoorOpen }
+          { path: '/rooms', label: 'Rooms', icon: FaDoorOpen }
         ];
       default:
         return [];
@@ -72,13 +72,13 @@ const PublicNavbar = ({ businessType }) => {
   const getBusinessIcon = () => {
     switch (businessType.name) {
       case BUSINESS_TYPES.DENTAL_CLINIC.name:
-        return faHospital;
+        return FaHospital;
       case BUSINESS_TYPES.GYM.name:
-        return faDumbbell;
+        return FaDumbbell;
       case BUSINESS_TYPES.HOTEL.name:
-        return faHotel;
+        return FaHotel;
       default:
-        return faHome;
+        return FaHome;
     }
   };
 
@@ -90,7 +90,7 @@ const PublicNavbar = ({ businessType }) => {
             className={`${styles.navButton} ${isActive('/') ? styles.active : ''}`}
             onClick={() => handleNavigation('/')}
           >
-            <FontAwesomeIcon icon={getBusinessIcon()} />
+            {React.createElement(getBusinessIcon())}
             <span className={styles.buttonLabel}>{businessType.name}</span>
           </button>
           {getNavItems().map((item) => (
@@ -99,7 +99,7 @@ const PublicNavbar = ({ businessType }) => {
               className={`${styles.navButton} ${isActive(item.path) ? styles.active : ''}`}
               onClick={() => handleNavigation(item.path)}
             >
-              <FontAwesomeIcon icon={item.icon} />
+              {React.createElement(item.icon)}
               <span className={styles.buttonLabel}>{item.label}</span>
             </button>
           ))}
@@ -115,26 +115,26 @@ const PublicNavbar = ({ businessType }) => {
                   className={`${styles.navButton} ${isActive('/dashboard') ? styles.active : ''}`}
                   onClick={() => handleNavigation('/dashboard')}
                 >
-                  <FontAwesomeIcon icon={faDatabase} />
+                  <FaDatabase />
                   <span className={styles.buttonLabel}>Dashboard</span>
                 </button>
               )}
               <div className={styles.userMenu}>
                 <button className={styles.userButton} onClick={handleMenuToggle}>
-                  <FontAwesomeIcon icon={faUser} />
+                  <FaUser />
                 </button>
                 {isMenuOpen && (
                   <div className={styles.menuDropdown}>
                     <button className={styles.menuItem} onClick={() => switchDemoUser()}>
-                      <FontAwesomeIcon icon={faDumbbell} />
+                      <FaDumbbell />
                       <span>Schimbă Utilizator Demo</span>
                     </button>
                     <button className={styles.menuItem} onClick={() => handleNavigation('/settings')}>
-                      <FontAwesomeIcon icon={faCog} />
+                      <FaCog />
                       <span>Settings</span>
                     </button>
                     <button className={`${styles.menuItem} ${styles.logout}`} onClick={() => handleNavigation('/logout')}>
-                      <FontAwesomeIcon icon={faSignOutAlt} />
+                      <FaSignOutAlt />
                       <span>Logout</span>
                     </button>
                   </div>
@@ -146,7 +146,7 @@ const PublicNavbar = ({ businessType }) => {
               className={`${styles.navButton} ${isActive('/login') ? styles.active : ''}`}
               onClick={handleLogin}
             >
-              <FontAwesomeIcon icon={faUser} />
+              <FaUser />
               <span className={styles.buttonLabel}>Login</span>
             </button>
           )}
