@@ -1,7 +1,8 @@
 import styles from './DashboardNavbar.module.css';
-import { FaChartLine, FaShoppingCart, FaUsers, FaBoxes, FaUser, FaBell } from 'react-icons/fa';
+import { FaChartLine, FaShoppingCart, FaUsers, FaBoxes, FaRobot, FaUser } from 'react-icons/fa';
 
 const DashboardNavbar = ({ currentView, setCurrentView }) => {
+  
   const getNavbarItems = () => {
     return [
       { id: 'analytics', label: 'Analytics', icon: <FaChartLine className={styles.icon} /> },
@@ -34,7 +35,7 @@ const DashboardNavbar = ({ currentView, setCurrentView }) => {
       </div>
       <div className={styles.navbarEnd}>
         <button className={styles.navIcon}>
-          <FaBell className={styles.icon} />
+          <FaRobot className={styles.icon} />
         </button>
         <button className={styles.navIcon}>
           <FaUser className={styles.icon} />

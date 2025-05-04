@@ -1,7 +1,7 @@
 import styles from './DashboardSidebar.module.css';
 import { FaHome, FaRobot, FaHistory, FaUsers } from 'react-icons/fa';
 
-const DashboardSidebar = ({ businessType, currentSection, setCurrentSection }) => {
+const DashboardSidebar = ({ currentSection, setCurrentSection }) => {
   const getSidebarItems = () => {
     return [
       { id: 'dashboard', label: 'Dashboard', icon: <FaHome className={styles.icon} /> },
@@ -13,9 +13,6 @@ const DashboardSidebar = ({ businessType, currentSection, setCurrentSection }) =
 
   return (
     <aside className={styles.dashboardSidebar}>
-      <div className={styles.sidebarHeader}>
-        <span>{businessType.name} Dashboard</span>
-      </div>
       <div className={styles.sidebarMenu}>
         {getSidebarItems().map((item) => (
           <button

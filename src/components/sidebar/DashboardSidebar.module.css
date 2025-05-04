@@ -11,17 +11,6 @@
   flex-direction: column;
 }
 
-.sidebarHeader {
-  padding: 0 20px;
-  margin-bottom: 20px;
-  color: #ffffff;
-  font-weight: bold;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
 
 .dashboardSidebar:hover .sidebarHeader {
   opacity: 1;
@@ -32,6 +21,7 @@
   flex-direction: column;
   gap: 10px;
   flex: 1;
+  justify-content: center;
 }
 
 .sidebarFooter {
@@ -55,18 +45,12 @@
   height: 50px;
 }
 
-.sidebarItem:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
 
 .sidebarItem:hover .label {
   opacity: 1;
   transform: translateX(0);
 }
 
-.sidebarItem.active {
-  background-color: rgba(255, 255, 255, 0.15);
-}
 
 .sidebarItem.active .iconWrapper {
   background-color: #ffffff;
