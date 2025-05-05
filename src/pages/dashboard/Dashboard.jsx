@@ -1,5 +1,4 @@
 import { useOutletContext } from 'react-router-dom';
-import { getBusinessType } from '../../config/businessTypes';
 import AutomationSection from '../../sections/AutomationSection';
 import HistorySection from '../../sections/HistorySection';
 import StaffSection from '../../sections/StaffSection';
@@ -11,7 +10,6 @@ import ClientsView from '../../views/ClientsView';
 
 const Dashboard = () => {
   const { currentSection, currentView } = useOutletContext();
-  const businessType = getBusinessType();
 
   const renderDashboardViews = () => {
     switch (currentView) {
@@ -47,7 +45,6 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-page">
-      <h1>{businessType.name} Dashboard</h1>
       <div className="dashboard-content">
         {renderSection()}
       </div>

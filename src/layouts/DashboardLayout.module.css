@@ -14,11 +14,10 @@
 
 .dashboardMain {
   flex: 1;
-  padding: 24px;
   margin-left: 80px; /* Width of sidebar */
   background-color: #f0f2f5;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   overflow-y: auto;
-  height: calc(100vh - 60px - 48px); /* Viewport height - navbar - padding */
+  height: calc(100vh - 60px); /* Viewport height - navbar - padding */
   position: relative;
 } 

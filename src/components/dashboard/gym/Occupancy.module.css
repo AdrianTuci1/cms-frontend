@@ -1,0 +1,39 @@
+.occupancyList {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.occupancyItem {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.areaName {
+  width: 100px;
+  font-weight: 500;
+  color: #333;
+}
+
+.occupancyBar {
+  flex: 1;
+  height: 8px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.occupancyFill {
+  height: 100%;
+  background-color: #1976d2;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.occupancyCount {
+  width: 60px;
+  text-align: right;
+  font-size: 14px;
+  color: #666;
+} 

@@ -1,24 +1,31 @@
-import React from 'react';
-import styles from '../TimelineView.module.css';
+import React, { useState } from 'react';
+import styles from './GymTimeline.module.css';
+import SpecialNavbar from '../../components/navbar/SpecialNavbar';
+import ResizablePanels from '../../components/dashboard/gym/ResizablePanels';
+import MemberCards from '../../components/dashboard/gym/MemberCards';
+import Occupancy from '../../components/dashboard/gym/Occupancy';
 
 const GymTimeline = () => {
+  const [viewMode, setViewMode] = useState('active');
+
   return (
-    <div className={styles.timelineContent}>
-      <h3>Classes & Sessions</h3>
-      <div className={styles.timelineItems}>
-        <div className={styles.timelineItem}>
-          <div className={styles.timelineDate}>Today, 9:00 AM</div>
-          <div className={styles.timelineTitle}>Yoga Class</div>
-          <div className={styles.timelineDescription}>Instructor: Sarah Wilson</div>
-          <div className={styles.timelineStatus} data-status="In Progress">In Progress</div>
-        </div>
-        <div className={styles.timelineItem}>
-          <div className={styles.timelineDate}>Today, 6:00 PM</div>
-          <div className={styles.timelineTitle}>Personal Training</div>
-          <div className={styles.timelineDescription}>Trainer: Mike Johnson</div>
-          <div className={styles.timelineStatus} data-status="Scheduled">Scheduled</div>
-        </div>
-      </div>
+    <div className={styles.container}>
+      <SpecialNavbar viewMode={viewMode} setViewMode={setViewMode} />
+      
+      <ResizablePanels
+        leftContent={
+          <>
+            <h3>Membri</h3>
+            <MemberCards />
+          </>
+        }
+        rightContent={
+          <>
+            <h3>Ocupare</h3>
+            <Occupancy />
+          </>
+        }
+      />
     </div>
   );
 };

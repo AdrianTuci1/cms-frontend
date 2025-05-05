@@ -23,7 +23,6 @@ const TimelineView = () => {
 
   return (
     <div className={styles.dashboardView}>
-      <h2>{businessType.name} Timeline</h2>
       {renderBusinessSpecificContent()}
     </div>
   );
