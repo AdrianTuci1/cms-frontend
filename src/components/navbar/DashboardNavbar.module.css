@@ -1,11 +1,10 @@
 .dashboardNavbar {
-  background-color: #ffffff;
+  background-color: #f0f2f5;
   padding: 0 20px;
   height: 60px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   position: fixed;
   top: 0;
   left: 0;
@@ -33,10 +32,10 @@
   display: flex;
   gap: 10px;
   align-items: center;
-  background-color: #000000;
+  background-color: #1d1d1d;
   padding: 8px;
   border-radius: 30px;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .navItem {
@@ -44,7 +43,7 @@
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  color: #cccccc;
+  color: #495057;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -54,15 +53,15 @@
 }
 
 .navItem:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  background-color: rgba(73, 80, 87, 0.1);
+  color: #212529;
 }
 
 .navItem.active {
   background-color: #ffffff;
-  color: #000000;
+  color: #212529;
   font-weight: 500;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .navbarEnd {

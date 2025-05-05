@@ -1,26 +1,28 @@
+import { useOutletContext } from 'react-router-dom';
 import { getBusinessType } from '../../config/businessTypes';
 import AutomationSection from '../../sections/AutomationSection';
 import HistorySection from '../../sections/HistorySection';
 import StaffSection from '../../sections/StaffSection';
 import SettingsSection from '../../sections/SettingsSection';
 import TimelineView from '../../views/TimelineView';
+import AnalyticsView from '../../views/AnalyticsView';
 import SalesView from '../../views/SalesView';
 import ClientsView from '../../views/ClientsView';
-import StocksView from '../../views/StocksView';
 
-const Dashboard = ({ currentSection, currentView }) => {
+const Dashboard = () => {
+  const { currentSection, currentView } = useOutletContext();
   const businessType = getBusinessType();
 
-  const renderHomeView = () => {
+  const renderDashboardViews = () => {
     switch (currentView) {
       case 'timeline':
         return <TimelineView />;
+      case 'analytics':
+        return <AnalyticsView />;
       case 'sales':
         return <SalesView />;
       case 'clients':
         return <ClientsView />;
-      case 'stocks':
-        return <StocksView />;
       default:
         return <TimelineView />;
     }
@@ -28,13 +30,13 @@ const Dashboard = ({ currentSection, currentView }) => {
 
   const renderSection = () => {
     switch (currentSection) {
-      case 'home':
-        return renderHomeView();
-      case 'automation':
+      case 'dashboard':
+        return renderDashboardViews();
+      case 'automations':
         return <AutomationSection />;
-      case 'history':
+      case 'activities':
         return <HistorySection />;
-      case 'staff':
+      case 'team':
         return <StaffSection />;
       case 'settings':
         return <SettingsSection />;

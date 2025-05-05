@@ -21,7 +21,7 @@ const DashboardLayout = () => {
 
   const [currentView, setCurrentView] = useState(() => {
     const savedView = localStorage.getItem(STORAGE_KEYS.VIEW);
-    return savedView || 'analytics';
+    return savedView || 'timeline';
   });
 
   // Save state to localStorage whenever it changes
@@ -38,6 +38,7 @@ const DashboardLayout = () => {
       <DashboardNavbar 
         currentView={currentView}
         setCurrentView={setCurrentView}
+        currentSection={currentSection}
       />
       <div className={styles.dashboardContent}>
         <DashboardSidebar 

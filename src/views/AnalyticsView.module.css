@@ -1,0 +1,41 @@
+.analyticsView {
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.analyticsContent {
+  margin-top: 24px;
+}
+
+.analyticsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+}
+
+.analyticsCard {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.analyticsCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.analyticsCard h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2D3436;
+  margin-bottom: 8px;
+}
+
+.analyticsCard p {
+  font-size: 14px;
+  color: #495057;
+  margin: 0;
+} 

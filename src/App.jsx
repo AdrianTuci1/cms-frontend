@@ -46,13 +46,13 @@ const App = () => {
           )}
         </Route>
 
-        {/* Dashboard route */}
-        <Route element={<DashboardLayout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
+        {/* Dashboard routes */}
+        <Route path="/dashboard" element={<DashboardLayout />}>
+          <Route index element={<Dashboard />} />
         </Route>
 
-        {/* Catch all route */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* Redirect to dashboard if no route matches */}
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Router>
   );
