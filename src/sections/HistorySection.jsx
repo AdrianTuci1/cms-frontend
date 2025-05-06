@@ -1,11 +1,10 @@
 import React from 'react';
+import HistoryView from './History/HistoryView';
 
 const HistorySection = () => {
   return (
     <div className="dashboard-section">
-      <h2>History</h2>
-      <p>View historical data and reports</p>
-      {/* Add history content here */}
+      <HistoryView />
     </div>
   );
 };

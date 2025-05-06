@@ -32,10 +32,6 @@ const AssistantsView = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <h2>Asistenti Inteligenti</h2>
-        <p>Configurati si monitorizati asistentii pentru gestionarea hotelului</p>
-      </div>
 
       <div className={styles.assistantsList}>
         {/* Asistent Booking */}

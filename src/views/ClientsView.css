@@ -1,0 +1,59 @@
+.dashboard-view {
+  width: 100%;
+}
+
+.business-type-selector {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.business-type-selector button {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.business-type-selector button.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.clients-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.client-card {
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
+}
+
+.client-card h3 {
+  margin: 0 0 15px 0;
+  color: #333;
+}
+
+.client-card p {
+  margin: 8px 0;
+  color: #666;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .business-type-selector {
+    flex-wrap: wrap;
+  }
+  
+  .business-type-selector button {
+    flex: 1;
+    min-width: 100px;
+  }
+} 

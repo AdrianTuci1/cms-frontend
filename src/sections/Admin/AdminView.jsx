@@ -355,9 +355,6 @@ const AdminView = () => {
 
   return (
     <div className={styles.adminContainer}>
-      <div className={styles.header}>
-        <h2>Administrare Sistem</h2>
-      </div>
       
       <div className={styles.tabs}>
         {tabs.map((tab) => (

@@ -1,0 +1,28 @@
+{
+  "reservation": {
+    "isActive": false,
+    "config": {
+      "apiKey": "",
+      "autoConfirm": false
+    }
+  },
+  "whatsapp": {
+    "isActive": false,
+    "config": {
+      "apiKey": "",
+      "autoReply": false,
+      "startTime": "08:00",
+      "endTime": "22:00"
+    }
+  },
+  "reporting": {
+    "isActive": false,
+    "config": {
+      "priceAdjustment": {
+        "enabled": false,
+        "maxChange": 10,
+        "frequency": "daily"
+      }
+    }
+  }
+} 

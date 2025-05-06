@@ -1,0 +1,258 @@
+.salesContainer {
+  background-color: #f5f5f5;
+  min-height: calc(100vh - 64px);
+  overflow: hidden;
+}
+
+.productsPanel {
+  background-color: #ffffff;
+  border-radius: 12px;
+  height: 100%;
+}
+
+.productsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.productsHeader h2 {
+  color: #1a1a1a;
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.productCount {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.productsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  padding: 10px 0;
+}
+
+.productCard {
+  background-color: #ffffff;
+  padding: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid #e0e0e0;
+}
+
+.productCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: #d0d0d0;
+}
+
+.productInfo {
+  margin-bottom: 12px;
+}
+
+.productInfo h3 {
+  color: #1a1a1a;
+  margin: 0 0 4px 0;
+  font-size: 1rem;
+}
+
+.productCode {
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.productPrice {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #1a1a1a;
+  font-weight: 500;
+}
+
+.stockInfo {
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.receiptPanel {
+  height: 100%;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.receiptHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.receiptHeader h2 {
+  color: #1a1a1a;
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.receiptDate {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.receiptItems {
+  flex: 1;
+  overflow-y: auto;
+  margin: 20px 0;
+}
+
+.receiptItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #ffffff;
+}
+
+.itemInfo {
+  flex: 1;
+}
+
+.itemName {
+  display: block;
+  color: #1a1a1a;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.itemCode {
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.itemDetails {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.quantityControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quantityControls button {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #e0e0e0;
+  background-color: #ffffff;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #1a1a1a;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.quantityControls button:hover {
+  background-color: #f5f5f5;
+  border-color: #d0d0d0;
+}
+
+.quantityControls span {
+  min-width: 24px;
+  text-align: center;
+  color: #1a1a1a;
+}
+
+.itemPrice {
+  color: #1a1a1a;
+  font-weight: 500;
+  min-width: 80px;
+  text-align: right;
+}
+
+.removeButton {
+  background: none;
+  border: none;
+  color: #dc3545;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0 5px;
+  transition: color 0.2s ease;
+}
+
+.removeButton:hover {
+  color: #c82333;
+}
+
+.receiptTotal {
+  padding: 20px 0;
+  border-top: 2px solid #e0e0e0;
+  background-color: #ffffff;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  color: #1a1a1a;
+}
+
+.totalRow:last-child {
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.totalRow strong {
+  color: #1a1a1a;
+}
+
+.receiptActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.validateButton, .cancelButton {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+}
+
+.validateButton {
+  background-color: #1a1a1a;
+  color: white;
+}
+
+.validateButton:hover:not(:disabled) {
+  background-color: #333;
+}
+
+.cancelButton {
+  background-color: #dc3545;
+  color: white;
+}
+
+.cancelButton:hover:not(:disabled) {
+  background-color: #c82333;
+}
+
+.validateButton:disabled, .cancelButton:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  background-color: #666;
+} 

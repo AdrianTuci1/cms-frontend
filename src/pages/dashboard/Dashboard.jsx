@@ -4,7 +4,7 @@ import HistorySection from '../../sections/HistorySection';
 import StaffSection from '../../sections/StaffSection';
 import SettingsSection from '../../sections/SettingsSection';
 import TimelineView from '../../views/TimelineView';
-import AnalyticsView from '../../views/AnalyticsView';
+import StocksView from '../../views/StocksView';
 import SalesView from '../../views/SalesView';
 import ClientsView from '../../views/ClientsView';
 
@@ -15,8 +15,8 @@ const Dashboard = () => {
     switch (currentView) {
       case 'timeline':
         return <TimelineView />;
-      case 'analytics':
-        return <AnalyticsView />;
+      case 'stocks':
+        return <StocksView />;
       case 'sales':
         return <SalesView />;
       case 'clients':

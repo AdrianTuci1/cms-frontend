@@ -1,0 +1,81 @@
+.dental-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+  margin-bottom: 24px;
+  border-left: 4px solid #2196f3;
+}
+
+.dental-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+}
+
+.dental-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.dental-card__header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.dental-card__appointment-badge {
+  background-color: #e3f2fd;
+  padding: 8px 16px;
+  border-radius: 8px;
+}
+
+.dental-card__appointment-date {
+  color: #1976d2;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.dental-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dental-card__info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.dental-card__info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dental-card__label {
+  font-size: 0.875rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.dental-card__value {
+  font-size: 1rem;
+  color: #1a1a1a;
+  font-weight: 400;
+}
+
+@media (max-width: 768px) {
+  .dental-card {
+    padding: 16px;
+  }
+
+  .dental-card__info {
+    grid-template-columns: 1fr;
+  }
+} 

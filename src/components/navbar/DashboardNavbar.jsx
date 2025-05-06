@@ -1,5 +1,6 @@
 import styles from './DashboardNavbar.module.css';
-import { FaChartLine, FaShoppingCart, FaUsers, FaRobot, FaUser, FaCalendarAlt, FaHistory, FaCog } from 'react-icons/fa';
+import { FaChartLine, FaShoppingCart, FaUsers, FaRobot, FaUser, FaCalendarAlt, FaHistory, FaCog, FaArrowLeft, FaPlus } from 'react-icons/fa';
+import ConversationsMenu from '../dashboard/ConversationsMenu';
 
 const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
   const getNavbarViews = () => {
@@ -7,7 +8,7 @@ const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
       case 'dashboard':
         return [
           { id: 'timeline', label: 'Timeline', icon: <FaCalendarAlt className={styles.icon} /> },
-          { id: 'analytics', label: 'Analytics', icon: <FaChartLine className={styles.icon} /> },
+          { id: 'stocks', label: 'Stocks', icon: <FaChartLine className={styles.icon} /> },
           { id: 'sales', label: 'Sales', icon: <FaShoppingCart className={styles.icon} /> },
           { id: 'clients', label: 'Clients', icon: <FaUsers className={styles.icon} /> }
         ];
@@ -53,9 +54,7 @@ const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
         </div>
       </div>
       <div className={styles.navbarEnd}>
-        <button className={styles.navIcon}>
-          <FaRobot className={styles.icon} />
-        </button>
+        <ConversationsMenu />
         <button className={styles.navIcon}>
           <FaUser className={styles.icon} />
         </button>

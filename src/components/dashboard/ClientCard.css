@@ -1,0 +1,52 @@
+.client-card {
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.client-card h3 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.client-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.info-group {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.label {
+  color: #666;
+  min-width: 120px;
+  margin: 0;
+}
+
+.value {
+  color: #333;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Business specific styles */
+.gym-client-card .status {
+  color: #28a745;
+}
+
+.dental-client-card .appointment {
+  color: #007bff;
+}
+
+.hotel-client-card .room {
+  color: #6f42c1;
+  font-weight: 600;
+} 

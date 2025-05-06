@@ -1,11 +1,10 @@
 import React from 'react';
+import AdminView from './Admin/AdminView';
 
 const StaffSection = () => {
   return (
     <div className="dashboard-section">
-      <h2>Staff</h2>
-      <p>Manage staff members and schedules</p>
-      {/* Add staff content here */}
+      <AdminView />
     </div>
   );
 };
