@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import styles from './GymTimeline.module.css';
 import SpecialNavbar from '../../components/navbar/SpecialNavbar';
 import ResizablePanels from '../../components/dashboard/gym/ResizablePanels';
-import MemberCards from '../../components/dashboard/gym/MemberCards';
 import Occupancy from '../../components/dashboard/gym/Occupancy';
+import Timeline from './timeline/Timeline';
 
 const GymTimeline = () => {
   const [viewMode, setViewMode] = useState('active');
@@ -15,13 +15,11 @@ const GymTimeline = () => {
       <ResizablePanels
         leftContent={
           <>
-            <h3>Membri</h3>
-            <MemberCards />
+            <Timeline />
           </>
         }
         rightContent={
           <>
-            <h3>Ocupare</h3>
             <Occupancy />
           </>
         }

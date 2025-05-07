@@ -9,7 +9,6 @@
 }
 
 .leftPanel, .rightPanel {
-  padding: 20px;
   overflow-y: auto;
 }
 

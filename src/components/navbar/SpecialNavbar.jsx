@@ -1,20 +1,19 @@
 import React from 'react';
+import { FaClock } from 'react-icons/fa';
 import styles from './SpecialNavbar.module.css';
+import useTimelineStore from '../../store/timelineStore';
 
-const SpecialNavbar = ({ viewMode, setViewMode }) => {
+const SpecialNavbar = () => {
+  const { showFullDay, setShowFullDay } = useTimelineStore();
+
   return (
-    <div className={styles.filterMenu}>
+    <div className={styles.navbar}>
       <button
-        className={`${styles.filterButton} ${viewMode === 'active' ? styles.active : ''}`}
-        onClick={() => setViewMode('active')}
+        className={`${styles.button} ${showFullDay ? styles.active : ''}`}
+        onClick={() => setShowFullDay(!showFullDay)}
       >
-        Active
-      </button>
-      <button
-        className={`${styles.filterButton} ${viewMode === 'all' ? styles.active : ''}`}
-        onClick={() => setViewMode('all')}
-      >
-        Toata Ziua
+        <FaClock />
+        <span>{showFullDay ? 'Toate' : 'Active'}</span>
       </button>
     </div>
   );
