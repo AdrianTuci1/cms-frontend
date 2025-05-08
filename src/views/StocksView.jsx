@@ -1,68 +1,11 @@
-import React, { useState, useCallback, memo } from 'react';
+import React, { useState, useCallback } from 'react';
 import { stocksData } from '../data/stocksData';
 import styles from './StocksView.module.css';
 import ResizablePanels from '../components/dashboard/gym/ResizablePanels';
-
-// Memoized Inventory Card Component
-const InventoryCard = memo(({ item, formatCurrency }) => (
-  <div className={styles.inventoryCard}>
-    <div className={styles.cardHeader}>
-      <div className={styles.cardTitle}>
-        <span className={styles.code}>{item.code}</span>
-        <h4>{item.name}</h4>
-      </div>
-      <span className={styles.category}>{item.category}</span>
-    </div>
-    <div className={styles.cardContent}>
-      <div className={styles.cardInfo}>
-        <div className={styles.infoItem}>
-          <span className={styles.infoLabel}>Price:</span>
-          <span className={styles.infoValue}>{formatCurrency(item.currentPrice)}</span>
-        </div>
-        <div className={styles.infoItem}>
-          <span className={styles.infoLabel}>Quantity:</span>
-          <span className={styles.infoValue}>{item.quantity}</span>
-        </div>
-        <div className={styles.infoItem}>
-          <span className={styles.infoLabel}>Total Value:</span>
-          <span className={styles.infoValue}>{formatCurrency(item.value)}</span>
-        </div>
-      </div>
-      <div className={styles.cardActions}>
-        <button className={styles.actionButton}>Edit</button>
-        <button className={styles.actionButton}>Delete</button>
-      </div>
-    </div>
-  </div>
-));
-
-// Memoized Low Stock Card Component
-const LowStockCard = memo(({ item, formatCurrency }) => (
-  <div className={styles.lowStockCard}>
-    <div className={styles.cardHeader}>
-      <div className={styles.cardTitle}>
-        <span className={styles.code}>{item.code}</span>
-        <h4>{item.name}</h4>
-      </div>
-      <span className={styles.category}>{item.category}</span>
-    </div>
-    <div className={styles.cardContent}>
-      <div className={styles.cardInfo}>
-        <div className={styles.infoItem}>
-          <span className={styles.infoLabel}>Price:</span>
-          <span className={styles.infoValue}>{formatCurrency(item.currentPrice)}</span>
-        </div>
-        <div className={styles.infoItem}>
-          <span className={styles.infoLabel}>Quantity:</span>
-          <span className={`${styles.infoValue} ${styles.lowQuantity}`}>{item.quantity}</span>
-        </div>
-      </div>
-      <div className={styles.cardActions}>
-        <button className={styles.actionButton}>Restock</button>
-      </div>
-    </div>
-  </div>
-));
+import StockNavbar from '../components/dashboard/stocks/StockNavbar';
+import InventoryCard from '../components/dashboard/stocks/InventoryCard';
+import LowStockCard from '../components/dashboard/stocks/LowStockCard';
+import AddStockForm from '../components/dashboard/stocks/AddStockForm';
 
 const StocksView = () => {
   const [showAddForm, setShowAddForm] = useState(false);
@@ -215,89 +158,18 @@ const StocksView = () => {
 
   return (
     <div className={styles.stocksView}>
-      <div className={styles.header}>
-        <h2>Inventory Management</h2>
-        <div className={styles.headerActions}>
-          <button 
-            className={styles.printButton}
-            onClick={handlePrint}
-          >
-            Print Stock
-          </button>
-          <button 
-            className={styles.addButton}
-            onClick={() => setShowAddForm(true)}
-          >
-            Add New Stock
-          </button>
-        </div>
-      </div>
+      <StockNavbar 
+        onPrint={handlePrint}
+        onAddStock={() => setShowAddForm(true)}
+      />
 
       {showAddForm && (
-        <div className={styles.addFormOverlay}>
-          <div className={styles.addForm}>
-            <h3>Add New Stock</h3>
-            <form onSubmit={handleAddItem}>
-              <div className={styles.formGroup}>
-                <label>Code:</label>
-                <input
-                  type="text"
-                  value={newItem.code}
-                  onChange={(e) => setNewItem({...newItem, code: e.target.value})}
-                  required
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label>Name:</label>
-                <input
-                  type="text"
-                  value={newItem.name}
-                  onChange={(e) => setNewItem({...newItem, name: e.target.value})}
-                  required
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label>Price:</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={newItem.currentPrice}
-                  onChange={(e) => setNewItem({...newItem, currentPrice: e.target.value})}
-                  required
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label>Quantity:</label>
-                <input
-                  type="number"
-                  value={newItem.quantity}
-                  onChange={(e) => setNewItem({...newItem, quantity: e.target.value})}
-                  required
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label>Category:</label>
-                <select
-                  value={newItem.category}
-                  onChange={(e) => setNewItem({...newItem, category: e.target.value})}
-                >
-                  <option value="Drinks">Drinks</option>
-                  <option value="Supplements">Supplements</option>
-                </select>
-              </div>
-              <div className={styles.formActions}>
-                <button type="submit" className={styles.submitButton}>Add Stock</button>
-                <button 
-                  type="button" 
-                  className={styles.cancelButton}
-                  onClick={() => setShowAddForm(false)}
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <AddStockForm
+          newItem={newItem}
+          setNewItem={setNewItem}
+          onSubmit={handleAddItem}
+          onCancel={() => setShowAddForm(false)}
+        />
       )}
 
       <ResizablePanels

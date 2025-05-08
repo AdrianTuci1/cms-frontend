@@ -44,7 +44,6 @@ const ClientsView = () => {
 
   return (
     <div className="dashboard-view">
-      <h2>Clients</h2>
       <div className="clients-container">
         {clients.map(client => renderClientCard(client))}
       </div>
