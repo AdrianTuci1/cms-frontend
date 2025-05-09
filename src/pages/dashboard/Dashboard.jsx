@@ -34,7 +34,7 @@ const Dashboard = () => {
         return <AutomationSection />;
       case 'activities':
         return <HistorySection />;
-      case 'team':
+      case 'admin':
         return <StaffSection />;
       case 'settings':
         return <SettingsSection />;

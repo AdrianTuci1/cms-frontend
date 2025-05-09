@@ -1,15 +1,25 @@
 import styles from './DashboardSidebar.module.css';
 import { FaHome, FaRobot, FaHistory, FaUsers, FaCog } from 'react-icons/fa';
+import useTabsStore from '../../store/tabsStore';
 
 const DashboardSidebar = ({ currentSection, setCurrentSection }) => {
+  const { setActiveSection } = useTabsStore();
+
   const getSidebarSections = () => {
     return [
       { id: 'dashboard', label: 'Dashboard', icon: <FaHome className={styles.icon} /> },
       { id: 'automations', label: 'Automations', icon: <FaRobot className={styles.icon} /> },
       { id: 'activities', label: 'Activities', icon: <FaHistory className={styles.icon} /> },
-      { id: 'team', label: 'Team', icon: <FaUsers className={styles.icon} /> },
+      { id: 'admin', label: 'Admin', icon: <FaUsers className={styles.icon} /> },
       { id: 'settings', label: 'Settings', icon: <FaCog className={styles.icon} /> }
     ];
+  };
+
+  const handleSectionChange = (sectionId) => {
+    setCurrentSection(sectionId);
+    if (sectionId === 'admin' || sectionId === 'settings') {
+      setActiveSection(sectionId);
+    }
   };
 
   return (
@@ -19,7 +29,7 @@ const DashboardSidebar = ({ currentSection, setCurrentSection }) => {
           <button
             key={section.id}
             className={`${styles.sidebarItem} ${currentSection === section.id ? styles.active : ''}`}
-            onClick={() => setCurrentSection(section.id)}
+            onClick={() => handleSectionChange(section.id)}
           >
             <div className={styles.iconWrapper}>
               {section.icon}

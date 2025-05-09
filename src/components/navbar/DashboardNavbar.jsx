@@ -1,8 +1,11 @@
 import styles from './DashboardNavbar.module.css';
-import { FaChartLine, FaShoppingCart, FaUsers, FaRobot, FaUser, FaCalendarAlt, FaHistory, FaCog, FaArrowLeft, FaPlus } from 'react-icons/fa';
+import { FaChartLine, FaShoppingCart, FaUsers, FaRobot, FaUser, FaCalendarAlt, FaHistory, FaCog } from 'react-icons/fa';
 import ConversationsMenu from '../dashboard/ConversationsMenu';
+import useTabsStore from '../../store/tabsStore';
 
 const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
+  const { activeTab, setActiveTab, getTabsBySection } = useTabsStore();
+
   const getNavbarViews = () => {
     switch (currentSection) {
       case 'dashboard':
@@ -22,13 +25,28 @@ const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
           { id: 'history', label: 'History', icon: <FaHistory className={styles.icon} /> },
           { id: 'reports', label: 'Reports', icon: <FaChartLine className={styles.icon} /> }
         ];
-      case 'team':
-        return [
-          { id: 'members', label: 'Members', icon: <FaUsers className={styles.icon} /> },
-          { id: 'roles', label: 'Roles', icon: <FaUser className={styles.icon} /> }
-        ];
+      case 'admin':
+        return getTabsBySection('admin').map(tab => ({
+          id: tab.id,
+          label: tab.label,
+          icon: <span className={styles.icon}>{tab.icon}</span>
+        }));
+      case 'settings':
+        return getTabsBySection('settings').map(tab => ({
+          id: tab.id,
+          label: tab.label,
+          icon: <span className={styles.icon}>{tab.icon}</span>
+        }));
       default:
         return [];
+    }
+  };
+
+  const handleTabClick = (tabId) => {
+    if (currentSection === 'admin' || currentSection === 'settings') {
+      setActiveTab(tabId);
+    } else {
+      setCurrentView(tabId);
     }
   };
 
@@ -44,8 +62,8 @@ const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
           {getNavbarViews().map((view) => (
             <button
               key={view.id}
-              className={`${styles.navItem} ${currentView === view.id ? styles.active : ''}`}
-              onClick={() => setCurrentView(view.id)}
+              className={`${styles.navItem} ${(currentSection === 'admin' || currentSection === 'settings' ? activeTab : currentView) === view.id ? styles.active : ''}`}
+              onClick={() => handleTabClick(view.id)}
             >
               {view.icon}
               <span>{view.label}</span>
