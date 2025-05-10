@@ -7,7 +7,8 @@ import styles from './DashboardLayout.module.css';
 
 const STORAGE_KEYS = {
   SECTION: 'dashboard_current_section',
-  VIEW: 'dashboard_current_view'
+  VIEW: 'dashboard_current_view',
+  SIDEBAR_EXPANDED: 'dashboard_sidebar_expanded'
 };
 
 const DashboardLayout = () => {
@@ -24,6 +25,11 @@ const DashboardLayout = () => {
     return savedView || 'timeline';
   });
 
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(() => {
+    const savedState = localStorage.getItem(STORAGE_KEYS.SIDEBAR_EXPANDED);
+    return savedState === 'true';
+  });
+
   // Save state to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.SECTION, currentSection);
@@ -32,6 +38,10 @@ const DashboardLayout = () => {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.VIEW, currentView);
   }, [currentView]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.SIDEBAR_EXPANDED, isSidebarExpanded);
+  }, [isSidebarExpanded]);
 
   return (
     <div className={styles.dashboardLayout}>
@@ -45,8 +55,10 @@ const DashboardLayout = () => {
           businessType={businessType} 
           currentSection={currentSection}
           setCurrentSection={setCurrentSection}
+          isExpanded={isSidebarExpanded}
+          setIsExpanded={setIsSidebarExpanded}
         />
-        <main className={styles.dashboardMain}>
+        <main className={`${styles.dashboardMain} ${isSidebarExpanded ? styles.mainExpanded : ''}`}>
           <Outlet context={{ 
             currentSection, 
             setCurrentSection,

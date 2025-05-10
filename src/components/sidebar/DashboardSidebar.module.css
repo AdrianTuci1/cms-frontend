@@ -1,15 +1,19 @@
 .dashboardSidebar {
   width: 80px;
-  height: calc(100vh - 60px);
-  background-color: #f0f2f5;
+  height: calc(100vh - 60px); 
+  background-color: var(--bg-primary);
   padding: 20px 0;
   position: fixed;
   left: 0;
   top: 60px;
   display: flex;
   flex-direction: column;
+  transition: width 0.3s ease;
 }
 
+.dashboardSidebar.expanded {
+  width: 240px;
+}
 
 .dashboardSidebar:hover .sidebarHeader {
   opacity: 1;
@@ -21,6 +25,8 @@
   gap: 10px;
   flex: 1;
   justify-content: center;
+  align-items: center;
+  margin-top: 20px;
 }
 
 .sidebarFooter {
@@ -43,16 +49,14 @@
   height: 50px;
 }
 
-
 .sidebarItem:hover .label {
   opacity: 1;
   transform: translateX(0);
 }
 
-
 .sidebarItem.active .iconWrapper {
-  background-color: #495057;
-  color: #ffffff;
+  background-color: var(--text-primary);
+  color: var(--bg-secondary);
 }
 
 .iconWrapper {
@@ -62,7 +66,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background-color: rgba(73, 80, 87, 0.1);
+  background-color: var(--bg-hover);
   transition: all 0.3s ease;
   position: absolute;
   left: 20px;
@@ -81,4 +85,28 @@
   transform: translateX(-20px);
   transition: all 0.3s ease;
   white-space: nowrap;
+  color: var(--text-primary);
+}
+
+.expanded .label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.expandButton {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: var(--bg-hover);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin: 0 auto;
+  transition: all 0.3s ease;
+}
+
+.expandButton:hover {
+  background: var(--bg-hover);
 } 

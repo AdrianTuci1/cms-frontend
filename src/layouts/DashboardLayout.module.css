@@ -1,7 +1,7 @@
 .dashboardLayout {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
 }
 
 .dashboardContent {
@@ -14,9 +14,19 @@
 
 .dashboardMain {
   flex: 1;
-  margin-left: 80px; /* Width of sidebar */
+  margin-left: 80px;
+  transition: all 0.3s ease;
   background-color: #f0f2f5;
   overflow-y: auto;
-  height: calc(100vh - 60px); /* Viewport height - navbar - padding */
+  height: calc(100vh - 60px);
   position: relative;
+  width: calc(100% - 80px);
+
+}
+
+.dashboardMain.mainExpanded {
+  margin-left: 240px;
+  width: calc(100% - 240px);
+  height: calc(100vh - 100px);
+  margin-top: 20px;
 } 

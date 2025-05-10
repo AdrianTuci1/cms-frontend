@@ -1,5 +1,5 @@
 import styles from './DashboardNavbar.module.css';
-import { FaChartLine, FaShoppingCart, FaUsers, FaRobot, FaUser, FaCalendarAlt, FaHistory, FaCog } from 'react-icons/fa';
+import { FaChartLine, FaShoppingCart, FaUsers, FaRobot, FaUser, FaCalendarAlt, FaHistory, FaCog, FaDumbbell } from 'react-icons/fa';
 import ConversationsMenu from '../dashboard/ConversationsMenu';
 import useTabsStore from '../../store/tabsStore';
 
@@ -54,7 +54,8 @@ const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
     <nav className={styles.dashboardNavbar}>
       <div className={styles.navbarStart}>
         <div className={styles.logo}>
-          <span>Dashboard</span>
+          <FaDumbbell className={styles.icon} />
+          <span>YourCompany</span>
         </div>
       </div>
       <div className={styles.navbarCenter}>

@@ -1,5 +1,5 @@
 .dashboard-page {
-  background-color: #414244;
+  background-color: var(--primary-color);
   min-height: 100vh;
   margin-left: 60px;
   margin-top: 60px;

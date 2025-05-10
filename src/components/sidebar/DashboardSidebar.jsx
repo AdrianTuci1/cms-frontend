@@ -1,8 +1,8 @@
 import styles from './DashboardSidebar.module.css';
-import { FaHome, FaRobot, FaHistory, FaUsers, FaCog } from 'react-icons/fa';
+import { FaHome, FaRobot, FaHistory, FaUsers, FaCog, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import useTabsStore from '../../store/tabsStore';
 
-const DashboardSidebar = ({ currentSection, setCurrentSection }) => {
+const DashboardSidebar = ({ currentSection, setCurrentSection, isExpanded, setIsExpanded }) => {
   const { setActiveSection } = useTabsStore();
 
   const getSidebarSections = () => {
@@ -23,7 +23,13 @@ const DashboardSidebar = ({ currentSection, setCurrentSection }) => {
   };
 
   return (
-    <aside className={styles.dashboardSidebar}>
+    <aside className={`${styles.dashboardSidebar} ${isExpanded ? styles.expanded : ''}`}>
+      <button 
+        className={styles.expandButton}
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        {isExpanded ? <FaChevronLeft /> : <FaChevronRight />}
+      </button>
       <div className={styles.sidebarMenu}>
         {getSidebarSections().map((section) => (
           <button
