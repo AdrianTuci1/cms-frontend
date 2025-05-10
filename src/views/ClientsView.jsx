@@ -12,21 +12,52 @@ const ClientsView = () => {
   const clients = [
     {
       id: 1,
-      name: 'John Doe',
-      email: 'john@example.com',
-      phone: '123-456-7890',
-      membershipType: 'Premium',
-      lastVisit: '2024-03-15',
-      // Gym specific
-      membershipStatus: 'Active',
-      // Dental specific
-      nextAppointment: '2024-04-01',
-      // Hotel specific
-      roomNumber: '101',
-      checkIn: '2024-03-20',
-      checkOut: '2024-03-25'
+      name: 'Maria Popescu',
+      email: 'maria.popescu@email.com',
+      phone: '0722-123-456',
+      photoUrl: 'https://randomuser.me/api/portraits/women/1.jpg',
+      doctor: 'Dr. Ion Ionescu',
+      previousTreatment: {
+        name: 'Curățare profesională',
+        date: '15.03.2024'
+      },
+      nextTreatment: {
+        name: 'Control periodic',
+        date: '15.06.2024'
+      }
     },
-    // Add more mock clients as needed
+    {
+      id: 2,
+      name: 'Alexandru Dumitrescu',
+      email: 'alex.dumitrescu@email.com',
+      phone: '0733-456-789',
+      photoUrl: 'https://randomuser.me/api/portraits/men/2.jpg',
+      doctor: 'Dr. Elena Popescu',
+      previousTreatment: {
+        name: 'Plombă',
+        date: '01.03.2024'
+      },
+      nextTreatment: {
+        name: 'Extracție măsea de minte',
+        date: '20.04.2024'
+      }
+    },
+    {
+      id: 3,
+      name: 'Ana Maria Ionescu',
+      email: 'ana.ionescu@email.com',
+      phone: '0744-789-012',
+      photoUrl: 'https://randomuser.me/api/portraits/women/3.jpg',
+      doctor: 'Dr. Ion Ionescu',
+      previousTreatment: {
+        name: 'Albire',
+        date: '10.02.2024'
+      },
+      nextTreatment: {
+        name: 'Control albire',
+        date: '10.05.2024'
+      }
+    }
   ];
 
   const renderClientCard = (client) => {

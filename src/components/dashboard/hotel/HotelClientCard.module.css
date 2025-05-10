@@ -1,0 +1,121 @@
+.card {
+  background: white;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: 12px;
+}
+
+.photo {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  gap: 16px;
+}
+
+.mainInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.name {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.roomBadge {
+  background: #e6f3ff;
+  color: #0066cc;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.datesInfo {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+}
+
+.dateItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dateDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.dateLabel {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.dateValue {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #1a1a1a;
+}
+
+.dateArrow {
+  width: 16px;
+  height: 16px;
+  color: #666;
+}
+
+.contactInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 200px;
+  border-left: 1px solid #eee;
+  padding-left: 16px;
+}
+
+.contactItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #666;
+  font-size: 0.75rem;
+}
+
+.contactItem svg {
+  width: 14px;
+  height: 14px;
+}
+
+@media (max-width: 768px) {
+  .contactInfo {
+    display: none;
+  }
+} 

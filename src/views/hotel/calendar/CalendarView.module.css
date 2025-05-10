@@ -1,0 +1,195 @@
+.calendarContainer {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 60px);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  box-sizing: border-box;
+}
+
+.dateSelector {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+}
+
+.navigationButton {
+  padding: 0.5rem 1rem;
+  border: none;
+  background: var(--color-primary);
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.2s ease;
+}
+
+.navigationButton:hover {
+  background: var(--color-primary-hover);
+}
+
+.navigationButton:active {
+  transform: translateY(1px);
+}
+
+.dateRange {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.tableWrapper {
+  flex: 1;
+  overflow: auto;
+  cursor: grab;
+  user-select: none;
+  position: relative;
+}
+
+.tableWrapper.dragging {
+  cursor: grabbing;
+  scroll-behavior: auto;
+}
+
+.tableWrapper::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.tableWrapper::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+.tableWrapper::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 5px;
+}
+
+.tableWrapper::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+.calendarTable {
+  border-collapse: collapse;
+  width: max-content;
+  table-layout: fixed;
+}
+
+.roomHeader,
+.dateHeader {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 0.75rem;
+  text-align: center;
+  font-weight: 500;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  color: var(--text-primary);
+  height: 60px;
+  box-sizing: border-box;
+}
+
+.roomHeader {
+  width: 150px;
+  text-align: left;
+  position: sticky;
+  left: 0;
+  z-index: 2;
+}
+
+.dateHeader {
+  width: 60px;
+}
+
+.roomCell {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 0.75rem;
+  text-align: left;
+  font-weight: 500;
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  color: var(--text-primary);
+  width: 150px;
+  height: 60px;
+  box-sizing: border-box;
+}
+
+.cell {
+  width: 60px;
+  height: 60px;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  position: relative;
+  background: var(--bg-primary);
+}
+
+.cell:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 2px var(--selection-border);
+  z-index: 1;
+}
+
+.cell.available {
+  background: var(--avatar-bg-success);
+}
+
+.cell.occupied {
+  background: var(--avatar-bg-primary);
+}
+
+.cell.pending {
+  background: var(--avatar-bg-primary);
+}
+
+.cell.maintenance {
+  background: var(--avatar-bg-primary);
+}
+
+.cell.highlighted {
+  background: var(--selection-bg);
+  border: 2px solid var(--selection-border);
+}
+
+.cell.preview {
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 0 0 2px var(--selection-border);
+}
+
+.cell.preview::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--selection-bg);
+  pointer-events: none;
+}
+
+.cell.dragging {
+  pointer-events: none;
+}
+
+.dateInput {
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 1rem;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+}
+
+.dateInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
