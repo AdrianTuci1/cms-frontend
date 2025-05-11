@@ -1,0 +1,135 @@
+.triggersView {
+  padding: 1.5rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.triggersHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.triggersHeader h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.addButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.addButton:hover {
+  background-color: #2563eb;
+}
+
+.icon {
+  font-size: 1rem;
+}
+
+.triggersGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.triggerCard {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.triggerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.triggerHeader h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.triggerActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.actionButton {
+  padding: 0.25rem;
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.actionButton:hover {
+  color: #1a1a1a;
+}
+
+.triggerDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.triggerDescription {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.triggerStatus {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.statusBadge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.statusBadge:first-child {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.statusBadge:last-child {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+@media (max-width: 768px) {
+  .triggersHeader {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .addButton {
+    width: 100%;
+    justify-content: center;
+  }
+} 

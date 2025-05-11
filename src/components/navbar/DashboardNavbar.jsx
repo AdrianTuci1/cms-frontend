@@ -2,9 +2,21 @@ import styles from './DashboardNavbar.module.css';
 import { FaChartLine, FaShoppingCart, FaUsers, FaRobot, FaUser, FaCalendarAlt, FaHistory, FaCog, FaDumbbell } from 'react-icons/fa';
 import ConversationsMenu from '../dashboard/ConversationsMenu';
 import useTabsStore from '../../store/tabsStore';
+import { useEffect } from 'react';
 
 const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
   const { activeTab, setActiveTab, getTabsBySection } = useTabsStore();
+
+  useEffect(() => {
+    const views = getNavbarViews();
+    if (views.length > 0) {
+      if (currentSection === 'admin' || currentSection === 'settings') {
+        setActiveTab(views[0].id);
+      } else {
+        setCurrentView(views[0].id);
+      }
+    }
+  }, [currentSection, setActiveTab, setCurrentView]);
 
   const getNavbarViews = () => {
     switch (currentSection) {

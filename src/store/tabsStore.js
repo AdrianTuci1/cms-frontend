@@ -30,27 +30,9 @@ const useTabsStore = create((set) => {
 
   const allTabs = [...commonTabs, ...(businessTypeTabs[businessType.name] || [])];
 
-  // Set initial active tab based on section
-  const getInitialTab = (section) => {
-    if (section === 'admin') return 'members';
-    if (section === 'settings') {
-      switch (businessType.name) {
-        case 'Gym':
-          return 'gym-subscriptions';
-        case 'Hotel':
-          return 'reservations';
-        case 'Dental Clinic':
-          return 'dental-treatments';
-        default:
-          return 'gallery';
-      }
-    }
-    return '';
-  };
-
   return {
     // State
-    activeTab: getInitialTab('admin'),
+    activeTab: '',
     activeSection: 'admin',
     tabs: allTabs,
 
@@ -66,9 +48,10 @@ const useTabsStore = create((set) => {
     },
 
     setActiveSection: (section) => {
+      const sectionTabs = allTabs.filter(tab => tab.section === section);
       set({
         activeSection: section,
-        activeTab: getInitialTab(section)
+        activeTab: sectionTabs.length > 0 ? sectionTabs[0].id : ''
       });
     },
 

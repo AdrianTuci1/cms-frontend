@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { getBusinessType } from '../config/businessTypes';
 import DashboardNavbar from '../components/navbar/DashboardNavbar';
 import DashboardSidebar from '../components/sidebar/DashboardSidebar';
+import DashboardDrawer from '../components/drawer/DashboardDrawer';
 import { Outlet } from 'react-router-dom';
 import styles from './DashboardLayout.module.css';
 
@@ -63,10 +64,11 @@ const DashboardLayout = () => {
             currentSection, 
             setCurrentSection,
             currentView, 
-            setCurrentView 
+            setCurrentView
           }} />
         </main>
       </div>
+      <DashboardDrawer />
     </div>
   );
 };
