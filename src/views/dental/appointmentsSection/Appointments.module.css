@@ -93,6 +93,7 @@
   font-size: 14px;
   font-weight: 500;
   margin-bottom: 4px;
+  color: var(--text-primary);
 }
 
 .dayDate {
@@ -158,8 +159,7 @@
   color: #333;
 }
 
-.appointmentsList {
-}
+
 
 .appointmentCard {
   background: #fff;

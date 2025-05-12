@@ -1,9 +1,18 @@
 import styles from './DashboardSidebar.module.css';
-import { FaHome, FaRobot, FaHistory, FaUsers, FaCog, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaHome, FaRobot, FaHistory, FaUsers, FaCog, FaArrowLeft, FaArrowRight, FaMapMarkerAlt, FaAngleDown } from 'react-icons/fa';
 import useTabsStore from '../../store/tabsStore';
+import useLocationsStore from '../../store/locationsStore';
+import { useState, useEffect } from 'react';
 
 const DashboardSidebar = ({ currentSection, setCurrentSection, isExpanded, setIsExpanded }) => {
   const { setActiveSection } = useTabsStore();
+  const { locations, currentLocation, setCurrentLocation, fetchLocations } = useLocationsStore();
+  const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
+  
+  useEffect(() => {
+    // Fetch locations when component mounts
+    fetchLocations();
+  }, [fetchLocations]);
 
   const getSidebarSections = () => {
     return [
@@ -21,15 +30,63 @@ const DashboardSidebar = ({ currentSection, setCurrentSection, isExpanded, setIs
       setActiveSection(sectionId);
     }
   };
+  
+  const handleLocationChange = (locationId) => {
+    setCurrentLocation(locationId);
+    setIsLocationDropdownOpen(false);
+  };
 
   return (
     <aside className={`${styles.dashboardSidebar} ${isExpanded ? styles.expanded : ''}`}>
-      <button 
-        className={styles.expandButton}
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
-        {isExpanded ? <FaChevronLeft /> : <FaChevronRight />}
-      </button>
+      <div className={styles.sidebarTop}>
+        <button 
+          className={styles.expandButton}
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <div className={styles.iconWrapper}>
+            {isExpanded ? 
+              <FaArrowLeft className={styles.icon} /> : 
+              <FaArrowRight className={styles.icon} />
+            }
+          </div>
+        </button>
+      </div>
+      
+      {isExpanded && currentLocation && (
+        <div className={styles.locationSelector}>
+          <div 
+            className={styles.currentLocation} 
+            onClick={() => setIsLocationDropdownOpen(!isLocationDropdownOpen)}
+          >
+            <div className={styles.locationIcon}>
+              <FaMapMarkerAlt />
+            </div>
+            <div className={styles.locationInfo}>
+              <div className={styles.locationName}>{currentLocation.name}</div>
+              <div className={styles.locationIdentifier}>{currentLocation.identifier}</div>
+            </div>
+            <div className={`${styles.dropdownIcon} ${isLocationDropdownOpen ? styles.open : ''}`}>
+              <FaAngleDown />
+            </div>
+          </div>
+          
+          {isLocationDropdownOpen && (
+            <div className={styles.locationsDropdown}>
+              {locations.map(location => (
+                <div 
+                  key={location.id} 
+                  className={`${styles.locationOption} ${location.id === currentLocation.id ? styles.active : ''}`}
+                  onClick={() => handleLocationChange(location.id)}
+                >
+                  <div className={styles.locationName}>{location.name}</div>
+                  <div className={styles.locationIdentifier}>{location.identifier}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+      
       <div className={styles.sidebarMenu}>
         {getSidebarSections().map((section) => (
           <button

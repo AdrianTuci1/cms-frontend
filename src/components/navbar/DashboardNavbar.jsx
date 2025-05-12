@@ -1,11 +1,13 @@
 import styles from './DashboardNavbar.module.css';
-import { FaChartLine, FaShoppingCart, FaUsers, FaRobot, FaUser, FaCalendarAlt, FaHistory, FaCog, FaDumbbell } from 'react-icons/fa';
+import { FaChartLine, FaShoppingCart, FaUsers, FaRobot, FaUser, FaCalendarAlt, FaHistory, FaCog, FaDumbbell, FaHospital, FaHotel, FaHome, FaTooth } from 'react-icons/fa';
 import ConversationsMenu from '../dashboard/ConversationsMenu';
 import useTabsStore from '../../store/tabsStore';
 import { useEffect } from 'react';
+import { getBusinessType, BUSINESS_TYPES } from '../../config/businessTypes';
 
 const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
   const { activeTab, setActiveTab, getTabsBySection } = useTabsStore();
+  const businessType = getBusinessType();
 
   useEffect(() => {
     const views = getNavbarViews();
@@ -54,6 +56,26 @@ const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
     }
   };
 
+  const getBusinessLogo = () => {
+    // Check for custom logo
+    const customLogo = import.meta.env.VITE_CUSTOM_LOGO;
+    if (customLogo) {
+      return <img src={customLogo} alt="Logo" className={styles.logoImage} />;
+    }
+
+    // Display icon based on business type
+    switch (businessType.name) {
+      case BUSINESS_TYPES.DENTAL_CLINIC.name:
+        return <FaTooth className={styles.logoIcon} />;
+      case BUSINESS_TYPES.GYM.name:
+        return <FaDumbbell className={styles.logoIcon} />;
+      case BUSINESS_TYPES.HOTEL.name:
+        return <FaHotel className={styles.logoIcon} />;
+      default:
+        return <FaHome className={styles.logoIcon} />;
+    }
+  };
+
   const handleTabClick = (tabId) => {
     if (currentSection === 'admin' || currentSection === 'settings') {
       setActiveTab(tabId);
@@ -66,8 +88,9 @@ const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
     <nav className={styles.dashboardNavbar}>
       <div className={styles.navbarStart}>
         <div className={styles.logo}>
-          <FaDumbbell className={styles.icon} />
-          <span>YourCompany</span>
+          <div className={styles.logoContainer}>
+            {getBusinessLogo()}
+          </div>
         </div>
       </div>
       <div className={styles.navbarCenter}>

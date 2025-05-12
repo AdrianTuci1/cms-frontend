@@ -55,7 +55,7 @@ export default function MonthlyReport() {
 
   return (
     <>
-      <div className={styles.bentoCard} style={{ gridColumn: '1 / span 3', gridRow: '1 / 2', width: '100%' }}>
+      <div className={`${styles.bentoCard} bg-secondary`} style={{ gridColumn: '1 / span 3', gridRow: '1 / 2', width: '100%' }}>
         <div className={styles.bentoCardTitle}><MdBarChart size={32} color="#3b82f6" /></div>
         <div style={{ display: 'flex', height: 350, width: '100%' }}>
           <div style={{ flex: '2', height: '100%' }}>
@@ -102,7 +102,7 @@ export default function MonthlyReport() {
             </ResponsiveContainer>
           </div>
           <div style={{ width: '1px', backgroundColor: '#e2e8f0', margin: '0 20px' }} />
-          <div style={{ flex: '1', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div style={{ flex: '1', display: 'flex', flexDirection: 'column' }}>
             <div className={styles.bentoOverviewRow} style={{ justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                 <span style={{ fontSize: '14px', color: '#64748b' }}>Profit Realizat</span>
@@ -179,7 +179,7 @@ export default function MonthlyReport() {
         </div>
       </div>
 
-      <div className={styles.bentoCard} style={{ gridColumn: '1 / 2', gridRow: '2 / 3' }}>
+      <div className={`${styles.bentoCard} bg-secondary`} style={{ gridColumn: '1 / 2', gridRow: '2 / 3' }}>
         <div className={styles.bentoCardTitle}><MdShowChart size={32} color="#3b82f6" /></div>
         <div style={{ height: 260 }}>
           <div style={{ textAlign: 'left', marginBottom: 20 }}>
@@ -249,7 +249,7 @@ export default function MonthlyReport() {
         </div>
       </div>
 
-      <div className={styles.bentoCard} style={{ gridColumn: '2 / 3', gridRow: '2 / 3' }}>
+      <div className={`${styles.bentoCard} bg-secondary`} style={{ gridColumn: '2 / 3', gridRow: '2 / 3' }}>
         <div className={styles.bentoCardTitle}><MdPieChart size={32} color="#3b82f6" /></div>
         <div style={{ height: 260, display: 'flex' }}>
           <div style={{ width: '65%', position: 'relative' }}>
@@ -313,7 +313,7 @@ export default function MonthlyReport() {
         </div>
       </div>
 
-      <div className={styles.bentoCard} style={{ gridColumn: '3 / 4', gridRow: '2 / 3' }}>
+      <div className={`${styles.bentoCard} bg-secondary`} style={{ gridColumn: '3 / 4', gridRow: '2 / 3' }}>
         <div className={styles.bentoCardTitle}><MdTrendingUp size={32} color="#3b82f6" /></div>
         <div style={{ height: 260 }}>
           <ResponsiveContainer width="100%" height="100%">

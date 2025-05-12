@@ -48,20 +48,17 @@ const AdminView = () => {
           />
         );
       default:
-        return null;
+        return <MembersTab />; // Default to members tab
     }
   };
 
   return (
     <div className={styles.adminView}>
       <div className={styles.header}>
-        <h1>Administrare</h1>
-        {activeTab === 'members' && (
-          <button className={styles.addButton} onClick={() => setIsModalOpen(true)}>
-            <FaPlus className={styles.icon} />
-            Adaugă Membru
-          </button>
-        )}
+        <button className={styles.addButton} onClick={() => setIsModalOpen(true)}>
+          <FaPlus className={styles.icon} />
+          Adaugă Membru
+        </button>
       </div>
 
       <div className={styles.content}>

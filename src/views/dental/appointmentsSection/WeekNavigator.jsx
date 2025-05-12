@@ -29,7 +29,6 @@ const isSameDay = (date1, date2) => {
 
 const WeekNavigator = ({
   currentWeek,
-  selectedDate,
   getAppointmentsCount,
   onPreviousWeek,
   onNextWeek

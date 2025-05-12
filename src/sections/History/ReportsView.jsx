@@ -31,7 +31,7 @@ export default function ReportsView() {
   };
 
   return (
-    <div className={styles.bentoWrap}>
+    <div className={`${styles.bentoWrap} bg-secondary`}>
       <div className={styles.bentoHeader}>
         <div className={styles.reportTypeSelector}>
           <button
