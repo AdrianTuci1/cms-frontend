@@ -1,0 +1,28 @@
+{
+  "gym": {
+    "membershipType": "Gold Membership - 12 luni",
+    "expiryDate": "2023-12-31", 
+    "memberName": "John Doe",
+    "accessLevel": "vip",
+    "visits": 28,
+    "lastVisit": "2023-10-15",
+    "personalTrainer": "Alex Smith",
+    "profilePicture": "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=880&q=80"
+  },
+  "dental": {
+    "medicPhoto": "https://via.placeholder.com/150",
+    "medicName": "Ianis Anghel",
+    "medicSpecialization": "Pediatrie",
+    "appointmentDate": "2025-03-12",
+    "appointmentTime": "10:00",
+    "treatmentType": "Umplere Carie"
+  },
+  "hotel": {
+    "roomPhoto": "https://media.istockphoto.com/id/1390233984/photo/modern-luxury-bedroom.jpg?s=612x612&w=0&k=20&c=po91poqYoQTbHUpO1LD1HcxCFZVpRG-loAMWZT7YRe4=",
+    "roomType": "Camera Dubla Deluxe",
+    "checkIn": "2025-02-17",
+    "checkOut": "2025-02-21",
+    "guests": 2,
+    "roomNumber": "302"
+  }
+} 

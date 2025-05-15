@@ -3,7 +3,7 @@ import { create } from 'zustand';
 const useAuthStore = create((set) => ({
   user: {
     id: '1',
-    name: 'VIP User',
+    name: 'Andrei',
     email: 'vip@example.com',
     accessLevel: 'vip'
   },

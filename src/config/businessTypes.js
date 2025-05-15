@@ -14,7 +14,8 @@ export const BUSINESS_TYPES = {
     dashboardComponents: ['Timeline', 'Sales', 'Clients', 'Stocks'],
     customRoutes: [
       { path: '/packages', component: 'Packages' },
-      { path: '/classes', component: 'Classes' }
+      { path: '/classes', component: 'Classes' },
+      { path: '/gym-demo', component: 'GymDemo' }
     ]
   },
   HOTEL: {
@@ -22,7 +23,8 @@ export const BUSINESS_TYPES = {
     homeComponents: ['Rooms'],
     dashboardComponents: ['Timeline', 'Sales', 'Clients', 'Stocks'],
     customRoutes: [
-      { path: '/rooms', component: 'Rooms' }
+      { path: '/rooms', component: 'Rooms' },
+      { path: '/hotel-demo', component: 'HotelDemo' }
     ]
   }
 };

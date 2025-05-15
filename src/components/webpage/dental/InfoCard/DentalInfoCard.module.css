@@ -1,0 +1,363 @@
+.card {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #4FC3F7, #2196F3);
+  transition: all 0.5s ease;
+  z-index: 1;
+}
+
+.card:hover::before {
+  background: linear-gradient(90deg, #2196F3, #4FC3F7, #2196F3);
+  background-size: 200% 100%;
+  animation: gradientMove 2s ease infinite;
+}
+
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.cardContent {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  justify-content: center;
+  min-height: 200px;
+  border: 1px solid transparent;
+}
+
+.doctorInfo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+  justify-content: space-between;
+  height: 80px;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 16px;
+}
+
+.doctorAvatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f0f0f0;
+  flex-shrink: 0;
+}
+
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarPlaceholder {
+  width: 100%;
+  height: 100%;
+  background: #e0e0e0;
+}
+
+.doctorDetails {
+  flex: 1;
+  margin-left: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
+
+.doctorName {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+  color: #000000;
+}
+
+.doctorSpecialization {
+  font-size: 14px;
+  color: #666666;
+  margin: 2px 0 0 0;
+}
+
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  height: 100%;
+  min-height: 60px;
+  padding: 5px 0;
+}
+
+.appointmentTime {
+  font-size: 24px;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 0;
+}
+
+.appointmentInfo {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+  justify-content: center;
+}
+
+.appointmentTitle {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  color: #000000;
+}
+
+.appointmentDate {
+  font-size: 24px;
+  color: #000000;
+  margin: 0;
+}
+
+.detailsLink {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: #000000;
+  cursor: pointer;
+}
+
+.arrowIcon {
+  margin-left: 5px;
+}
+
+@media (max-width: 480px) {
+  .cardContent {
+    padding: 15px;
+  }
+  
+  .doctorName {
+    font-size: 16px;
+  }
+  
+  .appointmentTitle {
+    font-size: 24px;
+  }
+  
+  .appointmentDate {
+    font-size: 20px;
+  }
+}
+
+@keyframes cardEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card:hover {
+  transform: none;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.cardInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.membershipType {
+  padding: 8px 16px;
+  border-radius: 20px;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.membershipType:hover {
+  transform: scale(1.05);
+}
+
+.accessLevel {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  transition: color 0.3s ease;
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #2196F3;
+}
+
+.accessLevel::before {
+  content: '';
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.memberDetails {
+  margin-bottom: 32px;
+}
+
+.memberName {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  color: #2D3436;
+  transition: color 0.3s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.expiryDate {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label {
+  font-size: 12px;
+  color: #636E72;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.date {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2D3436;
+  transition: color 0.3s ease;
+}
+
+.expandIndicator {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #636E72;
+  animation: bounce 2s infinite;
+  cursor: pointer;
+}
+
+.expandIndicator svg {
+  width: 24px;
+  height: 24px;
+  transition: transform 0.3s ease;
+}
+
+.card:hover .expandIndicator svg {
+  transform: rotate(180deg);
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-5px);
+  }
+  60% {
+    transform: translateY(-3px);
+  }
+}
+
+/* Dental-specific styles */
+.dentalIcon {
+  width: 32px;
+  height: 32px;
+  margin-bottom: 12px;
+  color: #2196F3;
+}
+
+.treatmentNotes {
+  margin-top: 16px;
+  padding: 12px;
+  background: #F5F6FA;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #636E72;
+  line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .card {
+    max-width: 100%;
+  }
+  
+  .cardContent {
+    padding: 16px;
+    gap: 16px;
+  }
+  
+  .memberName {
+    font-size: 20px;
+  }
+  
+  .expandIndicator {
+    top: 16px;
+    right: 16px;
+  }
+  
+  .accessLevel {
+    bottom: 16px;
+    left: 16px;
+  }
+}
+
+.dateDetailsRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+} 

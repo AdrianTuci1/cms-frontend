@@ -11,7 +11,9 @@ import Medics from './pages/dental/Medics';
 import Treatments from './pages/dental/Treatments';
 import Packages from './pages/gym/Packages';
 import Classes from './pages/gym/Classes';
+import GymDemo from './pages/gym/GymDemo';
 import Rooms from './pages/hotel/Rooms';
+import HotelDemo from './pages/hotel/HotelDemo';
 
 // Dashboard
 import Dashboard from './pages/dashboard/Dashboard';
@@ -39,10 +41,14 @@ const App = () => {
             <>
               <Route path="/packages" element={<Packages />} />
               <Route path="/classes" element={<Classes />} />
+              <Route path="/gym-demo" element={<GymDemo />} />
             </>
           )}
           {businessType.name === 'Hotel' && (
-            <Route path="/rooms" element={<Rooms />} />
+            <>
+              <Route path="/rooms" element={<Rooms />} />
+              <Route path="/hotel-demo" element={<HotelDemo />} />
+            </>
           )}
         </Route>
 

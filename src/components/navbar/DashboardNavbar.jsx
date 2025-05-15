@@ -1,5 +1,5 @@
 import styles from './DashboardNavbar.module.css';
-import { FaChartLine, FaShoppingCart, FaUsers, FaRobot, FaUser, FaCalendarAlt, FaHistory, FaCog, FaDumbbell, FaHospital, FaHotel, FaHome, FaTooth } from 'react-icons/fa';
+import { FaChartLine, FaShoppingCart, FaUsers, FaRobot, FaUser, FaCalendarAlt, FaHistory, FaCog, FaDumbbell, FaHome, FaTooth, FaBed } from 'react-icons/fa';
 import ConversationsMenu from '../dashboard/ConversationsMenu';
 import useTabsStore from '../../store/tabsStore';
 import { useEffect } from 'react';
@@ -70,7 +70,7 @@ const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
       case BUSINESS_TYPES.GYM.name:
         return <FaDumbbell className={styles.logoIcon} />;
       case BUSINESS_TYPES.HOTEL.name:
-        return <FaHotel className={styles.logoIcon} />;
+        return <FaBed className={styles.logoIcon} />;
       default:
         return <FaHome className={styles.logoIcon} />;
     }

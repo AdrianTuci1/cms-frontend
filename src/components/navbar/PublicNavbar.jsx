@@ -58,11 +58,13 @@ const PublicNavbar = ({ businessType }) => {
       case BUSINESS_TYPES.GYM.name:
         return [
           { path: '/packages', label: 'Packages', icon: FaIdCard },
-          { path: '/classes', label: 'Classes', icon: FaCalendarAlt }
+          { path: '/classes', label: 'Classes', icon: FaCalendarAlt },
+          { path: '/gym-demo', label: 'Membership Card', icon: FaIdCard }
         ];
       case BUSINESS_TYPES.HOTEL.name:
         return [
-          { path: '/rooms', label: 'Rooms', icon: FaDoorOpen }
+          { path: '/rooms', label: 'Rooms', icon: FaDoorOpen },
+          { path: '/hotel-demo', label: 'Room Card Demo', icon: FaIdCard }
         ];
       default:
         return [];

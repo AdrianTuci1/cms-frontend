@@ -1,5 +1,5 @@
 import React from 'react';
-import GymInfoCard from '../InfoCard/GymInfoCard';
+import GymInfoCard from '../../gym/InfoCard/GymInfoCard';
 import DentalInfoCard from '../../dental/InfoCard/DentalInfoCard';
 import HotelInfoCard from '../../hotel/InfoCard/HotelInfoCard';
 

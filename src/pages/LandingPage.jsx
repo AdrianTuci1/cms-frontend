@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import styles from './LandingPage.module.css';
 import LocationMap from '../components/webpage/general/LocationMap/LocationMap';
 import InvertedCard from '../components/webpage/general/Hero/InvertedCard';
-import MembershipCard from '../components/webpage/gym/MembershipCard/MembershipCard';
+import MembershipCard from '../components/webpage/general/MembershipCard/MembershipCard';
 import Facilities from '../components/webpage/gym/Facilities/Facilities';
 import Packages from '../components/webpage/gym/landingpackages/Packages';
 import Classes from '../components/webpage/gym/Classes/Classes';
@@ -12,6 +12,7 @@ import Footer from '../components/webpage/general/Footer/Footer';
 import gymDescription from '../content/gym-description.md?raw';
 import useAuthStore from '../store/authStore';
 import { getBusinessType } from '../config/businessTypes';
+import membershipData from '../data/membershipData.json';
 
 // Sample photos - replace with your actual photos
 const galleryPhotos = [
@@ -30,6 +31,55 @@ const LandingPage = () => {
   const title = businessType.name;
   const identifier = getBusinessIdentifier(businessType.name);
   const position = [44.4268, 26.1025]; // Default coordinates (Bucharest, Romania)
+  
+  // Determine the business type for the membership card
+  const getCardBusinessType = () => {
+    switch (businessType.name) {
+      case 'Dental Clinic':
+        return 'dental';
+      case 'Gym':
+        return 'gym';
+      case 'Hotel':
+        return 'hotel';
+      default:
+        return 'gym';
+    }
+  };
+
+  // Get the data for the card type
+  const getCardData = (cardBusinessType) => {
+    // If there's a user, merge the user data with the template data
+    if (user) {
+      switch (cardBusinessType) {
+        case 'gym':
+          return {
+            ...membershipData.gym,
+            membershipType: user.membershipType || membershipData.gym.membershipType,
+            expiryDate: user.expiryDate || membershipData.gym.expiryDate,
+            memberName: user.name || membershipData.gym.memberName,
+            accessLevel: user.accessLevel || membershipData.gym.accessLevel,
+            visits: user.visits || membershipData.gym.visits,
+            lastVisit: user.lastVisit || membershipData.gym.lastVisit,
+            personalTrainer: user.personalTrainer || membershipData.gym.personalTrainer
+          };
+        case 'dental':
+          return {
+            ...membershipData.dental,
+            patientName: user.name || membershipData.dental.patientName
+          };
+        case 'hotel':
+          return {
+            ...membershipData.hotel,
+            guestName: user.name || membershipData.hotel.guestName
+          };
+        default:
+          return membershipData.gym;
+      }
+    }
+    
+    // If there's no user, return the template data
+    return membershipData[cardBusinessType];
+  };
   
   const renderBusinessSpecificContent = () => {
     switch (businessType.name) {
@@ -58,6 +108,9 @@ const LandingPage = () => {
     }
   };
 
+  const cardBusinessType = getCardBusinessType();
+  const cardData = getCardData(cardBusinessType);
+
   return (
     <div className={styles.main}>
       <section className={styles.hero}>
@@ -74,13 +127,8 @@ const LandingPage = () => {
             {user ? (
               <div className={styles.membershipCardContainer}>
                 <MembershipCard
-                  membershipType={user.membershipType}
-                  expiryDate={user.expiryDate}
-                  memberName={user.name}
-                  accessLevel={user.accessLevel}
-                  visits={user.visits}
-                  lastVisit={user.lastVisit}
-                  personalTrainer={user.personalTrainer}
+                  businessType={cardBusinessType}
+                  data={cardData}
                 />
               </div>
             ) : (

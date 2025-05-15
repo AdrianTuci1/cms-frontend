@@ -6,7 +6,7 @@ const WebpageLayout = () => {
   const businessType = getBusinessType();
 
   return (
-    <div className="webpage-layout">
+    <div className="webpage-layout" style={{ marginInline:'20px'}}>
       <PublicNavbar businessType={businessType} />
       <main>
         <Outlet />

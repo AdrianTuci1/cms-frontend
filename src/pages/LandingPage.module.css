@@ -12,11 +12,6 @@
   width: 100%;
 }
 
-@media (max-width: 1024px) {
-  .main {
-    margin-inline: 20px;
-  }
-}
 
 .hero {
   width: 100%;
@@ -34,7 +29,6 @@
   width: 100%;
   background: var(--primary);
   display: flex;
-  height: 400px;
   border-radius: 24px;
   outline: 2px solid var(--secondary);
   flex-direction: column;
@@ -44,7 +38,7 @@
   padding-inline: 14px;
   height: fit-content;
   color: var(--text);
-  line-height: 0.5;
+  line-height: 0.1;
 }
 
 .clinicInfo h3 {
@@ -67,6 +61,7 @@
   display: flex;
   padding: 0;
 }
+
 .map {
   width: 550px;
   background: var(--secondary);
