@@ -2,11 +2,15 @@ import styles from './DashboardNavbar.module.css';
 import { FaChartLine, FaShoppingCart, FaUsers, FaRobot, FaUser, FaCalendarAlt, FaHistory, FaCog, FaDumbbell, FaHome, FaTooth, FaBed } from 'react-icons/fa';
 import ConversationsMenu from '../dashboard/ConversationsMenu';
 import useTabsStore from '../../store/tabsStore';
+import useDrawerStore from '../../store/drawerStore';
+
 import { useEffect } from 'react';
 import { getBusinessType, BUSINESS_TYPES } from '../../config/businessTypes';
+import AIAssistantWindow from '../drawer/AIAssistant/AIAssistantWindow';
 
 const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
   const { activeTab, setActiveTab, getTabsBySection } = useTabsStore();
+  const { openDrawer } = useDrawerStore();
   const businessType = getBusinessType();
 
   useEffect(() => {
@@ -108,7 +112,13 @@ const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
         </div>
       </div>
       <div className={styles.navbarEnd}>
-        <ConversationsMenu />
+        <button 
+          className={styles.navIcon}
+          onClick={() => openDrawer(<AIAssistantWindow />, 'Assistants')}
+        >
+          <FaRobot className={styles.icon}/>
+        </button>
+        
         <button className={styles.navIcon}>
           <FaUser className={styles.icon} />
         </button>
@@ -117,4 +127,4 @@ const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
   );
 };
 
-export default DashboardNavbar; 
+export default DashboardNavbar;

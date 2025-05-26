@@ -1,0 +1,134 @@
+{
+  "assistant": {
+    "id": "assistant",
+    "name": "AI Assistant",
+    "description": "I can help you manage reservations and customer information. Just let me know what you need!",
+    "icon": "FaRobot",
+    "notifications": [
+      {
+        "id": "content-review",
+        "title": "Content Review Required",
+        "description": "You have 3 posts pending review",
+        "type": "warning",
+        "actions": [
+          {
+            "id": "review-posts",
+            "label": "Review Posts",
+            "action": "review_content"
+          },
+          {
+            "id": "dismiss",
+            "label": "Dismiss",
+            "action": "dismiss_notification"
+          }
+        ]
+      },
+      {
+        "id": "system-update",
+        "title": "System Update Available",
+        "description": "A new version is ready to be installed",
+        "type": "info",
+        "actions": [
+          {
+            "id": "update-now",
+            "label": "Update Now",
+            "action": "start_update"
+          },
+          {
+            "id": "schedule",
+            "label": "Schedule Update",
+            "action": "schedule_update"
+          }
+        ]
+      },
+      {
+        "id": "user-activity",
+        "title": "Unusual User Activity",
+        "description": "Multiple failed login attempts detected",
+        "type": "error",
+        "actions": [
+          {
+            "id": "view-details",
+            "label": "View Details",
+            "action": "show_security_logs"
+          },
+          {
+            "id": "block-user",
+            "label": "Block User",
+            "action": "block_suspicious_user"
+          }
+        ]
+      }
+    ],
+    "quickActions": [
+      {
+        "id": "new_reservation",
+        "title": "New Reservation",
+        "description": "Create a new reservation in the system"
+      },
+      {
+        "id": "search_customer",
+        "title": "Search Customer",
+        "description": "Look up customer information"
+      },
+      {
+        "id": "create-post",
+        "title": "Create New Post",
+        "description": "Start writing a new blog post",
+        "icon": "FaFileAlt",
+        "action": "create_post"
+      },
+      {
+        "id": "manage-users",
+        "title": "Manage Users",
+        "description": "View and manage user accounts",
+        "icon": "FaUsers",
+        "action": "manage_users"
+      },
+      {
+        "id": "view-analytics",
+        "title": "View Analytics",
+        "description": "Check content and user statistics",
+        "icon": "FaChartBar",
+        "action": "show_analytics"
+      }
+    ]
+  },
+  "conversations": [
+    {
+      "id": "conv_001",
+      "messages": [
+        {
+          "id": "msg_001",
+          "isAI": true,
+          "content": "I've extracted some information from a WhatsApp conversation:\n\nDate: 15 April 2024\nName: Maria Popescu\n\nThe person mentioned they will be arriving. Would you like me to create a reservation in the system using just their phone number?",
+          "timestamp": "2024-04-15T10:30:00"
+        },
+        {
+          "id": "msg_002",
+          "isAI": false,
+          "content": "Yes, please create the reservation. The phone number is 0722123456",
+          "timestamp": "2024-04-15T10:31:00"
+        },
+        {
+          "id": "msg_003",
+          "isAI": true,
+          "content": "I'll create a reservation for Maria Popescu with the following details:\n\n- Date: 15 April 2024\n- Phone: 0722123456\n\nWould you like me to add any additional notes or preferences?",
+          "timestamp": "2024-04-15T10:31:30"
+        },
+        {
+          "id": "msg_004",
+          "isAI": false,
+          "content": "Yes, please add a note that they mentioned they'll arrive around 14:00",
+          "timestamp": "2024-04-15T10:32:00"
+        },
+        {
+          "id": "msg_005",
+          "isAI": true,
+          "content": "I've updated the reservation with the arrival time. The reservation has been created successfully. Would you like me to send a confirmation message to the customer?",
+          "timestamp": "2024-04-15T10:32:30"
+        }
+      ]
+    }
+  ]
+} 

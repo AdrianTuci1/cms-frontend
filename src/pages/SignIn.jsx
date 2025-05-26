@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getBusinessType } from '../config/businessTypes';
+import './SignIn.css';
 
 const SignIn = () => {
   const businessType = getBusinessType();
@@ -26,13 +27,28 @@ const SignIn = () => {
 
     try {
       // TODO: Implement actual authentication logic here
-      // For now, we'll just simulate a successful login
       console.log('Login attempt with:', formData);
-      
-      // Redirect to dashboard on successful login
       navigate('/dashboard');
     } catch (err) {
       setError('Invalid email or password');
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      // TODO: Implement Google Sign-In logic
+      console.log('Google Sign-In clicked');
+    } catch (err) {
+      setError('Failed to sign in with Google');
+    }
+  };
+
+  const handlePasskeySignIn = async () => {
+    try {
+      // TODO: Implement Passkey authentication
+      console.log('Passkey Sign-In clicked');
+    } catch (err) {
+      setError('Failed to sign in with Passkey');
     }
   };
 
@@ -43,6 +59,30 @@ const SignIn = () => {
         <h2>Sign In</h2>
         
         {error && <div className="error-message">{error}</div>}
+        
+        <div className="social-signin">
+          <button 
+            type="button" 
+            className="google-signin-button"
+            onClick={handleGoogleSignIn}
+          >
+            <img src="/google-icon.svg" alt="Google" />
+            Sign in with Google
+          </button>
+          
+          <button 
+            type="button" 
+            className="passkey-button"
+            onClick={handlePasskeySignIn}
+          >
+            <img src="/passkey-icon.svg" alt="Passkey" />
+            Sign in with Passkey
+          </button>
+        </div>
+
+        <div className="divider">
+          <span>or</span>
+        </div>
         
         <form onSubmit={handleSubmit} className="signin-form">
           <div className="form-group">
