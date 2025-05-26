@@ -6,7 +6,7 @@ import useDrawerStore from '../../store/drawerStore';
 
 import { useEffect } from 'react';
 import { getBusinessType, BUSINESS_TYPES } from '../../config/businessTypes';
-import AIAssistantWindow from '../drawer/AIAssistant/AIAssistantWindow';
+import AIAssistantChat from '../drawer/AIAssistant/AIAssistantChat';
 
 const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
   const { activeTab, setActiveTab, getTabsBySection } = useTabsStore();
@@ -114,7 +114,7 @@ const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
       <div className={styles.navbarEnd}>
         <button 
           className={styles.navIcon}
-          onClick={() => openDrawer(<AIAssistantWindow />, 'Assistants')}
+          onClick={() => openDrawer(<AIAssistantChat />, 'Assistants')}
         >
           <FaRobot className={styles.icon}/>
         </button>

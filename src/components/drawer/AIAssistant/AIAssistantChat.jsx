@@ -1,29 +1,28 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { FaExclamationTriangle, FaInfoCircle, FaBell, FaChevronDown, FaChevronUp, FaArrowUp, FaReply } from 'react-icons/fa';
+import React, { useState } from 'react';
 import styles from './AIAssistantChat.module.css';
 import useAIAssistantStore from '../../../store/aiAssistantStore';
-import assistantData from '../../../data/conversations.json';
+import Notifications from './Notifications';
+import Chat from './Chat';
+import ChatInput from './ChatInput';
+import useDrawerStore from '../../../store/drawerStore';
+import { IoAddCircleOutline } from 'react-icons/io5';
+import { BsClockHistory } from 'react-icons/bs';
 
 const AIAssistantChat = () => {
   const [message, setMessage] = useState('');
-  const [isNotificationsExpanded, setIsNotificationsExpanded] = useState(false);
-  const chatContentRef = useRef(null);
   const { 
     messages,
     sendMessage,
+    editMessage,
     isLoading,
     notifications,
     dismissedNotifications,
     handleNotificationAction,
-    handleQuickAction
+    clearMessages,
+    replyToMessage
   } = useAIAssistantStore();
 
-  // Scroll to bottom when new messages arrive
-  useEffect(() => {
-    if (chatContentRef.current) {
-      chatContentRef.current.scrollTop = chatContentRef.current.scrollHeight;
-    }
-  }, [messages]);
+  const { closeDrawer } = useDrawerStore();
 
   const handleSend = async () => {
     if (message.trim()) {
@@ -32,150 +31,58 @@ const AIAssistantChat = () => {
     }
   };
 
-  const getNotificationIcon = (type) => {
-    switch (type) {
-      case 'warning':
-        return <FaExclamationTriangle className={styles.warningIcon} />;
-      case 'error':
-        return <FaExclamationTriangle className={styles.errorIcon} />;
-      default:
-        return <FaInfoCircle className={styles.infoIcon} />;
-    }
+  const handleNewChat = async () => {
+    await clearMessages();
+    setMessage('');
   };
 
-  const formatTimestamp = (timestamp) => {
-    return new Date(timestamp).toLocaleTimeString([], { 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    });
+  const handleChatHistory = () => {
+    // History is now handled through API
+    console.log('Chat history is maintained through API');
   };
 
-  const activeNotifications = notifications.filter(
-    notification => !dismissedNotifications.includes(notification.id)
-  );
+  const hasMessages = messages.length > 0;
 
   return (
     <div className={styles.chatContainer}>
-
-      {/* Notifications Bar */}
-      {activeNotifications.length > 0 && (
-        <div className={`${styles.notificationsBar} ${isNotificationsExpanded ? styles.expanded : ''}`}>
-          <div className={styles.notificationsHeader}>
-            <div className={styles.notificationsCount}>
-              <FaBell />
-              <span>{activeNotifications.length} Notifications</span>
-            </div>
-            <button 
-              className={styles.expandButton}
-              onClick={() => setIsNotificationsExpanded(!isNotificationsExpanded)}
-            >
-              {isNotificationsExpanded ? <FaChevronUp /> : <FaChevronDown />}
-            </button>
-          </div>
-          
-          {isNotificationsExpanded && (
-            <div className={styles.notificationsList}>
-              {activeNotifications.map(notification => (
-                <div key={notification.id} className={`${styles.notification} ${styles[notification.type]}`}>
-                  <div className={styles.notificationHeader}>
-                    {getNotificationIcon(notification.type)}
-                    <h3>{notification.title}</h3>
-                  </div>
-                  <p>{notification.description}</p>
-                  <div className={styles.notificationActions}>
-                    {notification.actions.map(action => (
-                      <button
-                        key={action.id}
-                        className={styles.actionButton}
-                        onClick={() => handleNotificationAction(notification.id, action.id)}
-                        disabled={isLoading}
-                      >
-                        {action.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+      <div className={styles.drawerHeader}>
+        <div className={styles.headerButtons}>
+          <button className={styles.newChatButton} onClick={handleNewChat}>
+            <IoAddCircleOutline size={16} />
+            New Chat
+          </button>
+          <button className={styles.historyButton} onClick={handleChatHistory}>
+            <BsClockHistory size={16} />
+            History
+          </button>
         </div>
-      )}
-
-      <div className={styles.chatContent} ref={chatContentRef}>
-        {/* Welcome message */}
-        {messages.length === 0 && (
-          <div className={styles.welcomeMessage}>
-            <h2>Welcome to AI Assistant</h2>
-            <p>{assistantData.assistant.description}</p>
-
-            {/* Quick Actions */}
-            <div className={styles.quickActions}>
-              <h3>Quick Actions</h3>
-              <div className={styles.quickActionsGrid}>
-                {assistantData.assistant.quickActions.map(action => (
-                  <button
-                    key={action.id}
-                    className={styles.quickActionButton}
-                    onClick={() => handleQuickAction(action.id)}
-                    disabled={isLoading}
-                  >
-                    <div className={styles.quickActionIcon}>
-                      <FaBell />
-                    </div>
-                    <div className={styles.quickActionContent}>
-                      <h4>{action.title}</h4>
-                      <p>{action.description}</p>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Messages */}
-        {messages.map((msg, index) => (
-          <div 
-            key={msg.id} 
-            className={`${styles.message} ${msg.isAI ? styles.aiMessage : styles.userMessage}`}
-          >
-            <div className={styles.messageContent}>
-              <div className={styles.messageHeader}>
-                <span className={styles.agentName}>
-                  {msg.isAI ? assistantData.assistant.name : 'You'}
-                </span>
-                <span className={styles.messageTime}>
-                  {formatTimestamp(msg.timestamp)}
-                </span>
-              </div>
-              <div className={styles.messageText}>{msg.content}</div>
-            </div>
-          </div>
-        ))}
+        <button className={styles.closeButton} onClick={closeDrawer}>
+          ×
+        </button>
       </div>
 
-      {/* Input area - always visible */}
-      <div className={styles.inputArea}>
-        <textarea
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Type your message..."
-          className={styles.messageInput}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              handleSend();
-            }
-          }}
-          disabled={isLoading}
+      <div className={styles.notificationsSection}>
+        <Notifications 
+          notifications={notifications}
+          dismissedNotifications={dismissedNotifications}
+          handleNotificationAction={handleNotificationAction}
+          isLoading={isLoading}
         />
-        <button 
-          onClick={handleSend}
-          className={styles.sendButton}
-          disabled={!message.trim() || isLoading}
-        >
-          <FaArrowUp />
-        </button>
+      </div>
+
+      <div className={`${styles.chatSection} ${hasMessages ? styles.hasMessages : ''}`}>
+        <ChatInput
+          message={message}
+          setMessage={setMessage}
+          handleSend={handleSend}
+          isLoading={isLoading}
+        />
+        <Chat 
+          messages={messages}
+          isLoading={isLoading}
+          replyToMessage={replyToMessage}
+          editMessage={editMessage}
+        />
       </div>
     </div>
   );

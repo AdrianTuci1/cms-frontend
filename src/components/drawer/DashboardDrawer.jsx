@@ -23,12 +23,6 @@ const DashboardDrawer = () => {
     <>
       <div className={styles.overlay} onClick={closeDrawer} />
       <div className={`${styles.drawer} ${isOpen ? styles.open : ''}`}>
-        <div className={styles.drawerHeader}>
-          <h2 className={styles.drawerTitle}>{title}</h2>
-          <button className={styles.closeButton} onClick={closeDrawer}>
-            ×
-          </button>
-        </div>
         <div className={styles.drawerContent}>
           {content}
         </div>
