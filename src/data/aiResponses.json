@@ -1,0 +1,89 @@
+{
+  "assistant": {
+    "name": "AI Assistant",
+    "greeting": "Hello! I'm your AI assistant. How can I help you today?",
+    "errorMessages": {
+      "general": "I apologize, but I encountered an error. Please try again.",
+      "network": "I'm having trouble connecting to the server. Please check your internet connection.",
+      "timeout": "The request took too long to complete. Please try again.",
+      "invalidInput": "I couldn't understand your request. Could you please rephrase it?"
+    },
+    "actionResponses": {
+      "edit": {
+        "success": "Message edited successfully",
+        "error": "Failed to edit message"
+      },
+      "delete": {
+        "success": "Message deleted successfully",
+        "error": "Failed to delete message"
+      }
+    },
+    "statusMessages": {
+      "processing": "Processing your request...",
+      "completed": "Request completed successfully",
+      "error": "An error occurred while processing your request"
+    }
+  },
+  "messageTemplates": {
+    "user": {
+      "id": "string",
+      "content": "string",
+      "isAI": false,
+      "timestamp": "string",
+      "parentId": "string | null",
+      "actionStatus": "pending | completed | error | null",
+      "actionError": "string | null",
+      "actionResult": "string | null"
+    },
+    "ai": {
+      "id": "string",
+      "content": "string",
+      "isAI": true,
+      "timestamp": "string",
+      "parentId": "string | null",
+      "suggestedActions": [
+        {
+          "type": "string",
+          "label": "string",
+          "data": {}
+        }
+      ]
+    }
+  },
+  "apiResponses": {
+    "message": {
+      "success": {
+        "id": "string",
+        "content": "string",
+        "timestamp": "string",
+        "isAI": true
+      },
+      "error": {
+        "code": "string",
+        "message": "string"
+      }
+    },
+    "action": {
+      "success": {
+        "result": "string",
+        "status": "completed"
+      },
+      "error": {
+        "code": "string",
+        "message": "string",
+        "status": "error"
+      }
+    },
+    "notification": {
+      "success": {
+        "result": "string",
+        "status": "completed"
+      },
+      "error": {
+        "code": "string",
+        "message": "string",
+        "status": "error"
+      }
+    }
+  }
+} 

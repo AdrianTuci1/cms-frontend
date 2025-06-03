@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styles from './AIAssistantChat.module.css';
 import useAIAssistantStore from '../../../store/aiAssistantStore';
 import Notifications from './Notifications';
@@ -7,33 +7,22 @@ import ChatInput from './ChatInput';
 import useDrawerStore from '../../../store/drawerStore';
 import { IoAddCircleOutline } from 'react-icons/io5';
 import { BsClockHistory } from 'react-icons/bs';
+import aiAssistantService from '../../../services/aiAssistantService';
 
 const AIAssistantChat = () => {
-  const [message, setMessage] = useState('');
   const { 
     messages,
-    sendMessage,
-    editMessage,
     isLoading,
     notifications,
     dismissedNotifications,
     handleNotificationAction,
-    clearMessages,
-    replyToMessage
+    clearMessages
   } = useAIAssistantStore();
 
   const { closeDrawer } = useDrawerStore();
 
-  const handleSend = async () => {
-    if (message.trim()) {
-      await sendMessage(message);
-      setMessage('');
-    }
-  };
-
   const handleNewChat = async () => {
     await clearMessages();
-    setMessage('');
   };
 
   const handleChatHistory = () => {
@@ -41,7 +30,13 @@ const AIAssistantChat = () => {
     console.log('Chat history is maintained through API');
   };
 
-  const hasMessages = messages.length > 0;
+  const handleSendMessage = async (content) => {
+    try {
+      await aiAssistantService.sendMessage(content);
+    } catch (error) {
+      console.error('Failed to send message:', error);
+    }
+  };
 
   return (
     <div className={styles.chatContainer}>
@@ -70,19 +65,9 @@ const AIAssistantChat = () => {
         />
       </div>
 
-      <div className={`${styles.chatSection} ${hasMessages ? styles.hasMessages : ''}`}>
-        <ChatInput
-          message={message}
-          setMessage={setMessage}
-          handleSend={handleSend}
-          isLoading={isLoading}
-        />
-        <Chat 
-          messages={messages}
-          isLoading={isLoading}
-          replyToMessage={replyToMessage}
-          editMessage={editMessage}
-        />
+      <div className={styles.chatSection}>
+        <Chat />
+        <ChatInput onSendMessage={handleSendMessage} />
       </div>
     </div>
   );

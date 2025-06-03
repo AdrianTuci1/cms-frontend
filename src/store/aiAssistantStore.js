@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import assistantData from '../data/conversations.json';
+import aiResponses from '../data/aiResponses.json';
+import aiAssistantService from '../services/aiAssistantService';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
@@ -33,23 +35,7 @@ const createActions = (set, get) => ({
 
     set({ isLoading: true });
     try {
-      const response = await fetch(`${API_URL}/chat/message`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          content,
-          parentId,
-          timestamp
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to send message');
-      }
-
-      const data = await response.json();
+      const data = await aiAssistantService.sendMessage(content, parentId);
       
       // Add AI response
       set(state => ({
@@ -67,7 +53,7 @@ const createActions = (set, get) => ({
       set(state => ({
         messages: [...state.messages, {
           id: Date.now(),
-          content: "Sorry, I encountered an error. Please try again.",
+          content: aiResponses.assistant.errorMessages.general,
           isAI: true,
           timestamp: new Date().toISOString(),
           parentId,
@@ -96,28 +82,7 @@ const createActions = (set, get) => ({
     }));
 
     try {
-      const response = await fetch(`${API_URL}/chat/action`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          messageId,
-          action: {
-            type: 'edit_message',
-            data: {
-              content: newContent
-            }
-          },
-          timestamp: new Date().toISOString()
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to edit message');
-      }
-
-      const data = await response.json();
+      const data = await aiAssistantService.editMessage(messageId, newContent);
       
       set(state => ({
         messages: state.messages.map(msg => {
@@ -162,23 +127,7 @@ const createActions = (set, get) => ({
     }));
 
     try {
-      const response = await fetch(`${API_URL}/chat/action`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          messageId,
-          action,
-          timestamp: new Date().toISOString()
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to execute action');
-      }
-
-      const data = await response.json();
+      const data = await aiAssistantService.executeAction(messageId, action);
       
       set(state => ({
         messages: state.messages.map(msg => {
@@ -211,17 +160,12 @@ const createActions = (set, get) => ({
 
   clearMessages: async () => {
     try {
-      const response = await fetch(`${API_URL}/chat/clear`, {
-        method: 'DELETE'
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to clear messages');
-      }
-
-      set({ messages: [] });
+      await aiAssistantService.clearMessages();
     } catch (error) {
       console.error('Error clearing messages:', error);
+    } finally {
+      // Always clear local state
+      set({ messages: [] });
     }
   },
 
@@ -248,30 +192,7 @@ const createActions = (set, get) => ({
         }]
       }));
 
-      // Execute the action
-      const response = await fetch(`${API_URL}/chat/action`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          messageId,
-          action: {
-            type: action.action,
-            data: {
-              notificationId,
-              actionId
-            }
-          },
-          timestamp: new Date().toISOString()
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to execute notification action');
-      }
-
-      const data = await response.json();
+      const data = await aiAssistantService.handleNotificationAction(notificationId, actionId);
 
       set(state => ({
         messages: state.messages.map(msg => {

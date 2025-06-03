@@ -1,33 +1,42 @@
-import React from 'react';
-import { FaArrowUp } from 'react-icons/fa';
-import styles from './AIAssistantChat.module.css';
+import React, { useState } from 'react';
+import styles from './Chat.module.css';
 
-const ChatInput = ({ message, setMessage, handleSend, isLoading }) => {
+const ChatInput = ({ onSendMessage }) => {
+  const [message, setMessage] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (message.trim()) {
+      onSendMessage(message);
+      setMessage('');
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e);
+    }
+  };
+
   return (
-    <div className={styles.inputArea}>
-      <div style={{ position: 'relative' }}>
-        <textarea
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Type your message..."
-          className={styles.messageInput}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              handleSend();
-            }
-          }}
-          disabled={isLoading}
-        />
-        <button 
-          onClick={handleSend}
-          className={styles.sendButton}
-          disabled={!message.trim() || isLoading}
-        >
-          <FaArrowUp />
-        </button>
-      </div>
-    </div>
+    <form onSubmit={handleSubmit} className={styles.inputContainer}>
+      <input
+        type="text"
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        onKeyPress={handleKeyPress}
+        placeholder="Scrie un mesaj..."
+        className={styles.input}
+      />
+      <button 
+        type="submit" 
+        className={styles.sendButton}
+        disabled={!message.trim()}
+      >
+        Trimite
+      </button>
+    </form>
   );
 };
 
