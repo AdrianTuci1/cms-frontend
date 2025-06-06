@@ -21,7 +21,6 @@ const DashboardSidebar = ({ currentSection, setCurrentSection, isExpanded, setIs
       { id: 'automations', label: 'Automations', icon: <FaRobot className={styles.icon} /> },
       { id: 'activities', label: 'Activities', icon: <FaHistory className={styles.icon} /> },
       { id: 'admin', label: 'Admin', icon: <FaUsers className={styles.icon} /> },
-      { id: 'settings', label: 'Settings', icon: <FaCog className={styles.icon} /> }
     ];
   };
 

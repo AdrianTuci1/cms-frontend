@@ -2,13 +2,13 @@ import { useOutletContext } from 'react-router-dom';
 import AutomationSection from '../../sections/AutomationSection';
 import HistorySection from '../../sections/HistorySection';
 import StaffSection from '../../sections/StaffSection';
-import SettingsSection from '../../sections/SettingsSection';
 import StocksSection from '../../sections/Stocks/StocksSection';
 import TimelineView from '../../views/TimelineView';
 import SalesView from '../../views/SalesView';
 import ClientsView from '../../views/ClientsView';
 import TreatmentsView from '../../views/TreatmentsView';
 import PackagesView from '../../views/PackagesView';
+import RoomsView from '../../views/RoomsView';
 
 const Dashboard = () => {
   const { currentSection, currentView } = useOutletContext();
@@ -25,6 +25,8 @@ const Dashboard = () => {
         return <TreatmentsView />;
       case 'packages':
         return <PackagesView />;
+      case 'rooms':
+        return <RoomsView />;
       default:
         return <TimelineView />;
     }
@@ -42,8 +44,6 @@ const Dashboard = () => {
         return <HistorySection />;
       case 'admin':
         return <StaffSection />;
-      case 'settings':
-        return <SettingsSection />;
       default:
         return null;
     }

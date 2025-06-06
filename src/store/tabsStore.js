@@ -7,25 +7,24 @@ const useTabsStore = create((set) => {
   // Common tabs for all business types
   const commonTabs = [
     { id: 'members', label: 'Membri', icon: '👥', section: 'admin' },
-    { id: 'roles', label: 'Roluri și Permisiuni', icon: '🔑', section: 'admin' },
-    { id: 'gallery', label: 'Galerie', icon: '🖼️', section: 'settings' },
+    { id: 'roles', label: 'Roluri și Permisiuni', icon: '🔑', section: 'admin' }
   ];
 
   // Business type specific tabs
   const businessTypeTabs = {
     'Dental Clinic': [
-      { id: 'dental-treatments', label: 'Tratamente', icon: '🦷', section: 'settings' },
+      { id: 'dental-treatments', label: 'Tratamente', icon: '🦷', section: 'treatments' }
     ],
     'Gym': [
-      { id: 'gym-subscriptions', label: 'Abonamente', icon: '💳', section: 'settings' },
-      { id: 'gym-classes', label: 'Clase', icon: '🏋️', section: 'settings' },
-      { id: 'gym-facilities', label: 'Facilități', icon: '🏋️‍♀️', section: 'settings' },
+      { id: 'gym-subscriptions', label: 'Abonamente', icon: '💳', section: 'subscriptions' },
+      { id: 'gym-classes', label: 'Clase', icon: '🏋️', section: 'classes' },
+      { id: 'gym-facilities', label: 'Facilități', icon: '🏋️‍♀️', section: 'facilities' }
     ],
     'Hotel': [
-      { id: 'reservations', label: 'Gestionare Rezervări', icon: '🔒', section: 'settings' },
-      { id: 'attractions', label: 'Atracții', icon: '🎡', section: 'settings' },
-      { id: 'services', label: 'Servicii', icon: '🛍️', section: 'settings' },
-    ],
+      { id: 'reservations', label: 'Gestionare Rezervări', icon: '🔒', section: 'reservations' },
+      { id: 'attractions', label: 'Atracții', icon: '🎡', section: 'attractions' },
+      { id: 'services', label: 'Servicii', icon: '🛍️', section: 'services' }
+    ]
   };
 
   const allTabs = [...commonTabs, ...(businessTypeTabs[businessType.name] || [])];

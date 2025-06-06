@@ -42,6 +42,11 @@ const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
         if (businessType.name === BUSINESS_TYPES.GYM.name) {
           views.push({ id: 'packages', label: 'Packages', icon: <FaDumbbell className={styles.icon} /> });
         }
+
+        // Add Rooms view only for hotel
+        if (businessType.name === BUSINESS_TYPES.HOTEL.name) {
+          views.push({ id: 'rooms', label: 'Rooms', icon: <FaBed className={styles.icon} /> });
+        }
         
         return views;
       case 'stocks':
