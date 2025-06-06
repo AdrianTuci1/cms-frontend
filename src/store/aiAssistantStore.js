@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import assistantData from '../data/conversations.json';
 import aiResponses from '../data/aiResponses.json';
-import aiAssistantService from '../services/aiAssistantService';
+import { AIAssistantService } from '../services/aiAssistant';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
@@ -19,12 +19,12 @@ const createActions = (set, get) => ({
   // Message actions
   sendMessage: async (content, parentId = null) => {
     const timestamp = new Date().toISOString();
-    const messageId = Date.now();
+    const userMessageId = `user_${Date.now()}`;  // Prefix user messages
     
     // Add user message
     set(state => ({
       messages: [...state.messages, {
-        id: messageId,
+        id: userMessageId,
         content,
         isAI: false,
         timestamp,
@@ -35,24 +35,13 @@ const createActions = (set, get) => ({
 
     set({ isLoading: true });
     try {
-      const data = await aiAssistantService.sendMessage(content, parentId);
-      
-      // Add AI response
-      set(state => ({
-        messages: [...state.messages, {
-          id: data.id,
-          content: data.content,
-          isAI: true,
-          timestamp: data.timestamp,
-          parentId,
-          replies: []
-        }]
-      }));
+      await AIAssistantService.sendMessage(content, parentId);
     } catch (error) {
       console.error('Error sending message:', error);
+      const errorMessageId = `error_${Date.now()}`;  // Prefix error messages
       set(state => ({
         messages: [...state.messages, {
-          id: Date.now(),
+          id: errorMessageId,
           content: aiResponses.assistant.errorMessages.general,
           isAI: true,
           timestamp: new Date().toISOString(),
@@ -63,6 +52,37 @@ const createActions = (set, get) => ({
     } finally {
       set({ isLoading: false });
     }
+  },
+
+  // Add message handler
+  addMessage: (message) => {
+    console.log('Raw message received in store:', message);
+    console.log('Message type:', message.type);
+    console.log('Message role:', message.role);
+    
+    // Check both type and role to determine if it's an AI message
+    const isAIMessage = message.type === 'agent.response' || message.role === 'agent';
+    console.log('Is AI message?', isAIMessage);
+    
+    // Ensure unique ID by prefixing based on type/role
+    const messageId = `${isAIMessage ? 'ai_' : 'user_'}${message.messageId}`;
+    
+    const formattedMessage = {
+      id: messageId,
+      content: message.content,
+      isAI: isAIMessage,
+      timestamp: message.timestamp,
+      parentId: null,
+      replies: [],
+      metadata: message.metadata
+    };
+    
+    console.log('Formatted message for store:', formattedMessage);
+    console.log('Final isAI value:', formattedMessage.isAI);
+    
+    set(state => ({
+      messages: [...state.messages, formattedMessage]
+    }));
   },
 
   editMessage: async (messageId, newContent) => {
@@ -82,7 +102,7 @@ const createActions = (set, get) => ({
     }));
 
     try {
-      const data = await aiAssistantService.editMessage(messageId, newContent);
+      const data = await AIAssistantService.editMessage(messageId, newContent);
       
       set(state => ({
         messages: state.messages.map(msg => {
@@ -127,7 +147,7 @@ const createActions = (set, get) => ({
     }));
 
     try {
-      const data = await aiAssistantService.executeAction(messageId, action);
+      const data = await AIAssistantService.executeAction(messageId, action);
       
       set(state => ({
         messages: state.messages.map(msg => {
@@ -160,7 +180,7 @@ const createActions = (set, get) => ({
 
   clearMessages: async () => {
     try {
-      await aiAssistantService.clearMessages();
+      await AIAssistantService.clearMessages();
     } catch (error) {
       console.error('Error clearing messages:', error);
     } finally {
@@ -192,7 +212,7 @@ const createActions = (set, get) => ({
         }]
       }));
 
-      const data = await aiAssistantService.handleNotificationAction(notificationId, actionId);
+      const data = await AIAssistantService.handleNotificationAction(notificationId, actionId);
 
       set(state => ({
         messages: state.messages.map(msg => {
@@ -249,5 +269,10 @@ const useAIAssistantStore = create(
     }
   )
 );
+
+// Subscribe to socket messages
+AIAssistantService.addMessageHandler((message) => {
+  useAIAssistantStore.getState().addMessage(message);
+});
 
 export default useAIAssistantStore; 

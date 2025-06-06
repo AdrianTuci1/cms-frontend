@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { FaArrowUp, FaReply, FaCheck, FaSpinner, FaExclamationTriangle } from 'react-icons/fa';
 import styles from './AIAssistantChat.module.css';
 import assistantData from '../../../data/conversations.json';
-import aiAssistantService from '../../../services/aiAssistantService';
+import { AIAssistantService } from '../../../services/aiAssistant';
 
 export const Message = ({ message, onReply, onEdit, isLoading }) => {
   const [isReplying, setIsReplying] = useState(false);
@@ -147,7 +147,7 @@ export const Message = ({ message, onReply, onEdit, isLoading }) => {
           <div 
             className={`${styles.messageText} ${!message.isAI ? styles.editableMessage : ''}`}
             onClick={handleEdit}
-            style={{ cursor: !message.isAI ? 'pointer' : 'default' }}
+            style={{ cursor: !message.isAI ? 'pointer' : 'default', color: 'black' }}
           >
             {message.content}
           </div>
@@ -215,40 +215,39 @@ const Chat = () => {
   const messagesContainerRef = useRef(null);
 
   useEffect(() => {
-    // Load initial message history
     loadMessageHistory();
 
-    // Add message handler for real-time messages
     const handleMessage = (response) => {
-      setMessages(prev => [...prev, {
+      const newMessage = {
         id: response.messageId || Date.now(),
         content: response.content,
-        isAI: response.type === 'agent.response',
+        isAI: response.isAI || response.role === 'agent',
         timestamp: response.timestamp,
         metadata: response.metadata
-      }]);
+      };
+      
+      setMessages(prev => [...prev, newMessage]);
       setIsLoading(false);
     };
 
-    // Add error handler
     const handleError = (error) => {
       console.error('Chat error:', error);
       setIsLoading(false);
     };
 
-    aiAssistantService.addMessageHandler(handleMessage);
-    aiAssistantService.addErrorHandler(handleError);
+    AIAssistantService.addMessageHandler(handleMessage);
+    AIAssistantService.addErrorHandler(handleError);
 
     return () => {
-      aiAssistantService.removeMessageHandler(handleMessage);
-      aiAssistantService.removeErrorHandler(handleError);
+      AIAssistantService.removeMessageHandler(handleMessage);
+      AIAssistantService.removeErrorHandler(handleError);
     };
   }, []);
 
   const loadMessageHistory = async (before = null) => {
     try {
       setIsLoading(true);
-      const historyMessages = await aiAssistantService.loadMessageHistory(20, before);
+      const historyMessages = await AIAssistantService.loadMessageHistory(20, before);
       
       if (historyMessages.length === 0) {
         setHasMore(false);
@@ -298,7 +297,7 @@ const Chat = () => {
     }]);
 
     try {
-      await aiAssistantService.sendMessage(content);
+      await AIAssistantService.sendMessage(content);
     } catch (error) {
       console.error('Failed to send message:', error);
       setIsLoading(false);
@@ -311,6 +310,11 @@ const Chat = () => {
         className={styles.messagesContainer}
         ref={messagesContainerRef}
         onScroll={handleScroll}
+        style={{ 
+          height: 'calc(100vh - 200px)', 
+          overflowY: 'auto',
+          padding: '20px'
+        }}
       >
         {isLoading && messages.length === 0 && (
           <div className={styles.loadingContainer}>
@@ -325,7 +329,7 @@ const Chat = () => {
             onReply={handleSendMessage}
             onEdit={async (messageId, newContent) => {
               try {
-                await aiAssistantService.editMessage(messageId, newContent);
+                await AIAssistantService.editMessage(messageId, newContent);
                 setMessages(prev => prev.map(msg => 
                   msg.id === messageId ? { ...msg, content: newContent } : msg
                 ));

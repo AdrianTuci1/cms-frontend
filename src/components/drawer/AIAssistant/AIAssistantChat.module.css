@@ -2,10 +2,197 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: #ffffff;
-  border-radius: 8px;
-  overflow: hidden;
   width: 100%;
+  background-color: #f5f5f5;
+}
+
+.messagesContainer {
+  flex: 1;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.message {
+  margin-bottom: 16px;
+  width: 100%;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.aiMessage {
+  margin-right: 0;
+}
+
+.userMessage {
+  margin-left: 0;
+}
+
+.messageContent {
+  border-radius: 12px;
+  background-color: white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  width: 100%;
+}
+
+.aiMessage .messageContent {
+  background-color: #e3f2fd;
+}
+
+.userMessage .messageContent {
+  background-color: #e8f5e9;
+}
+
+.messageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.agentName {
+  font-weight: 600;
+  color: #333;
+}
+
+.messageTime {
+  font-size: 0.8em;
+  color: #666;
+}
+
+.messageText {
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+.editableMessage:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+.loadingContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #666;
+}
+
+.loadingSpinner {
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.replyButton {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  padding: 4px 8px;
+  border: none;
+  background: none;
+  color: #666;
+  cursor: pointer;
+  font-size: 0.9em;
+}
+
+.replyButton:hover {
+  color: #333;
+}
+
+.replyInput, .editInput {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+.messageInput {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: none;
+  min-height: 40px;
+  max-height: 120px;
+  font-family: inherit;
+}
+
+.sendButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background-color: #2196f3;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.sendButton:hover {
+  background-color: #1976d2;
+}
+
+.sendButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.messageStatus {
+  margin-top: 4px;
+  font-size: 0.8em;
+}
+
+.statusPending, .statusCompleted, .statusError {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.statusPending {
+  color: #f57c00;
+}
+
+.statusCompleted {
+  color: #4caf50;
+}
+
+.statusError {
+  color: #f44336;
+}
+
+.statusIcon {
+  font-size: 0.9em;
+}
+
+.actionError {
+  margin-top: 4px;
+  padding: 8px;
+  background-color: #ffebee;
+  border-radius: 4px;
+  color: #f44336;
+  font-size: 0.9em;
+}
+
+.actionResult {
+  margin-top: 4px;
+  padding: 8px;
+  background-color: #e8f5e9;
+  border-radius: 4px;
+  color: #2e7d32;
+  font-size: 0.9em;
 }
 
 .notificationsSection {
@@ -276,161 +463,6 @@
   font-size: 14px;
 }
 
-/* Message Styles */
-.message {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  position: relative;
-}
-
-.message:not(:last-child)::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 12px;
-  right: 12px;
-  height: 1px;
-  background-color: #e0e0e0;
-}
-
-.userMessage {
-  background-color: #f8f9fa;
-}
-
-.aiMessage {
-  background-color: white;
-}
-
-.messageContent {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.messageHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2px;
-}
-
-.agentName {
-  font-weight: 500;
-  color: #2c3e50;
-  font-style: italic;
-  font-size: 12px;
-}
-
-.messageTime {
-  font-size: 11px;
-  color: #6c757d;
-}
-
-.messageText {
-  margin: 8px 0;
-  line-height: 1.5;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-.replyButton {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: none;
-  border: none;
-  color: #007bff;
-  font-size: 12px;
-  padding: 4px 8px;
-  margin-top: 4px;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: all 0.2s;
-  align-self: flex-start;
-}
-
-.replyButton:hover {
-  background-color: rgba(0, 123, 255, 0.1);
-}
-
-.replyButton:disabled {
-  color: #6c757d;
-  cursor: not-allowed;
-}
-
-.replyButton svg {
-  width: 12px;
-  height: 12px;
-}
-
-.inputArea {
-  position: sticky;
-  display: flex;
-  width: 100%;
-  background-color: #fff;
-  border-top: 1px solid #e0e0e0;
-  z-index: 2;
-  transition: all 0.3s ease;
-}
-
-.inputArea > div {
-  width: 100%;
-  position: relative;
-}
-
-.chatSection.hasMessages .inputArea {
-  position: sticky;
-  bottom: 0;
-  border-top: 1px solid #e0e0e0;
-  border-bottom: none;
-}
-
-.messageInput {
-  width: 100%;
-  min-height: 60px;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  resize: none;
-  font-family: inherit;
-  font-size: 0.9rem;
-  line-height: 1.4;
-  background: var(--bg-hover);
-  color: var(--text-primary);
-  padding: 12px 48px 12px 12px;
-}
-
-.messageInput:focus {
-  outline: none;
-  border-color: var(--primary-color);
-}
-
-.sendButton {
-  position: absolute;
-  right: 16px;
-  bottom: 16px;
-  width: 32px;
-  height: 32px;
-  border: none;
-  border-radius: 4px;
-  background: var(--text-primary);
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.sendButton:disabled {
-  background: var(--text-secondary);
-  cursor: not-allowed;
-}
-
-.sendButton:hover:not(:disabled) {
-  background: var(--text-secondary);
-}
-
 .notificationsContainer {
   display: flex;
   flex-direction: column;
@@ -451,13 +483,6 @@
   margin-left: 24px;
   border-left: 2px solid #e0e0e0;
   padding-left: 12px;
-}
-
-.replyInput {
-  margin-top: 8px;
-  position: relative;
-  display: flex;
-  gap: 8px;
 }
 
 .drawerHeader {
@@ -538,10 +563,6 @@
   padding: 8px;
   border-radius: 4px;
   transition: background-color 0.2s ease;
-}
-
-.editableMessage:hover {
-  background-color: #f8f9fa;
 }
 
 .editInput {

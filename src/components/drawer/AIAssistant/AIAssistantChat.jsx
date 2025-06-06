@@ -7,7 +7,7 @@ import ChatInput from './ChatInput';
 import useDrawerStore from '../../../store/drawerStore';
 import { IoAddCircleOutline } from 'react-icons/io5';
 import { BsClockHistory } from 'react-icons/bs';
-import aiAssistantService from '../../../services/aiAssistantService';
+import { AIAssistantService } from '../../../services/aiAssistant';
 
 const AIAssistantChat = () => {
   const { 
@@ -32,7 +32,7 @@ const AIAssistantChat = () => {
 
   const handleSendMessage = async (content) => {
     try {
-      await aiAssistantService.sendMessage(content);
+      await AIAssistantService.sendMessage(content);
     } catch (error) {
       console.error('Failed to send message:', error);
     }
