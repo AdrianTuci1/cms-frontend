@@ -27,11 +27,26 @@ const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
   const getNavbarViews = () => {
     switch (currentSection) {
       case 'dashboard':
-        return [
+        const views = [
           { id: 'timeline', label: 'Timeline', icon: <FaCalendarAlt className={styles.icon} /> },
-          { id: 'stocks', label: 'Stocks', icon: <FaChartLine className={styles.icon} /> },
           { id: 'sales', label: 'Sales', icon: <FaShoppingCart className={styles.icon} /> },
           { id: 'clients', label: 'Clients', icon: <FaUsers className={styles.icon} /> }
+        ];
+        
+        // Add Treatments view only for dental clinic
+        if (businessType.name === BUSINESS_TYPES.DENTAL_CLINIC.name) {
+          views.push({ id: 'treatments', label: 'Treatments', icon: <FaTooth className={styles.icon} /> });
+        }
+        
+        // Add Packages view only for gym
+        if (businessType.name === BUSINESS_TYPES.GYM.name) {
+          views.push({ id: 'packages', label: 'Packages', icon: <FaDumbbell className={styles.icon} /> });
+        }
+        
+        return views;
+      case 'stocks':
+        return [
+          { id: 'inventory', label: 'Inventory', icon: <FaChartLine className={styles.icon} /> }
         ];
       case 'automations':
         return [

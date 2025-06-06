@@ -1,11 +1,11 @@
 import React, { useState, useCallback } from 'react';
-import { stocksData } from '../data/stocksData';
+import { stocksData } from '../../data/stocksData';
 import styles from './StocksView.module.css';
-import ResizablePanels from '../components/dashboard/gym/ResizablePanels';
-import StockNavbar from '../components/dashboard/stocks/StockNavbar';
-import InventoryCard from '../components/dashboard/stocks/InventoryCard';
-import LowStockCard from '../components/dashboard/stocks/LowStockCard';
-import AddStockForm from '../components/dashboard/stocks/AddStockForm';
+import ResizablePanels from '../../components/dashboard/gym/ResizablePanels';
+import StockNavbar from '../../components/dashboard/stocks/StockNavbar';
+import InventoryCard from '../../components/dashboard/stocks/InventoryCard';
+import LowStockCard from '../../components/dashboard/stocks/LowStockCard';
+import AddStockForm from '../../components/dashboard/stocks/AddStockForm';
 
 const StocksView = () => {
   const [showAddForm, setShowAddForm] = useState(false);

@@ -1,5 +1,5 @@
 import styles from './DashboardSidebar.module.css';
-import { FaHome, FaRobot, FaHistory, FaUsers, FaCog, FaArrowLeft, FaArrowRight, FaMapMarkerAlt, FaAngleDown } from 'react-icons/fa';
+import { FaHome, FaRobot, FaHistory, FaUsers, FaCog, FaArrowLeft, FaArrowRight, FaMapMarkerAlt, FaAngleDown, FaChartLine } from 'react-icons/fa';
 import useTabsStore from '../../store/tabsStore';
 import useLocationsStore from '../../store/locationsStore';
 import { useState, useEffect } from 'react';
@@ -17,6 +17,7 @@ const DashboardSidebar = ({ currentSection, setCurrentSection, isExpanded, setIs
   const getSidebarSections = () => {
     return [
       { id: 'dashboard', label: 'Dashboard', icon: <FaHome className={styles.icon} /> },
+      { id: 'stocks', label: 'Stocks', icon: <FaChartLine className={styles.icon} /> },
       { id: 'automations', label: 'Automations', icon: <FaRobot className={styles.icon} /> },
       { id: 'activities', label: 'Activities', icon: <FaHistory className={styles.icon} /> },
       { id: 'admin', label: 'Admin', icon: <FaUsers className={styles.icon} /> },

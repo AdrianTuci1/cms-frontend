@@ -3,10 +3,12 @@ import AutomationSection from '../../sections/AutomationSection';
 import HistorySection from '../../sections/HistorySection';
 import StaffSection from '../../sections/StaffSection';
 import SettingsSection from '../../sections/SettingsSection';
+import StocksSection from '../../sections/Stocks/StocksSection';
 import TimelineView from '../../views/TimelineView';
-import StocksView from '../../views/StocksView';
 import SalesView from '../../views/SalesView';
 import ClientsView from '../../views/ClientsView';
+import TreatmentsView from '../../views/TreatmentsView';
+import PackagesView from '../../views/PackagesView';
 
 const Dashboard = () => {
   const { currentSection, currentView } = useOutletContext();
@@ -15,12 +17,14 @@ const Dashboard = () => {
     switch (currentView) {
       case 'timeline':
         return <TimelineView />;
-      case 'stocks':
-        return <StocksView />;
       case 'sales':
         return <SalesView />;
       case 'clients':
         return <ClientsView />;
+      case 'treatments':
+        return <TreatmentsView />;
+      case 'packages':
+        return <PackagesView />;
       default:
         return <TimelineView />;
     }
@@ -30,6 +34,8 @@ const Dashboard = () => {
     switch (currentSection) {
       case 'dashboard':
         return renderDashboardViews();
+      case 'stocks':
+        return <StocksSection view={currentView} />;
       case 'automations':
         return <AutomationSection />;
       case 'activities':
