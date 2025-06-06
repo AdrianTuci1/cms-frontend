@@ -5,7 +5,9 @@ export const useDragScroll = () => {
   const tableWrapperRef = useRef(null);
   const dragStartTimeRef = useRef(Date.now());
   const startXRef = useRef(0);
+  const startYRef = useRef(0);
   const scrollLeftRef = useRef(0);
+  const scrollTopRef = useRef(0);
 
   const handleMouseDown = useCallback((e) => {
     if (!tableWrapperRef.current) return;
@@ -14,7 +16,9 @@ export const useDragScroll = () => {
     dragStartTimeRef.current = Date.now();
     
     startXRef.current = e.pageX - tableWrapperRef.current.offsetLeft;
+    startYRef.current = e.pageY - tableWrapperRef.current.offsetTop;
     scrollLeftRef.current = tableWrapperRef.current.scrollLeft;
+    scrollTopRef.current = tableWrapperRef.current.scrollTop;
 
     // Prevenim selecția textului în timpul drag-ului
     e.preventDefault();
@@ -24,8 +28,13 @@ export const useDragScroll = () => {
     if (!isDragging || !tableWrapperRef.current) return;
 
     const x = e.pageX - tableWrapperRef.current.offsetLeft;
-    const walk = (x - startXRef.current) * 2; // Multiplicator pentru scroll mai rapid
-    tableWrapperRef.current.scrollLeft = scrollLeftRef.current - walk;
+    const y = e.pageY - tableWrapperRef.current.offsetTop;
+    
+    const walkX = (x - startXRef.current) * 2; // Multiplicator pentru scroll mai rapid
+    const walkY = (y - startYRef.current) * 2;
+
+    tableWrapperRef.current.scrollLeft = scrollLeftRef.current - walkX;
+    tableWrapperRef.current.scrollTop = scrollTopRef.current - walkY;
 
     e.preventDefault();
   }, [isDragging]);

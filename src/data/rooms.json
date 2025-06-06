@@ -1,0 +1,60 @@
+{
+  "rooms": [
+    {
+      "number": "101",
+      "type": "Single",
+      "floor": 1,
+      "capacity": 1,
+      "price": 200
+    },
+    {
+      "number": "102",
+      "type": "Double",
+      "floor": 1,
+      "capacity": 2,
+      "price": 300
+    },
+    {
+      "number": "103",
+      "type": "Double",
+      "floor": 1,
+      "capacity": 2,
+      "price": 300
+    },
+    {
+      "number": "201",
+      "type": "Single",
+      "floor": 2,
+      "capacity": 1,
+      "price": 200
+    },
+    {
+      "number": "202",
+      "type": "Double",
+      "floor": 2,
+      "capacity": 2,
+      "price": 300
+    },
+    {
+      "number": "301",
+      "type": "Single",
+      "floor": 3,
+      "capacity": 1,
+      "price": 200
+    },
+    {
+      "number": "302",
+      "type": "Double",
+      "floor": 3,
+      "capacity": 2,
+      "price": 300
+    },
+    {
+      "number": "401",
+      "type": "Single",
+      "floor": 4,
+      "capacity": 1,
+      "price": 200
+    }
+  ]
+} 

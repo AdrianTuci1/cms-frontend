@@ -13,6 +13,20 @@ const ROOM_STATUS = {
   MAINTENANCE: 'maintenance'
 };
 
+const STATUS_COLORS = {
+  [ROOM_STATUS.AVAILABLE]: '#4caf50',
+  [ROOM_STATUS.OCCUPIED]: '#f44336',
+  [ROOM_STATUS.PENDING]: '#ff9800',
+  [ROOM_STATUS.MAINTENANCE]: '#2196f3'
+};
+
+const STATUS_LABELS = {
+  [ROOM_STATUS.AVAILABLE]: 'Disponibil',
+  [ROOM_STATUS.OCCUPIED]: 'Ocupat',
+  [ROOM_STATUS.PENDING]: 'În așteptare',
+  [ROOM_STATUS.MAINTENANCE]: 'În mentenanță'
+};
+
 const CalendarView = () => {
   const { 
     rooms, 
@@ -26,6 +40,7 @@ const CalendarView = () => {
 
   const [days, setDays] = useState([]);
   const [previewDate, setPreviewDate] = useState(null);
+  const [tooltipData, setTooltipData] = useState(null);
   const { isDragging, tableWrapperRef, handleMouseDown, handleMouseMove, dragStartTimeRef } = useDragScroll();
 
   useEffect(() => {
@@ -51,16 +66,24 @@ const CalendarView = () => {
       const reservedRoom = reservation.rooms.find(r => r.roomNumber === roomNumber);
       if (!reservedRoom) return;
 
-      console.log(`Detalii rezervare pentru Camera ${roomNumber}:
-Rezervat de: ${reservation.fullName}
-Telefon: ${reservation.phone}
-Status: ${reservedRoom.status}`);
+      setTooltipData({
+        roomNumber,
+        reservation: {
+          guestName: reservation.fullName,
+          phone: reservation.phone,
+          status: reservedRoom.status,
+          checkIn: reservedRoom.startDate,
+          checkOut: reservedRoom.endDate
+        }
+      });
+    } else {
+      setTooltipData(null);
     }
   }, [reservations, rooms, dragStartTimeRef]);
 
   const handleCellHover = useCallback((roomNumber, date) => {
     if (isDragging) return;
-    setPreviewDate(date);
+    setPreviewDate({ roomNumber, date });
   }, [isDragging]);
 
   const handleCellLeave = useCallback(() => {
@@ -68,11 +91,17 @@ Status: ${reservedRoom.status}`);
   }, []);
 
   const isInSelectedPeriod = useCallback((date, roomNumber) => {
-    if (!highlightedRoom || highlightedRoom !== roomNumber) {
+    if (!previewDate || previewDate.roomNumber !== roomNumber) {
       return false;
     }
     
     const dayStr = date.toISOString().split("T")[0];
+    const previewDayStr = previewDate.date.toISOString().split("T")[0];
+    
+    if (dayStr !== previewDayStr) {
+      return false;
+    }
+
     const isReserved = reservations.some((res) => 
       res.rooms.some(room => 
         room.roomNumber === roomNumber &&
@@ -86,7 +115,7 @@ Status: ${reservedRoom.status}`);
     }
 
     return true;
-  }, [highlightedRoom, reservations]);
+  }, [previewDate, reservations]);
 
   const getRoomStatus = useCallback((roomNumber, date) => {
     const dayStr = date.toISOString().split("T")[0];
@@ -126,6 +155,9 @@ Status: ${reservedRoom.status}`);
         tableWrapperRef={tableWrapperRef}
         handleMouseDown={handleMouseDown}
         handleMouseMove={handleMouseMove}
+        tooltipData={tooltipData}
+        statusColors={STATUS_COLORS}
+        statusLabels={STATUS_LABELS}
       />
     </div>
   );
