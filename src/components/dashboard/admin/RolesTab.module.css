@@ -94,4 +94,86 @@
   border: 1px solid #e0e0e0;
   border-radius: 4px;
   font-size: 14px;
+}
+
+.rolesContainer {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  overflow: hidden;
+  height: calc(100vh - 178px);
+  overflow-y: auto;
+}
+
+.card {
+  padding: 1rem;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  background: #f8f9fa;
+}
+
+.roleInfo {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.details {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.name {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.description {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.accountsCount {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.countPill {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: #3498db;
+  color: white;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  width: fit-content;
+}
+
+.permissions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.permissionPill {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: #f8f9fa;
+  color: #666;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  width: fit-content;
 } 

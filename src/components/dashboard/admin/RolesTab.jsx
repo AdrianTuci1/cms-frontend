@@ -1,173 +1,51 @@
 import React from 'react';
-import styles from './AdminView.module.css';
+import styles from './RolesTab.module.css';
 
-const RolesTab = ({ staffEmails, onAddEmail, onRemoveEmail, onViewProfile }) => {
+const RolesTab = () => {
+  const roles = [
+    {
+      id: 1,
+      name: 'Administrator',
+      description: 'Acces complet la toate funcționalitățile sistemului',
+      accountsCount: 2
+    },
+    {
+      id: 2,
+      name: 'Manager',
+      description: 'Gestionare operațională și raportare',
+      accountsCount: 3
+    },
+    {
+      id: 3,
+      name: 'Receptioner',
+      description: 'Gestionare rezervări și relație cu clienții',
+      accountsCount: 5
+    },
+    {
+      id: 4,
+      name: 'Cameristă',
+      description: 'Gestionare camere și curățenie',
+      accountsCount: 8
+    }
+  ];
+
   return (
-    <div className={styles.section}>
-      <h2>Gestionare Roluri și Permisiuni</h2>
-      <div className={styles.rolesGrid}>
-        <div className={styles.roleCard}>
-          <h3>Administrator</h3>
-          <div className={styles.permissions}>
-            <label className={styles.checkbox}>
-              <input type="checkbox" defaultChecked /> Acces complet
-            </label>
-            <label className={styles.checkbox}>
-              <input type="checkbox" defaultChecked /> Gestionare utilizatori
-            </label>
-            <label className={styles.checkbox}>
-              <input type="checkbox" defaultChecked /> Gestionare sistem
-            </label>
-          </div>
-        </div>
-
-        <div className={styles.roleCard}>
-          <h3>Manager</h3>
-          <div className={styles.permissions}>
-            <label className={styles.checkbox}>
-              <input type="checkbox" defaultChecked /> Gestionare rezervări
-            </label>
-            <label className={styles.checkbox}>
-              <input type="checkbox" defaultChecked /> Gestionare angajați
-            </label>
-            <label className={styles.checkbox}>
-              <input type="checkbox" defaultChecked /> Rapoarte
-            </label>
-          </div>
-          <div className={styles.emailSection}>
-            <h4>Staff Manager</h4>
-            <div className={styles.emailList}>
-              {staffEmails.manager.map((email, index) => (
-                <div key={index} className={styles.emailItem}>
-                  <span>{email}</span>
-                  <button 
-                    className={styles.viewProfileButton}
-                    onClick={() => onViewProfile(email)}
-                  >
-                    👤
-                  </button>
-                  <button 
-                    className={styles.removeEmailButton}
-                    onClick={() => onRemoveEmail('manager', email)}
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
-            </div>
-            <div className={styles.addEmailForm}>
-              <input
-                type="email"
-                placeholder="Adaugă email manager"
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    onAddEmail('manager', e.target.value);
-                    e.target.value = '';
-                  }
-                }}
-              />
+    <div className={styles.rolesContainer}>
+      {roles.map((role) => (
+        <div key={role.id} className={styles.card}>
+          <div className={styles.roleInfo}>
+            <div className={styles.details}>
+              <h3 className={styles.name}>{role.name}</h3>
+              <p className={styles.description}>{role.description}</p>
+              <div className={styles.accountsCount}>
+                <span className={styles.countPill}>
+                  {role.accountsCount} {role.accountsCount === 1 ? 'cont' : 'conturi'}
+                </span>
+              </div>
             </div>
           </div>
         </div>
-
-        <div className={styles.roleCard}>
-          <h3>Receptioner</h3>
-          <div className={styles.permissions}>
-            <label className={styles.checkbox}>
-              <input type="checkbox" defaultChecked /> Gestionare rezervări
-            </label>
-            <label className={styles.checkbox}>
-              <input type="checkbox" defaultChecked /> Acces la istoric
-            </label>
-            <label className={styles.checkbox}>
-              <input type="checkbox" /> Gestionare angajați
-            </label>
-          </div>
-          <div className={styles.emailSection}>
-            <h4>Staff Receptioneri</h4>
-            <div className={styles.emailList}>
-              {staffEmails.receptioner.map((email, index) => (
-                <div key={index} className={styles.emailItem}>
-                  <span>{email}</span>
-                  <button 
-                    className={styles.viewProfileButton}
-                    onClick={() => onViewProfile(email)}
-                  >
-                    👤
-                  </button>
-                  <button 
-                    className={styles.removeEmailButton}
-                    onClick={() => onRemoveEmail('receptioner', email)}
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
-            </div>
-            <div className={styles.addEmailForm}>
-              <input
-                type="email"
-                placeholder="Adaugă email receptioner"
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    onAddEmail('receptioner', e.target.value);
-                    e.target.value = '';
-                  }
-                }}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className={styles.roleCard}>
-          <h3>Cameristă</h3>
-          <div className={styles.permissions}>
-            <label className={styles.checkbox}>
-              <input type="checkbox" defaultChecked /> Gestionare camere
-            </label>
-            <label className={styles.checkbox}>
-              <input type="checkbox" defaultChecked /> Acces la program
-            </label>
-            <label className={styles.checkbox}>
-              <input type="checkbox" defaultChecked /> Raportare starea camerelor
-            </label>
-          </div>
-          <div className={styles.emailSection}>
-            <h4>Staff Cameriste</h4>
-            <div className={styles.emailList}>
-              {staffEmails.camerista.map((email, index) => (
-                <div key={index} className={styles.emailItem}>
-                  <span>{email}</span>
-                  <button 
-                    className={styles.viewProfileButton}
-                    onClick={() => onViewProfile(email)}
-                  >
-                    👤
-                  </button>
-                  <button 
-                    className={styles.removeEmailButton}
-                    onClick={() => onRemoveEmail('camerista', email)}
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
-            </div>
-            <div className={styles.addEmailForm}>
-              <input
-                type="email"
-                placeholder="Adaugă email cameristă"
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    onAddEmail('camerista', e.target.value);
-                    e.target.value = '';
-                  }
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
+      ))}
     </div>
   );
 };
