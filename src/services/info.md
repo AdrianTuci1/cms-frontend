@@ -9,12 +9,13 @@ Arhitectura de Date Locală (Offline Persistence cu SQLite):
 Cum se va inițializa și gestiona SQLite pe ambele platforme (web și mobil)? Specifică bibliotecile/tehnologiile recomandate pentru fiecare (ex: wa-sqlite sau sql.js pentru web, react-native-sqlite-storage sau sqflite pentru mobil).
 Cum va fi asigurată compatibilitatea schemei bazei de date între web și mobil?
 Definește schema detaliată a tabelelor SQLite de care vom avea nevoie. Pentru fiecare tabel, specifică cel puțin 3-5 câmpuri relevante, incluzând tenantId (ca index), ID-uri, status (pentru UI optimist) și timestamp-uri. Include tabele pentru:
-calendar_events
-customers
+calendar_events (diferite pentru fiecare tenant)
+customers (diferite pe tenant)
 stock_items
 employees
-history_activities
+history_activities (diferite pe tenant)
 offline_queue
+services (specific fiecarui tenant: tratamente, pachete, camere)
 Explică strategia pentru migrările de schemă ale bazei de date locale pe măsură ce aplicația evoluează.
 Descrie fluxul de sincronizare inițială a datelor (primul fetch) și cum sunt ele stocate în SQLite.
 State Management Global cu Zustand (Distribuție Date):

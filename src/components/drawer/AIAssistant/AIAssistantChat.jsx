@@ -1,7 +1,6 @@
 import React from 'react';
 import styles from './AIAssistantChat.module.css';
 import useAIAssistantStore from '../../../store/aiAssistantStore';
-import Notifications from './Notifications';
 import Chat from './Chat';
 import ChatInput from './ChatInput';
 import useDrawerStore from '../../../store/drawerStore';
@@ -13,9 +12,6 @@ const AIAssistantChat = () => {
   const { 
     messages,
     isLoading,
-    notifications,
-    dismissedNotifications,
-    handleNotificationAction,
     clearMessages
   } = useAIAssistantStore();
 
@@ -40,6 +36,7 @@ const AIAssistantChat = () => {
 
   return (
     <div className={styles.chatContainer}>
+      <div className={styles.contentWrapper}>
       <div className={styles.drawerHeader}>
         <div className={styles.headerButtons}>
           <button className={styles.newChatButton} onClick={handleNewChat}>
@@ -56,18 +53,10 @@ const AIAssistantChat = () => {
         </button>
       </div>
 
-      <div className={styles.notificationsSection}>
-        <Notifications 
-          notifications={notifications}
-          dismissedNotifications={dismissedNotifications}
-          handleNotificationAction={handleNotificationAction}
-          isLoading={isLoading}
-        />
-      </div>
-
-      <div className={styles.chatSection}>
-        <Chat />
-        <ChatInput onSendMessage={handleSendMessage} />
+        <div className={styles.chatSection}>
+          <Chat />
+          <ChatInput onSendMessage={handleSendMessage} />
+        </div>
       </div>
     </div>
   );

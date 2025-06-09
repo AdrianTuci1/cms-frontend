@@ -30,6 +30,19 @@ const WeekView = ({
     );
   };
 
+  const hasAnyAppointments = appointments.length > 0;
+
+  if (!hasAnyAppointments) {
+    return (
+      <div className={styles.emptyState}>
+        <div className={styles.emptyStateContent}>
+          <h3>Nu aveți rezervări în această săptămână</h3>
+          <p>Programările vor apărea aici când vor fi create</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.weekView}>
       {selectedWeek.map((date, index) => {
@@ -53,7 +66,7 @@ const WeekView = ({
                 ))
               ) : (
                 <div className={styles.noAppointments}>
-                  No Appointments
+                  Fără programări
                 </div>
               )}
             </div>

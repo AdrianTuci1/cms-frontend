@@ -137,6 +137,7 @@
   border: 1px solid #e0e0e0;
   border-radius: 4px;
   background: #fafafa;
+  height: 100%;
 }
 
 .dayHeader {
@@ -158,8 +159,6 @@
   font-weight: 500;
   color: #333;
 }
-
-
 
 .appointmentCard {
   background: #fff;
@@ -329,4 +328,31 @@
   text-align: center;
   color: #999;
   font-size: 0.875rem;
+}
+
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(100vh - 300px);
+  padding: 32px;
+  background: #fafafa;
+  border-radius: 8px;
+}
+
+.emptyStateContent {
+  text-align: center;
+  color: #666;
+}
+
+.emptyStateContent h3 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.emptyStateContent p {
+  font-size: 0.875rem;
+  color: #666;
 } 

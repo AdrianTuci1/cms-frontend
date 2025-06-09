@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { mockAppointments } from '../../data/mockAppointments';
 import AppointmentHeader from './appointmentsSection/AppointmentHeader';
 import WeekNavigator from './appointmentsSection/WeekNavigator';
-import WeekView from './appointmentsSection/WeekView';
 import styles from './appointmentsSection/Appointments.module.css';
+
+// Lazy load WeekView component
+const WeekView = lazy(() => import('./appointmentsSection/WeekView'));
 
 const calculateCurrentWeek = (date) => {
   const start = new Date(date);
@@ -41,18 +43,19 @@ const Appointments = () => {
   const [isAllAppointments, setIsAllAppointments] = useState(true);
   const [currentWeek, setCurrentWeek] = useState([]);
   const [appointments, setAppointments] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const weekDates = calculateCurrentWeek(selectedDate);
     setCurrentWeek(weekDates);
     
-    // Simulăm încărcarea datelor
-    setLoading(true);
-    setTimeout(() => {
-      setAppointments(mockAppointments);
-      setLoading(false);
-    }, 500);
+    // Filtrăm doar programările pentru săptămâna curentă
+    const weekStart = weekDates[0];
+    const weekEnd = weekDates[6];
+    const filteredAppointments = mockAppointments.filter(appointment => {
+      const appointmentDate = new Date(appointment.date);
+      return appointmentDate >= weekStart && appointmentDate <= weekEnd;
+    });
+    setAppointments(filteredAppointments);
   }, [selectedDate]);
 
   const displayedAppointments = isAllAppointments
@@ -84,14 +87,6 @@ const Appointments = () => {
     ).length;
   };
 
-  if (loading) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.loading}>Loading appointments...</div>
-      </div>
-    );
-  }
-
   return (
     <div className={styles.container}>
       <AppointmentHeader
@@ -113,12 +108,14 @@ const Appointments = () => {
         onNextWeek={handleNextWeek}
       />
 
-      <WeekView
-        selectedWeek={currentWeek}
-        appointments={displayedAppointments}
-        onAppointmentClick={handleAppointmentClick}
-        onPatientClick={handlePatientClick}
-      />
+      <Suspense fallback={null}>
+        <WeekView
+          selectedWeek={currentWeek}
+          appointments={displayedAppointments}
+          onAppointmentClick={handleAppointmentClick}
+          onPatientClick={handlePatientClick}
+        />
+      </Suspense>
     </div>
   );
 };
