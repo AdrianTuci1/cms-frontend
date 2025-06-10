@@ -6,9 +6,7 @@ import StocksSection from '../../sections/Stocks/StocksSection';
 import TimelineView from '../../views/TimelineView';
 import SalesView from '../../views/SalesView';
 import ClientsView from '../../views/ClientsView';
-import TreatmentsView from '../../views/dental/treatments/TreatmentsView';
-import PackagesView from '../../views/gym/packages/PackagesView';
-import RoomsView from '../../views/hotel/rooms/RoomsView';
+import ServicesView from '../../views/ServicesView';
 
 const Dashboard = () => {
   const { currentSection, currentView } = useOutletContext();
@@ -21,12 +19,8 @@ const Dashboard = () => {
         return <SalesView />;
       case 'clients':
         return <ClientsView />;
-      case 'treatments':
-        return <TreatmentsView />;
-      case 'packages':
-        return <PackagesView />;
-      case 'rooms':
-        return <RoomsView />;
+      case 'services':
+        return <ServicesView />;
       default:
         return <TimelineView />;
     }

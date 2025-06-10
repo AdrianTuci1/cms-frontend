@@ -19,6 +19,8 @@ const AppointmentHeader = ({
   selectedDate,
   onSelectDate
 }) => {
+
+
   return (
     <div className={styles.header}>
       <div className={styles.headerActions}>

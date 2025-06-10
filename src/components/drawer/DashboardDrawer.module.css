@@ -15,9 +15,10 @@
   width: 450px;
   height: 100vh;
   z-index: 1001;
-  transition: right 2s ease-in;
+  transition: right 0.4s ease-in;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .drawer.open {

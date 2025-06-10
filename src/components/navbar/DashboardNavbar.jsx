@@ -1,5 +1,5 @@
 import styles from './DashboardNavbar.module.css';
-import { FaChartLine, FaShoppingCart, FaUsers, FaRobot, FaUser, FaCalendarAlt, FaHistory, FaCog, FaDumbbell, FaHome, FaTooth, FaBed } from 'react-icons/fa';
+import { FaChartLine, FaShoppingCart, FaUsers, FaRobot, FaUser, FaCalendarAlt, FaHistory, FaCog, FaDumbbell, FaHome, FaTooth, FaBed, FaConciergeBell } from 'react-icons/fa';
 import ConversationsMenu from '../dashboard/ConversationsMenu';
 import useTabsStore from '../../store/tabsStore';
 import useDrawerStore from '../../store/drawerStore';
@@ -7,6 +7,7 @@ import useDrawerStore from '../../store/drawerStore';
 import { useEffect } from 'react';
 import { getBusinessType, BUSINESS_TYPES } from '../../config/businessTypes';
 import AIAssistantChat from '../drawer/AIAssistant/AIAssistantChat';
+import UserDrawer from '../drawer/UserDrawer/UserDrawer';
 
 const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
   const { activeTab, setActiveTab, getTabsBySection } = useTabsStore();
@@ -34,18 +35,18 @@ const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
         ];
         
         // Add Treatments view only for dental clinic
-        if (businessType.name === BUSINESS_TYPES.DENTAL_CLINIC.name) {
-          views.push({ id: 'treatments', label: 'Treatments', icon: <FaTooth className={styles.icon} /> });
+        if (businessType.name === 'Dental Clinic') {
+          views.push({ id: 'services', label: 'Treatments', icon: <FaTooth className={styles.icon} /> });
         }
         
         // Add Packages view only for gym
-        if (businessType.name === BUSINESS_TYPES.GYM.name) {
-          views.push({ id: 'packages', label: 'Packages', icon: <FaDumbbell className={styles.icon} /> });
+        if (businessType.name === 'Gym') {
+          views.push({ id: 'services', label: 'Packages', icon: <FaDumbbell className={styles.icon} /> });
         }
 
         // Add Rooms view only for hotel
-        if (businessType.name === BUSINESS_TYPES.HOTEL.name) {
-          views.push({ id: 'rooms', label: 'Rooms', icon: <FaBed className={styles.icon} /> });
+        if (businessType.name === 'Hotel') {
+          views.push({ id: 'services', label: 'Rooms', icon: <FaBed className={styles.icon} /> });
         }
         
         return views;
@@ -139,7 +140,10 @@ const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
           <FaRobot className={styles.icon}/>
         </button>
         
-        <button className={styles.navIcon}>
+        <button 
+          className={styles.navIcon}
+          onClick={() => openDrawer(<UserDrawer />, 'User Profile')}
+        >
           <FaUser className={styles.icon} />
         </button>
       </div>

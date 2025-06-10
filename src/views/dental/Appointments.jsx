@@ -3,6 +3,8 @@ import { mockAppointments } from '../../data/mockAppointments';
 import AppointmentHeader from './appointmentsSection/AppointmentHeader';
 import WeekNavigator from './appointmentsSection/WeekNavigator';
 import styles from './appointmentsSection/Appointments.module.css';
+import AddAppointment from '../../components/drawer/AddAppointment/AddAppointment';
+import useDrawerStore from '../../store/drawerStore';
 
 // Lazy load WeekView component
 const WeekView = lazy(() => import('./appointmentsSection/WeekView'));
@@ -43,6 +45,7 @@ const Appointments = () => {
   const [isAllAppointments, setIsAllAppointments] = useState(true);
   const [currentWeek, setCurrentWeek] = useState([]);
   const [appointments, setAppointments] = useState([]);
+  const { openDrawer } = useDrawerStore();
 
   useEffect(() => {
     const weekDates = calculateCurrentWeek(selectedDate);
@@ -68,7 +71,7 @@ const Appointments = () => {
 
   const handleAddAppointment = () => {
     // To be implemented with drawer
-    console.log('Add appointment clicked');
+    openDrawer(<AddAppointment />, 'addAppointment');
   };
 
   const handleAppointmentClick = (appointment) => {

@@ -29,11 +29,19 @@ export const BUSINESS_TYPES = {
   }
 };
 
+const ENV_TO_BUSINESS_TYPE = {
+  'DENTAL': 'DENTAL_CLINIC',
+  'GYM': 'GYM',
+  'HOTEL': 'HOTEL'
+};
+
 export const getBusinessType = () => {
-  const businessType = import.meta.env.VITE_BUSINESS_TYPE;
-  if (!businessType || !BUSINESS_TYPES[businessType]) {
+  const envBusinessType = import.meta.env.VITE_BUSINESS_TYPE;
+  const mappedType = ENV_TO_BUSINESS_TYPE[envBusinessType];
+  
+  if (!envBusinessType || !mappedType || !BUSINESS_TYPES[mappedType]) {
     console.warn('Invalid or missing BUSINESS_TYPE in .env, defaulting to DENTAL_CLINIC');
     return BUSINESS_TYPES.DENTAL_CLINIC;
   }
-  return BUSINESS_TYPES[businessType];
+  return BUSINESS_TYPES[mappedType];
 }; 

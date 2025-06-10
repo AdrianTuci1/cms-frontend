@@ -56,7 +56,7 @@ const AdminView = () => {
     <div className={styles.adminView}>
       <div className={styles.header}>
         <button className={styles.addButton} onClick={() => setIsModalOpen(true)}>
-          <FaPlus className={styles.icon} />
+          <FaPlus className={styles.icon}/>
           Adaugă Membru
         </button>
       </div>
