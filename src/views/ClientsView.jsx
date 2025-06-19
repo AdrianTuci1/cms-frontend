@@ -1,15 +1,17 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { getBusinessType } from '../config/businessTypes';
+import { FaSearch, FaPlus } from 'react-icons/fa';
 import GymClientCard from '../components/dashboard/gym/GymClientCard';
 import DentalClientCard from '../components/dashboard/dental/DentalClientCard';
 import HotelClientCard from '../components/dashboard/hotel/HotelClientCard';
-import './ClientsView.css';
+import styles from './ClientsView.module.css';
 
 const ClientsView = () => {
   const businessType = getBusinessType();
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Mock data - replace with actual data from your backend
-  const clients = [
+  const allClients = [
     {
       id: 1,
       name: 'Maria Popescu',
@@ -57,8 +59,61 @@ const ClientsView = () => {
         name: 'Control albire',
         date: '10.05.2024'
       }
+    },
+    {
+      id: 4,
+      name: 'Vasile Popa',
+      email: 'vasile.popa@email.com',
+      phone: '0755-111-222',
+      photoUrl: 'https://randomuser.me/api/portraits/men/4.jpg',
+      doctor: 'Dr. Elena Popescu',
+      previousTreatment: {
+        name: 'Extracție',
+        date: '20.02.2024'
+      },
+      nextTreatment: {
+        name: 'Proteză',
+        date: '25.05.2024'
+      }
+    },
+    {
+      id: 5,
+      name: 'Elena Dumitru',
+      email: 'elena.dumitru@email.com',
+      phone: '0766-333-444',
+      photoUrl: 'https://randomuser.me/api/portraits/women/5.jpg',
+      doctor: 'Dr. Ion Ionescu',
+      previousTreatment: {
+        name: 'Consultare',
+        date: '05.03.2024'
+      },
+      nextTreatment: {
+        name: 'Tratament ortodontic',
+        date: '30.04.2024'
+      }
     }
   ];
+
+  // Filter clients based on search term
+  const filteredClients = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return allClients;
+    }
+    
+    const searchLower = searchTerm.toLowerCase();
+    return allClients.filter(client => 
+      client.name.toLowerCase().includes(searchLower) ||
+      client.email.toLowerCase().includes(searchLower) ||
+      client.phone.includes(searchTerm) ||
+      client.doctor.toLowerCase().includes(searchLower) ||
+      client.previousTreatment.name.toLowerCase().includes(searchLower) ||
+      client.nextTreatment.name.toLowerCase().includes(searchLower)
+    );
+  }, [searchTerm, allClients]);
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
 
   const renderClientCard = (client) => {
     switch (businessType.name) {
@@ -74,9 +129,38 @@ const ClientsView = () => {
   };
 
   return (
-    <div className="dashboard-view">
-      <div className="clients-container">
-        {clients.map(client => renderClientCard(client))}
+    <div className={styles.adminView}>
+      <div className={styles.header}>
+        <div className={styles.searchContainer}>
+          <FaSearch className={styles.searchIcon} />
+          <input
+            type="text"
+            placeholder="Search clients by name, email, phone, doctor, or treatment..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className={styles.searchInput}
+          />
+        </div>
+        <button className={styles.addButton}>
+          <FaPlus className={styles.icon}/>
+          Adaugă Client
+        </button>
+      </div>
+
+      <div className={styles.content}>
+        <div className={styles.membersContainer}>
+          {filteredClients.length > 0 ? (
+            filteredClients.map(client => renderClientCard(client))
+          ) : searchTerm.trim() ? (
+            <div className={styles.emptyState}>
+              <p>No clients found matching "{searchTerm}". Try a different search term.</p>
+            </div>
+          ) : (
+            <div className={styles.emptyState}>
+              <p>No clients found. Add a client using the button above.</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

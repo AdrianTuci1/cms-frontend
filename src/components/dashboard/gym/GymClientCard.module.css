@@ -1,88 +1,39 @@
 .card {
-  background: #f5f5f5;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 1rem;
+  background: #fff;
+  border-bottom: 1px solid #eee;
   transition: all 0.2s ease;
-  max-width: 100%;
-  margin: 0.5rem 0;
-  display: flex;
-  gap: 1rem;
-  position: relative;
-  border-left: 4px solid transparent;
 }
 
 .card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: #f8f9fa;
 }
 
-.card:hover[data-membership="premium"] {
-  border-left-color: #1890ff;
+.memberInfo {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 1.5rem;
+  align-items: center;
 }
 
-.card:hover[data-membership="basic"] {
-  border-left-color: #52c41a;
-}
-
-.card:hover[data-membership="vip"] {
-  border-left-color: #fa8c16;
-}
-
-.photo {
-  width: 80px;
-  height: 80px;
+.photoContainer {
+  width: 64px;
+  height: 64px;
   border-radius: 8px;
   overflow: hidden;
-  background: #f5f5f5;
   flex-shrink: 0;
 }
 
-.photo img {
+.photo {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.content {
-  flex: 1;
+.details {
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-}
-
-.mainInfo {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.contactInfo {
-  display: none;
-  flex-direction: column;
-  gap: 0.25rem;
-  padding-left: 1rem;
-  border-left: 1px solid #eee;
-}
-
-.contactItem {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  color: #666;
-}
-
-.contactItem svg {
-  width: 16px;
-  height: 16px;
-  color: #999;
-}
-
-.nameRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   gap: 0.5rem;
 }
 
@@ -90,7 +41,56 @@
   margin: 0;
   font-size: 1.1rem;
   font-weight: 600;
-  color: #2c3e50;
+  color: #1a1a1a;
+}
+
+.role {
+  display: inline-block;
+  font-weight: 600;
+  color: #3498db;
+  font-size: 0.9rem;
+  background: #f8f9fa;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  width: fit-content;
+}
+
+.contactInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 200px;
+  order: 3;
+}
+
+.contactItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.icon {
+  color: #3498db;
+  width: 16px;
+  height: 16px;
+}
+
+.workDays {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.dayPill {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: #f8f9fa;
+  color: #666;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
 .status {
@@ -160,14 +160,8 @@
     padding: 1.25rem;
   }
 
-  .content {
-    flex-direction: row;
+  .infoRow {
     gap: 1.5rem;
-  }
-
-  .contactInfo {
-    display: flex;
-    min-width: 200px;
   }
 }
 
@@ -176,7 +170,7 @@
     padding: 0.75rem;
   }
 
-  .photo {
+  .photoContainer {
     width: 60px;
     height: 60px;
   }

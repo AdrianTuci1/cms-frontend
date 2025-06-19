@@ -1,7 +1,23 @@
 import React from 'react';
 import styles from '../AddAppointment.module.css';
 
-const DentalAppointmentForm = ({ formData, onInputChange }) => {
+const DentalAppointmentForm = ({ formData, onInputChange, errors = {} }) => {
+  const getFieldError = (fieldName) => {
+    return errors[fieldName] || errors.name; // Fallback to generic name error
+  };
+
+  const getInputClassName = (fieldName) => {
+    const baseClass = styles.formInput;
+    const errorClass = getFieldError(fieldName) ? styles.error : '';
+    return `${baseClass} ${errorClass}`.trim();
+  };
+
+  const getSelectClassName = (fieldName) => {
+    const baseClass = styles.formSelect;
+    const errorClass = getFieldError(fieldName) ? styles.error : '';
+    return `${baseClass} ${errorClass}`.trim();
+  };
+
   return (
     <>
       <div className={styles.formSection}>
@@ -13,12 +29,17 @@ const DentalAppointmentForm = ({ formData, onInputChange }) => {
             </label>
             <input
               type="text"
-              className={styles.formInput}
+              className={getInputClassName('patientName')}
               value={formData.patientName || ''}
               onChange={(e) => onInputChange('patientName', e.target.value)}
               placeholder="Enter patient name"
               required
             />
+            {getFieldError('patientName') && (
+              <div className={styles.errorMessage}>
+                {getFieldError('patientName')}
+              </div>
+            )}
           </div>
           <div className={styles.formGroup}>
             <label className={`${styles.formLabel} ${styles.requiredLabel}`}>
@@ -26,12 +47,17 @@ const DentalAppointmentForm = ({ formData, onInputChange }) => {
             </label>
             <input
               type="tel"
-              className={styles.formInput}
+              className={getInputClassName('phoneNumber')}
               value={formData.phoneNumber || ''}
               onChange={(e) => onInputChange('phoneNumber', e.target.value)}
               placeholder="Enter phone number"
               required
             />
+            {getFieldError('phoneNumber') && (
+              <div className={styles.errorMessage}>
+                {getFieldError('phoneNumber')}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -45,11 +71,16 @@ const DentalAppointmentForm = ({ formData, onInputChange }) => {
             </label>
             <input
               type="date"
-              className={styles.formInput}
+              className={getInputClassName('date')}
               value={formData.date || ''}
               onChange={(e) => onInputChange('date', e.target.value)}
               required
             />
+            {getFieldError('date') && (
+              <div className={styles.errorMessage}>
+                {getFieldError('date')}
+              </div>
+            )}
           </div>
           <div className={styles.formGroup}>
             <label className={`${styles.formLabel} ${styles.requiredLabel}`}>
@@ -57,11 +88,16 @@ const DentalAppointmentForm = ({ formData, onInputChange }) => {
             </label>
             <input
               type="time"
-              className={styles.formInput}
+              className={getInputClassName('time')}
               value={formData.time || ''}
               onChange={(e) => onInputChange('time', e.target.value)}
               required
             />
+            {getFieldError('time') && (
+              <div className={styles.errorMessage}>
+                {getFieldError('time')}
+              </div>
+            )}
           </div>
         </div>
 
@@ -71,7 +107,7 @@ const DentalAppointmentForm = ({ formData, onInputChange }) => {
               Treatment Type
             </label>
             <select
-              className={styles.formSelect}
+              className={getSelectClassName('treatmentType')}
               value={formData.treatmentType || ''}
               onChange={(e) => onInputChange('treatmentType', e.target.value)}
               required
@@ -85,13 +121,18 @@ const DentalAppointmentForm = ({ formData, onInputChange }) => {
               <option value="crown">Crown</option>
               <option value="other">Other</option>
             </select>
+            {getFieldError('treatmentType') && (
+              <div className={styles.errorMessage}>
+                {getFieldError('treatmentType')}
+              </div>
+            )}
           </div>
           <div className={styles.formGroup}>
             <label className={`${styles.formLabel} ${styles.requiredLabel}`}>
               Dentist
             </label>
             <select
-              className={styles.formSelect}
+              className={getSelectClassName('dentist')}
               value={formData.dentist || ''}
               onChange={(e) => onInputChange('dentist', e.target.value)}
               required
@@ -101,6 +142,11 @@ const DentalAppointmentForm = ({ formData, onInputChange }) => {
               <option value="dr_johnson">Dr. Johnson</option>
               <option value="dr_williams">Dr. Williams</option>
             </select>
+            {getFieldError('dentist') && (
+              <div className={styles.errorMessage}>
+                {getFieldError('dentist')}
+              </div>
+            )}
           </div>
         </div>
 

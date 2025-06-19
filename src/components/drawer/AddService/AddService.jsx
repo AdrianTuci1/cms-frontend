@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import styles from './AddService.module.css';
 import useDrawerStore from '../../../store/drawerStore';
-import { FaTimes } from 'react-icons/fa';
+import { getBusinessType, BUSINESS_TYPES } from '../../../config/businessTypes';
+import { FaSpinner } from 'react-icons/fa';
 import TreatmentForm from './forms/TreatmentForm';
 import PackageForm from './forms/PackageForm';
 import RoomForm from './forms/RoomForm';
-import { getBusinessType, BUSINESS_TYPES } from '../../../config/businessTypes';
 
 const SERVICE_TYPES = {
   TREATMENT: 'treatment',
@@ -29,30 +29,67 @@ const AddService = () => {
     }
   });
   const [formData, setFormData] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
+    
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: null
+      }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    // Basic validation - you can expand this based on your needs
+    if (!formData.name && !formData.serviceName && !formData.roomName) {
+      newErrors.name = 'Name is required';
+    }
+    
+    if (!formData.price && formData.price !== 0) {
+      newErrors.price = 'Price is required';
+    }
+    
+    if (!formData.description) {
+      newErrors.description = 'Description is required';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Implement service creation logic
-    console.log('Form submitted:', formData);
-  };
-
-  const getFormTitle = () => {
-    switch (serviceType) {
-      case SERVICE_TYPES.TREATMENT:
-        return 'New Treatment';
-      case SERVICE_TYPES.PACKAGE:
-        return 'New Package';
-      case SERVICE_TYPES.ROOM:
-        return 'New Room';
-      default:
-        return 'New Service';
+    
+    if (!validateForm()) {
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      // TODO: Implement service creation logic
+      console.log('Form submitted:', formData);
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Success - close drawer
+      closeDrawer();
+    } catch (error) {
+      console.error('Error creating service:', error);
+      // Handle error - you could show a toast notification here
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -63,6 +100,7 @@ const AddService = () => {
           <TreatmentForm 
             formData={formData}
             onInputChange={handleInputChange}
+            errors={errors}
           />
         );
       case SERVICE_TYPES.PACKAGE:
@@ -70,6 +108,7 @@ const AddService = () => {
           <PackageForm 
             formData={formData}
             onInputChange={handleInputChange}
+            errors={errors}
           />
         );
       case SERVICE_TYPES.ROOM:
@@ -77,6 +116,7 @@ const AddService = () => {
           <RoomForm 
             formData={formData}
             onInputChange={handleInputChange}
+            errors={errors}
           />
         );
       default:
@@ -87,23 +127,33 @@ const AddService = () => {
   return (
     <div className={styles.serviceContainer}>
       <div className={styles.contentWrapper}>
-        <div className={styles.drawerHeader}>
-          <h2>{getFormTitle()}</h2>
-          <button className={styles.closeButton} onClick={closeDrawer}>
-            <FaTimes />
-          </button>
-        </div>
 
         <form onSubmit={handleSubmit} className={styles.serviceForm}>
           {renderServiceForm()}
           
           <div className={styles.formActions}>
-            <button type="button" className={styles.cancelButton} onClick={closeDrawer}>
+            <button 
+              type="button" 
+              className={styles.cancelButton} 
+              onClick={closeDrawer}
+              disabled={isSubmitting}
+            >
               Cancel
             </button>
-            <button type="submit" className={styles.submitButton}>
-              Create {serviceType === SERVICE_TYPES.TREATMENT ? 'Treatment' : 
-                     serviceType === SERVICE_TYPES.PACKAGE ? 'Package' : 'Room'}
+            <button 
+              type="submit" 
+              className={styles.submitButton}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <FaSpinner className="fa-spin" />
+                  Creating...
+                </>
+              ) : (
+                `Create ${serviceType === SERVICE_TYPES.TREATMENT ? 'Treatment' : 
+                         serviceType === SERVICE_TYPES.PACKAGE ? 'Package' : 'Room'}`
+              )}
             </button>
           </div>
         </form>

@@ -1,7 +1,23 @@
 import React from 'react';
 import styles from '../AddAppointment.module.css';
 
-const HotelAppointmentForm = ({ formData, onInputChange }) => {
+const HotelAppointmentForm = ({ formData, onInputChange, errors = {} }) => {
+  const getFieldError = (fieldName) => {
+    return errors[fieldName] || errors.name; // Fallback to generic name error
+  };
+
+  const getInputClassName = (fieldName) => {
+    const baseClass = styles.formInput;
+    const errorClass = getFieldError(fieldName) ? styles.error : '';
+    return `${baseClass} ${errorClass}`.trim();
+  };
+
+  const getSelectClassName = (fieldName) => {
+    const baseClass = styles.formSelect;
+    const errorClass = getFieldError(fieldName) ? styles.error : '';
+    return `${baseClass} ${errorClass}`.trim();
+  };
+
   return (
     <>
       <div className={styles.formSection}>
@@ -13,12 +29,17 @@ const HotelAppointmentForm = ({ formData, onInputChange }) => {
             </label>
             <input
               type="text"
-              className={styles.formInput}
+              className={getInputClassName('guestName')}
               value={formData.guestName || ''}
               onChange={(e) => onInputChange('guestName', e.target.value)}
               placeholder="Enter guest name"
               required
             />
+            {getFieldError('guestName') && (
+              <div className={styles.errorMessage}>
+                {getFieldError('guestName')}
+              </div>
+            )}
           </div>
           <div className={styles.formGroup}>
             <label className={`${styles.formLabel} ${styles.requiredLabel}`}>
@@ -26,12 +47,17 @@ const HotelAppointmentForm = ({ formData, onInputChange }) => {
             </label>
             <input
               type="tel"
-              className={styles.formInput}
+              className={getInputClassName('phoneNumber')}
               value={formData.phoneNumber || ''}
               onChange={(e) => onInputChange('phoneNumber', e.target.value)}
               placeholder="Enter phone number"
               required
             />
+            {getFieldError('phoneNumber') && (
+              <div className={styles.errorMessage}>
+                {getFieldError('phoneNumber')}
+              </div>
+            )}
           </div>
         </div>
 
@@ -42,12 +68,17 @@ const HotelAppointmentForm = ({ formData, onInputChange }) => {
             </label>
             <input
               type="email"
-              className={styles.formInput}
+              className={getInputClassName('email')}
               value={formData.email || ''}
               onChange={(e) => onInputChange('email', e.target.value)}
               placeholder="Enter email address"
               required
             />
+            {getFieldError('email') && (
+              <div className={styles.errorMessage}>
+                {getFieldError('email')}
+              </div>
+            )}
           </div>
           <div className={styles.formGroup}>
             <label className={`${styles.formLabel} ${styles.requiredLabel}`}>
@@ -55,13 +86,18 @@ const HotelAppointmentForm = ({ formData, onInputChange }) => {
             </label>
             <input
               type="number"
-              className={styles.formInput}
+              className={getInputClassName('numberOfGuests')}
               value={formData.numberOfGuests || ''}
               onChange={(e) => onInputChange('numberOfGuests', e.target.value)}
               min="1"
               max="10"
               required
             />
+            {getFieldError('numberOfGuests') && (
+              <div className={styles.errorMessage}>
+                {getFieldError('numberOfGuests')}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -75,11 +111,16 @@ const HotelAppointmentForm = ({ formData, onInputChange }) => {
             </label>
             <input
               type="date"
-              className={styles.formInput}
+              className={getInputClassName('checkInDate')}
               value={formData.checkInDate || ''}
               onChange={(e) => onInputChange('checkInDate', e.target.value)}
               required
             />
+            {getFieldError('checkInDate') && (
+              <div className={styles.errorMessage}>
+                {getFieldError('checkInDate')}
+              </div>
+            )}
           </div>
           <div className={styles.formGroup}>
             <label className={`${styles.formLabel} ${styles.requiredLabel}`}>
@@ -87,11 +128,16 @@ const HotelAppointmentForm = ({ formData, onInputChange }) => {
             </label>
             <input
               type="date"
-              className={styles.formInput}
+              className={getInputClassName('checkOutDate')}
               value={formData.checkOutDate || ''}
               onChange={(e) => onInputChange('checkOutDate', e.target.value)}
               required
             />
+            {getFieldError('checkOutDate') && (
+              <div className={styles.errorMessage}>
+                {getFieldError('checkOutDate')}
+              </div>
+            )}
           </div>
         </div>
 
@@ -101,7 +147,7 @@ const HotelAppointmentForm = ({ formData, onInputChange }) => {
               Room Type
             </label>
             <select
-              className={styles.formSelect}
+              className={getSelectClassName('roomType')}
               value={formData.roomType || ''}
               onChange={(e) => onInputChange('roomType', e.target.value)}
               required
@@ -113,6 +159,11 @@ const HotelAppointmentForm = ({ formData, onInputChange }) => {
               <option value="executive">Executive Suite</option>
               <option value="presidential">Presidential Suite</option>
             </select>
+            {getFieldError('roomType') && (
+              <div className={styles.errorMessage}>
+                {getFieldError('roomType')}
+              </div>
+            )}
           </div>
           <div className={styles.formGroup}>
             <label className={`${styles.formLabel} ${styles.requiredLabel}`}>
@@ -120,13 +171,18 @@ const HotelAppointmentForm = ({ formData, onInputChange }) => {
             </label>
             <input
               type="number"
-              className={styles.formInput}
+              className={getInputClassName('numberOfRooms')}
               value={formData.numberOfRooms || ''}
               onChange={(e) => onInputChange('numberOfRooms', e.target.value)}
               min="1"
               max="5"
               required
             />
+            {getFieldError('numberOfRooms') && (
+              <div className={styles.errorMessage}>
+                {getFieldError('numberOfRooms')}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -190,7 +246,7 @@ const HotelAppointmentForm = ({ formData, onInputChange }) => {
               Payment Method
             </label>
             <select
-              className={styles.formSelect}
+              className={getSelectClassName('paymentMethod')}
               value={formData.paymentMethod || ''}
               onChange={(e) => onInputChange('paymentMethod', e.target.value)}
               required
@@ -200,18 +256,24 @@ const HotelAppointmentForm = ({ formData, onInputChange }) => {
               <option value="debit_card">Debit Card</option>
               <option value="cash">Cash</option>
               <option value="bank_transfer">Bank Transfer</option>
+              <option value="paypal">PayPal</option>
             </select>
+            {getFieldError('paymentMethod') && (
+              <div className={styles.errorMessage}>
+                {getFieldError('paymentMethod')}
+              </div>
+            )}
           </div>
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>
-              Special Rate Code
+              Special Instructions
             </label>
             <input
               type="text"
               className={styles.formInput}
-              value={formData.rateCode || ''}
-              onChange={(e) => onInputChange('rateCode', e.target.value)}
-              placeholder="Enter rate code if applicable"
+              value={formData.specialInstructions || ''}
+              onChange={(e) => onInputChange('specialInstructions', e.target.value)}
+              placeholder="Any special payment instructions"
             />
           </div>
         </div>
