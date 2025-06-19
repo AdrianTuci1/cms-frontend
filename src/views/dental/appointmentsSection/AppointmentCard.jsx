@@ -1,4 +1,6 @@
 import styles from './Appointments.module.css';
+import { FaUser } from 'react-icons/fa';
+import { MdMedicalServices } from 'react-icons/md';
 
 const generateInitials = (text) => {
   if (!text) return '';
@@ -84,11 +86,7 @@ const AppointmentCard = ({
           onPatientClick(appointment);
         }}
       >
-        <img 
-          src="/requests.png" 
-          alt={patientName}
-          className={styles.patientAvatar}
-        />
+        <FaUser className={styles.patientAvatar} />
         <span className={styles.patientName}>
           {patientName}
         </span>
@@ -96,11 +94,7 @@ const AppointmentCard = ({
 
       {/* Medic Info */}
       <div className={styles.medicInfo}>
-        <img 
-          src="/medics.png" 
-          alt={medicName}
-          className={styles.medicAvatar}
-        />
+        <MdMedicalServices className={styles.medicAvatar} />
         <span className={styles.medicName}>
           {medicName}
         </span>

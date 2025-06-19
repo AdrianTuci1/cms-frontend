@@ -1,12 +1,11 @@
 import styles from './DashboardNavbar.module.css';
-import { FaChartLine, FaShoppingCart, FaUsers, FaRobot, FaUser, FaCalendarAlt, FaHistory, FaCog, FaDumbbell, FaHome, FaTooth, FaBed, FaConciergeBell } from 'react-icons/fa';
-import ConversationsMenu from '../dashboard/ConversationsMenu';
+import { FaChartLine, FaShoppingCart, FaUsers, FaRobot, FaUser, FaCalendarAlt, FaHistory, FaCog, FaDumbbell, FaHome, FaTooth, FaBed } from 'react-icons/fa';
 import useTabsStore from '../../store/tabsStore';
 import useDrawerStore from '../../store/drawerStore';
 
 import { useEffect } from 'react';
 import { getBusinessType, BUSINESS_TYPES } from '../../config/businessTypes';
-import AIAssistantChat from '../drawer/AIAssistant/AIAssistantChat';
+import AIAssistantChat from '../drawer/AIAssistant';
 import UserDrawer from '../drawer/UserDrawer/UserDrawer';
 
 const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
@@ -135,7 +134,7 @@ const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
       <div className={styles.navbarEnd}>
         <button 
           className={styles.navIcon}
-          onClick={() => openDrawer(<AIAssistantChat />, 'Assistants')}
+          onClick={() => openDrawer(<AIAssistantChat />, 'Assistants', 'ai-assistant')}
         >
           <FaRobot className={styles.icon}/>
         </button>

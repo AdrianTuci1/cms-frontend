@@ -43,7 +43,6 @@
 .weekContainer {
   display: flex;
   justify-content: space-between;
-  height: 100px;
 }
 
 .previousWeek,
@@ -129,7 +128,7 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   padding: 16px;
-  overflow-y: auto;
+  overflow-y: scroll;
 }
 
 .dayColumn {
@@ -227,10 +226,11 @@
 
 .patientAvatar,
 .medicAvatar {
-  width: 24px;
-  height: 24px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   margin-right: 8px;
+  color: black;
 }
 
 .medicAvatar {

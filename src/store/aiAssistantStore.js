@@ -18,20 +18,24 @@ const initialState = {
 const createActions = (set, get) => ({
   // Message actions
   sendMessage: async (content, parentId = null) => {
+    console.log('AI Assistant store - sendMessage called:', { content, parentId });
     const timestamp = new Date().toISOString();
     const userMessageId = `user_${Date.now()}`;  // Prefix user messages
     
     // Add user message
-    set(state => ({
-      messages: [...state.messages, {
-        id: userMessageId,
-        content,
-        isAI: false,
-        timestamp,
-        parentId,
-        replies: []
-      }]
-    }));
+    set(state => {
+      console.log('AI Assistant store - adding user message to state');
+      return {
+        messages: [...state.messages, {
+          id: userMessageId,
+          content,
+          isAI: false,
+          timestamp,
+          parentId,
+          replies: []
+        }]
+      };
+    });
 
     set({ isLoading: true });
     try {
@@ -56,6 +60,7 @@ const createActions = (set, get) => ({
 
   // Add message handler
   addMessage: (message) => {
+    console.log('AI Assistant store - addMessage called:', message);
     console.log('Raw message received in store:', message);
     console.log('Message type:', message.type);
     console.log('Message role:', message.role);
@@ -80,9 +85,12 @@ const createActions = (set, get) => ({
     console.log('Formatted message for store:', formattedMessage);
     console.log('Final isAI value:', formattedMessage.isAI);
     
-    set(state => ({
-      messages: [...state.messages, formattedMessage]
-    }));
+    set(state => {
+      console.log('AI Assistant store - adding formatted message to state');
+      return {
+        messages: [...state.messages, formattedMessage]
+      };
+    });
   },
 
   editMessage: async (messageId, newContent) => {

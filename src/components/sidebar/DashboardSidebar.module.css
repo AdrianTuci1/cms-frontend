@@ -230,4 +230,20 @@
 .locationOption:last-child {
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
+}
+
+.menuSeparator {
+  height: 1px;
+  background-color: rgba(0, 0, 0, 0.1);
+  margin: 0.5rem 0;
+  width: 100%;
+}
+
+.sidebarItem.special .iconWrapper {
+  background-color: rgba(147, 51, 234, 0.1);
+  color: rgb(147, 51, 234);
+}
+
+.sidebarItem.special:hover .iconWrapper {
+  background-color: rgba(147, 51, 234, 0.2);
 } 

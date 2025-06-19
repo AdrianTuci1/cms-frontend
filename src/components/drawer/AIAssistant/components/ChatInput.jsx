@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { IoIosSend } from 'react-icons/io';
-import styles from './Chat.module.css';
+import styles from '../styles/AIAssistantChat.module.css';
 
 const ChatInput = ({ onSendMessage }) => {
   const [message, setMessage] = useState('');
@@ -52,7 +52,7 @@ const ChatInput = ({ onSendMessage }) => {
         className={styles.sendButton}
         disabled={!message.trim()}
       >
-        <IoIosSend size={24} />
+        <IoIosSend size={20} />
       </button>
     </form>
   );

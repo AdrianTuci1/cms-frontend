@@ -1,0 +1,10 @@
+{
+  "testMessage": {
+    "id": "test_appointments",
+    "messageId": "test_appointments",
+    "content": "Am preluat 2 programari de pe whatapp si o programare telefonica in ultimele 30 de minute, aici sunt detaliile:\n\n**Programare 1 - WhatsApp**\n👤 **Client:** Maria Popescu\n📅 **Data:** 15 Decembrie 2024\n🕐 **Ora:** 14:30\n🦷 **Serviciu:** Control + Curățare\n📞 **Telefon:** 0723 456 789\n\n**Programare 2 - WhatsApp**\n👤 **Client:** Ion Vasilescu\n📅 **Data:** 16 Decembrie 2024\n🕐 **Ora:** 10:00\n🦷 **Serviciu:** Extracție măsea de minte\n📞 **Telefon:** 0745 123 456\n\n**Programare 3 - Telefonic**\n👤 **Client:** Elena Dumitrescu\n📅 **Data:** 17 Decembrie 2024\n🕐 **Ora:** 16:00\n🦷 **Serviciu:** Placă dentară\n📞 **Telefon:** 0768 987 654\n\nToate programările au fost confirmate și adăugate în sistem.",
+    "isAI": true,
+    "timestamp": null,
+    "metadata": {}
+  }
+} 

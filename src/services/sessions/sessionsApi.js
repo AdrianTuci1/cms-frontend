@@ -1,4 +1,5 @@
 const API_URL_SESSIONS = import.meta.env.VITE_API_URL_SESSIONS || 'http://localhost:3001/api';
+import testAppointments from '../../data/testAppointments.json';
 
 /**
  * Load sessions for a user
@@ -69,15 +70,36 @@ export async function loadMessages({ sessionId, limit = 20, before = null }) {
     }
 
     const data = await response.json();
-    return data.messages.map(message => ({
+    const messages = data.messages.map(message => ({
       id: message.messageId,
       content: message.payload.content,
       isAI: message.type === 'agent.response',
       timestamp: message.timestamp,
       metadata: message.payload.context?.metadata
     }));
+
+    // If no messages exist and this is the first load (no before parameter), return test data
+    if (messages.length === 0 && !before) {
+      const testMessage = {
+        ...testAppointments.testMessage,
+        timestamp: new Date().toISOString()
+      };
+      return [testMessage];
+    }
+
+    return messages;
   } catch (error) {
     console.error('Error loading messages:', error);
+    
+    // Return test data when API fails and this is the first load
+    if (!before) {
+      const testMessage = {
+        ...testAppointments.testMessage,
+        timestamp: new Date().toISOString()
+      };
+      return [testMessage];
+    }
+    
     throw error;
   }
 }

@@ -1,8 +1,9 @@
 import styles from './DashboardSidebar.module.css';
-import { FaHome, FaRobot, FaHistory, FaUsers, FaCog, FaArrowLeft, FaArrowRight, FaMapMarkerAlt, FaAngleDown, FaChartLine } from 'react-icons/fa';
+import { FaHome, FaRobot, FaHistory, FaUsers, FaArrowLeft, FaArrowRight, FaMapMarkerAlt, FaAngleDown, FaChartLine, FaFileInvoiceDollar, FaBolt } from 'react-icons/fa';
 import useTabsStore from '../../store/tabsStore';
 import useLocationsStore from '../../store/locationsStore';
 import { useState, useEffect } from 'react';
+import React from 'react';
 
 const DashboardSidebar = ({ currentSection, setCurrentSection, isExpanded, setIsExpanded }) => {
   const { setActiveSection } = useTabsStore();
@@ -16,8 +17,10 @@ const DashboardSidebar = ({ currentSection, setCurrentSection, isExpanded, setIs
 
   const getSidebarSections = () => {
     return [
+      { id: 'blitz', label: 'Blitz', icon: <FaBolt className={styles.icon} />, isSpecial: true },
       { id: 'dashboard', label: 'Dashboard', icon: <FaHome className={styles.icon} /> },
       { id: 'stocks', label: 'Stocks', icon: <FaChartLine className={styles.icon} /> },
+      { id: 'invoices', label: 'Invoices', icon: <FaFileInvoiceDollar className={styles.icon} /> },
       { id: 'automations', label: 'Automations', icon: <FaRobot className={styles.icon} /> },
       { id: 'activities', label: 'Activities', icon: <FaHistory className={styles.icon} /> },
       { id: 'admin', label: 'Admin', icon: <FaUsers className={styles.icon} /> },
@@ -88,17 +91,19 @@ const DashboardSidebar = ({ currentSection, setCurrentSection, isExpanded, setIs
       )}
       
       <div className={styles.sidebarMenu}>
-        {getSidebarSections().map((section) => (
-          <button
-            key={section.id}
-            className={`${styles.sidebarItem} ${currentSection === section.id ? styles.active : ''}`}
-            onClick={() => handleSectionChange(section.id)}
-          >
-            <div className={styles.iconWrapper}>
-              {section.icon}
-            </div>
-            <span className={styles.label}>{section.label}</span>
-          </button>
+        {getSidebarSections().map((section, index) => (
+          <React.Fragment key={section.id}>
+            {index === 1 && <div className={styles.menuSeparator} />}
+            <button
+              className={`${styles.sidebarItem} ${currentSection === section.id ? styles.active : ''} ${section.isSpecial ? styles.special : ''}`}
+              onClick={() => handleSectionChange(section.id)}
+            >
+              <div className={styles.iconWrapper}>
+                {section.icon}
+              </div>
+              <span className={styles.label}>{section.label}</span>
+            </button>
+          </React.Fragment>
         ))}
       </div>
     </aside>

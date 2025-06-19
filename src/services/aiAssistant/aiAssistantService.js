@@ -14,8 +14,10 @@ class AIAssistantService {
    * Initialize the service
    */
   async init() {
+    console.log('AI Assistant service - initializing');
     socketManager.initWorker(this.tenantId);
     await this.initializeSession();
+    console.log('AI Assistant service - initialization complete');
   }
 
   /**
@@ -23,7 +25,9 @@ class AIAssistantService {
    */
   async initializeSession() {
     try {
+      console.log('AI Assistant service - initializing session');
       await SessionsService.initializeSession();
+      console.log('AI Assistant service - session initialized successfully');
     } catch (error) {
       console.error('Error initializing session:', error);
     }
@@ -36,8 +40,10 @@ class AIAssistantService {
    * @returns {Promise<import('./aiAssistantTypes').Message>}
    */
   async sendMessage(content, context = {}) {
+    console.log('AI Assistant service - sendMessage called:', { content, context });
     const sessionId = SessionsService.getCurrentSessionId();
     if (!sessionId) {
+      console.log('AI Assistant service - no session ID, initializing session');
       await this.initializeSession();
     }
 
@@ -63,6 +69,7 @@ class AIAssistantService {
     }
 
     try {
+      console.log('AI Assistant service - calling API to send message');
       return await aiAssistantApi.sendMessage(message);
     } catch (error) {
       console.error('Error sending message:', error);

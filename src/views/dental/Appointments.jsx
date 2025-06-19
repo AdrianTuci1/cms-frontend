@@ -51,6 +51,14 @@ const Appointments = () => {
     const weekDates = calculateCurrentWeek(selectedDate);
     setCurrentWeek(weekDates);
     
+    // TODO: Here we can fetch real appointments from an API
+    // Example:
+    // const fetchAppointments = async () => {
+    //   const response = await fetch('/api/appointments');
+    //   const realAppointments = await response.json();
+    //   return realAppointments;
+    // };
+    
     // Filtrăm doar programările pentru săptămâna curentă
     const weekStart = weekDates[0];
     const weekEnd = weekDates[6];

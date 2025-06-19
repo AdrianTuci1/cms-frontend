@@ -7,6 +7,8 @@ import TimelineView from '../../views/TimelineView';
 import SalesView from '../../views/SalesView';
 import ClientsView from '../../views/ClientsView';
 import ServicesView from '../../views/ServicesView';
+import InvoicesSection from '../../sections/Invoices/InvoicesSection';
+import BlitzSection from '../../sections/Blitz/BlitzSection';
 
 const Dashboard = () => {
   const { currentSection, currentView } = useOutletContext();
@@ -38,6 +40,10 @@ const Dashboard = () => {
         return <HistorySection />;
       case 'admin':
         return <StaffSection />;
+      case 'invoices':
+        return <InvoicesSection />;
+      case 'blitz':
+        return <BlitzSection />;
       default:
         return null;
     }

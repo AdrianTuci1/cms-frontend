@@ -4,17 +4,20 @@ const useDrawerStore = create((set) => ({
   isOpen: false,
   content: null,
   title: '',
+  type: 'drawer', // 'drawer' or 'ai-assistant'
   
-  openDrawer: (content, title) => set({
+  openDrawer: (content, title, type = 'drawer') => set({
     isOpen: true,
     content,
-    title
+    title,
+    type
   }),
   
   closeDrawer: () => set({
     isOpen: false,
     content: null,
-    title: ''
+    title: '',
+    type: 'drawer'
   })
 }));
 
