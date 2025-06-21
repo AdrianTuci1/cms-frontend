@@ -12,7 +12,6 @@ const App = () => {
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<Dashboard />} />
         </Route>
-
         {/* Redirect to signin if no route matches */}
         <Route path="*" element={<Navigate to="/signin" replace />} />
       </Routes>
