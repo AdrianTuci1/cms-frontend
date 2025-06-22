@@ -24,6 +24,7 @@ export const historySectionGeneral = {
             description: "Created a new client",
             action: "Check-out room 104",
             type: "check-out",
+            status: "success",
             revertable: false,
         },
         {
@@ -38,6 +39,7 @@ export const historySectionGeneral = {
             description: "Client has a problem",
             action: "problem at room 104",
             type: "problem",
+            status: "failed",
             revertable: false,
         },
         {
@@ -52,6 +54,7 @@ export const historySectionGeneral = {
             description: "",
             action: "cleaning at room 104",
             type: "cleaning",
+            status: "pending",
             revertable: false,
         },
         {
@@ -66,6 +69,7 @@ export const historySectionGeneral = {
             description: "Client has a problem",
             action: "problem at room 104",
             type: "problem",
+            status: "success",
             revertable: false,
         },
         {
@@ -80,6 +84,7 @@ export const historySectionGeneral = {
             description: "Client has a problem",
             action: "reservation deleted at room 104",
             type: "deleted",
+            status: "success",
             revertable: true,
         },
     ]

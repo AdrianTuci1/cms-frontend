@@ -52,7 +52,7 @@ export const employeesSectionGeneral = {
 
 
 
-export const availableRoles = {
+export const availableRolesGeneral = {
     roles: [
         {
             id: 1,

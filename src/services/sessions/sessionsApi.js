@@ -1,4 +1,4 @@
-const API_URL_SESSIONS = import.meta.env.VITE_API_URL_SESSIONS || 'http://localhost:3001/api';
+const API_URL_SESSIONS = import.meta.env.VITE_AI_URL || 'http://localhost:3001/api';
 import testAppointments from '../../data/testAppointments.json';
 
 /**

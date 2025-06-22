@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+const API_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:4000';
 
 /**
  * Send a message to the AI assistant
@@ -7,7 +7,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
  */
 export async function sendMessage(message) {
   try {
-    const response = await fetch(`${API_URL}/messages`, {
+    const response = await fetch(`${API_URL}/api/messages`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -43,7 +43,7 @@ export async function sendMessage(message) {
  */
 export async function editMessage(messageId, message) {
   try {
-    const response = await fetch(`${API_URL}/messages/${messageId}`, {
+    const response = await fetch(`${API_URL}/api/messages/${messageId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -79,7 +79,7 @@ export async function editMessage(messageId, message) {
  */
 export async function executeAction(messageId, message) {
   try {
-    const response = await fetch(`${API_URL}/messages/${messageId}/action`, {
+    const response = await fetch(`${API_URL}/api/messages/${messageId}/action`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -115,7 +115,7 @@ export async function executeAction(messageId, message) {
  */
 export async function handleNotificationAction(notificationId, message) {
   try {
-    const response = await fetch(`${API_URL}/notifications/${notificationId}/action`, {
+    const response = await fetch(`${API_URL}/api/notifications/${notificationId}/action`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
