@@ -22,7 +22,8 @@ const WeekView = ({
   selectedWeek,
   appointments = [],
   onAppointmentClick,
-  onPatientClick
+  onPatientClick,
+  isLoading = false
 }) => {
   const getAppointmentsForDay = (date) => {
     return appointments.filter(appointment => 
@@ -31,6 +32,17 @@ const WeekView = ({
   };
 
   const hasAnyAppointments = appointments.length > 0;
+
+  if (isLoading) {
+    return (
+      <div className={styles.loadingState}>
+        <div className={styles.loadingStateContent}>
+          <div className={styles.spinner}></div>
+          <p>Se încarcă programările...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!hasAnyAppointments) {
     return (
