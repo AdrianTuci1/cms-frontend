@@ -1,0 +1,400 @@
+/**
+ * ApiClient - Client HTTP principal pentru API
+ * Inherită din BaseClient și folosește AuthManager și RequestManager
+ */
+
+import BaseClient from './BaseClient.js';
+import AuthManager from './AuthManager.js';
+import RequestManager from './RequestManager.js';
+
+export class ApiClient extends BaseClient {
+  constructor(config = {}) {
+    super(config);
+    
+    // Multi-tenant support
+    this.tenantId = config.tenantId || import.meta.env.VITE_TENANT_ID;
+    this.locationId = config.locationId;
+    
+    // Inițializează manager-ele
+    this.authManager = new AuthManager({
+      baseURL: this.baseURL,
+      refreshThreshold: config.refreshThreshold || 5 * 60 * 1000
+    });
+    
+    this.requestManager = new RequestManager(this);
+    
+    // Setup interceptori pentru autentificare
+    this.setupAuthInterceptors();
+    
+    // Inițializează client-ul
+    this.initialize();
+  }
+
+  /**
+   * Setup interceptori pentru autentificare
+   */
+  setupAuthInterceptors() {
+    // Request interceptor pentru auth headers
+    this.addRequestInterceptor((config) => {
+      // Adaugă tenant ID și location ID
+      if (this.tenantId) {
+        config.headers['X-Tenant-ID'] = this.tenantId;
+      }
+      
+      if (this.locationId) {
+        config.headers['X-Location-ID'] = this.locationId;
+      }
+
+      // Adaugă auth header
+      const authHeader = this.authManager.getAuthHeader();
+      if (authHeader) {
+        config.headers['Authorization'] = authHeader;
+      }
+
+      return config;
+    });
+
+    // Response interceptor pentru refresh token
+    this.addResponseInterceptor(
+      (response) => response,
+      async (error) => {
+        if (error.status === 401 && this.authManager.getRefreshToken()) {
+          try {
+            // Încearcă refresh token
+            const newToken = await this.authManager.refreshAuthToken();
+            if (newToken) {
+              // Reexecută request-ul original cu noul token
+              error.config.headers['Authorization'] = `Bearer ${newToken}`;
+              return this.request(error.config);
+            }
+          } catch (refreshError) {
+            // Refresh failed, clear tokens
+            this.authManager.clearTokens();
+            throw refreshError;
+          }
+        }
+        throw error;
+      }
+    );
+  }
+
+  /**
+   * Setează token-ul de autentificare
+   */
+  setAuthToken(token, refreshToken = null, expiry = null) {
+    this.authManager.setTokens(token, refreshToken, expiry);
+  }
+
+  /**
+   * Setează location ID-ul curent
+   */
+  setLocationId(locationId) {
+    this.locationId = locationId;
+  }
+
+  /**
+   * Obține location ID-ul curent
+   */
+  getLocationId() {
+    return this.locationId;
+  }
+
+  /**
+   * Obține tenant ID-ul
+   */
+  getTenantId() {
+    return this.tenantId;
+  }
+
+  /**
+   * Metoda principală pentru cereri HTTP
+   */
+  async request(config) {
+    return this.requestManager.request(config);
+  }
+
+  /**
+   * Metode helper pentru HTTP methods
+   */
+  async get(url, config = {}) {
+    return this.requestManager.get(url, config);
+  }
+
+  async post(url, data = null, config = {}) {
+    return this.requestManager.post(url, data, config);
+  }
+
+  async put(url, data = null, config = {}) {
+    return this.requestManager.put(url, data, config);
+  }
+
+  async patch(url, data = null, config = {}) {
+    return this.requestManager.patch(url, data, config);
+  }
+
+  async delete(url, config = {}) {
+    return this.requestManager.delete(url, config);
+  }
+
+  /**
+   * Upload file
+   */
+  async upload(url, file, config = {}) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return this.request({
+      ...config,
+      method: 'POST',
+      url,
+      data: formData,
+      headers: {
+        ...config.headers,
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+  }
+
+  /**
+   * Upload multiple files
+   */
+  async uploadMultiple(url, files, config = {}) {
+    const formData = new FormData();
+    
+    if (Array.isArray(files)) {
+      files.forEach((file, index) => {
+        formData.append(`files[${index}]`, file);
+      });
+    } else {
+      Object.entries(files).forEach(([key, file]) => {
+        formData.append(key, file);
+      });
+    }
+
+    return this.request({
+      ...config,
+      method: 'POST',
+      url,
+      data: formData,
+      headers: {
+        ...config.headers,
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+  }
+
+  /**
+   * Download file
+   */
+  async download(url, filename = null, config = {}) {
+    const response = await this.request({
+      ...config,
+      method: 'GET',
+      url,
+      responseType: 'blob'
+    });
+
+    // Creează link pentru download
+    const blob = new Blob([response.data]);
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = filename || 'download';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(downloadUrl);
+
+    return response;
+  }
+
+  /**
+   * Upload cu progress tracking
+   */
+  async uploadWithProgress(url, file, onProgress, config = {}) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return this.requestManager.requestWithProgress({
+      ...config,
+      method: 'POST',
+      url,
+      data: formData,
+      headers: {
+        ...config.headers,
+        'Content-Type': 'multipart/form-data'
+      }
+    }, onProgress);
+  }
+
+  /**
+   * Cerere cu timeout personalizat
+   */
+  async requestWithTimeout(config, timeout) {
+    return this.requestManager.requestWithTimeout(config, timeout);
+  }
+
+  /**
+   * Cereri în paralel
+   */
+  async requestAll(requests) {
+    return this.requestManager.requestAll(requests);
+  }
+
+  /**
+   * Cereri în serie
+   */
+  async requestSequential(requests) {
+    return this.requestManager.requestSequential(requests);
+  }
+
+  /**
+   * Cerere cu retry personalizat
+   */
+  async requestWithRetry(config, retryConfig = {}) {
+    return this.requestManager.requestWithRetry(config, retryConfig);
+  }
+
+  /**
+   * Cerere cu cache
+   */
+  async requestWithCache(config, cacheKey, cacheOptions = {}) {
+    return this.requestManager.requestWithCache(config, cacheKey, cacheOptions);
+  }
+
+  /**
+   * Anulează o cerere în curs
+   */
+  cancelRequest(requestId) {
+    return this.requestManager.cancelRequest(requestId);
+  }
+
+  /**
+   * Anulează toate cererile în curs
+   */
+  cancelAllRequests() {
+    return this.requestManager.cancelAllRequests();
+  }
+
+  /**
+   * Obține cererile în curs
+   */
+  getPendingRequests() {
+    return this.requestManager.getPendingRequests();
+  }
+
+  /**
+   * Adaugă o cerere la queue
+   */
+  addToQueue(requestConfig, priority = 0) {
+    return this.requestManager.addToQueue(requestConfig, priority);
+  }
+
+  /**
+   * Obține informații despre autentificare
+   */
+  getAuthInfo() {
+    return this.authManager.getTokenInfo();
+  }
+
+  /**
+   * Verifică dacă utilizatorul este autentificat
+   */
+  isAuthenticated() {
+    return this.authManager.isTokenValid();
+  }
+
+  /**
+   * Verifică dacă utilizatorul are o rolă specifică
+   */
+  hasRole(role) {
+    return this.authManager.hasRole(role);
+  }
+
+  /**
+   * Verifică dacă utilizatorul are o permisiune specifică
+   */
+  hasPermission(permission) {
+    return this.authManager.hasPermission(permission);
+  }
+
+  /**
+   * Obține ID-ul utilizatorului
+   */
+  getUserId() {
+    return this.authManager.getUserId();
+  }
+
+  /**
+   * Obține claims din token
+   */
+  getTokenClaims() {
+    return this.authManager.getTokenClaims();
+  }
+
+  /**
+   * Curăță token-urile de autentificare
+   */
+  clearAuthTokens() {
+    return this.authManager.clearTokens();
+  }
+
+  /**
+   * Setează callback pentru refresh token
+   */
+  setOnTokenRefresh(callback) {
+    return this.authManager.setOnTokenRefresh(callback);
+  }
+
+  /**
+   * Setează callback pentru token expirat
+   */
+  setOnTokenExpired(callback) {
+    return this.authManager.setOnTokenExpired(callback);
+  }
+
+  /**
+   * Setează callback pentru erori de autentificare
+   */
+  setOnAuthError(callback) {
+    return this.authManager.setOnAuthError(callback);
+  }
+
+  /**
+   * Obține statistici complete
+   */
+  getStats() {
+    return {
+      ...super.getStats(),
+      auth: this.authManager.getTokenInfo(),
+      requests: this.requestManager.getRequestStats(),
+      tenantId: this.tenantId,
+      locationId: this.locationId
+    };
+  }
+
+  /**
+   * Testează conectivitatea
+   */
+  async testConnectivity() {
+    try {
+      const response = await this.get('/health/ping');
+      return {
+        success: true,
+        latency: response.headers['x-response-time'] || 'unknown',
+        status: response.status
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+        status: error.status
+      };
+    }
+  }
+}
+
+// Instanță singleton
+const apiClient = new ApiClient();
+
+export default apiClient; 

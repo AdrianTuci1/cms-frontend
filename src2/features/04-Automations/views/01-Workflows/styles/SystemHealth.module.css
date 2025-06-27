@@ -1,0 +1,481 @@
+.systemHealthBox {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f0f0f0;
+  flex-shrink: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.tokenInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f8f9fa;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+}
+
+.tokenLabel {
+  font-size: 0.95rem;
+  color: #666;
+}
+
+.tokenValue {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.systemHealthBox h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #333;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.healthMetrics {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.healthMetric {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.metricLabel {
+  width: 80px;
+  font-size: 0.95rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.progressBar {
+  flex: 1;
+  height: 8px;
+  background: #f5f5f5;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress {
+  height: 100%;
+  background: #4CAF50;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.metricValue {
+  width: 50px;
+  text-align: right;
+  font-size: 0.95rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.systemStatus {
+  margin-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.statusIndicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #dc3545;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2);
+}
+
+.statusIndicator.healthy {
+  background: #4CAF50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+}
+
+.statusText {
+  font-size: 0.95rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.controlButtons {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.controlButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.startButton {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.startButton:hover {
+  background-color: #45a049;
+}
+
+.stopButton {
+  background-color: #dc3545;
+  color: white;
+}
+
+.stopButton:hover {
+  background-color: #c82333;
+}
+
+.purchaseButton {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.purchaseButton:hover {
+  background-color: #e0a800;
+}
+
+.controlButton svg {
+  width: 16px;
+  height: 16px;
+}
+
+.progressChart {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background: linear-gradient(145deg, #ffffff, #f8f9fa);
+  border-radius: 12px;
+  border: 1px solid rgba(240, 240, 240, 0.8);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.chartTitle {
+  font-size: 1.1rem;
+  color: #2c3e50;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.customTooltip {
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid rgba(240, 240, 240, 0.8);
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(8px);
+}
+
+.tooltipDay {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.tooltipItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+}
+
+.tooltipDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.tooltipName {
+  font-size: 0.9rem;
+  color: #1e293b;
+  font-weight: 500;
+  min-width: 80px;
+}
+
+.tooltipValue {
+  font-size: 0.9rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.metricsContainer {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 1.5rem;
+}
+
+.metricsSection {
+  flex: 1;
+  background: linear-gradient(145deg, #ffffff, #f8f9fa);
+  border-radius: 12px;
+  padding: 1.25rem;
+  border: 1px solid rgba(240, 240, 240, 0.8);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  color: #2c3e50;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+}
+
+.reservationsProgress {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.progressBarContainer {
+  height: 24px;
+  background: #f1f5f9;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+}
+
+.progressSegment {
+  height: 100%;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.progressSegment:hover {
+  filter: brightness(1.1);
+}
+
+.reservationsLegend {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: #ffffff;
+  border-radius: 6px;
+  border: 1px solid rgba(240, 240, 240, 0.8);
+  transition: all 0.3s ease;
+}
+
+.legendItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.legendDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.legendLabel {
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.legendValue {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.profitGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.profitItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid rgba(240, 240, 240, 0.8);
+  transition: all 0.3s ease;
+}
+
+.profitItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.profitIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+  font-size: 1.25rem;
+}
+
+.profitInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.profitLabel {
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.profitValue {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.savedPlacesSection {
+  margin-top: 1.5rem;
+  background: linear-gradient(145deg, #ffffff, #f8f9fa);
+  border-radius: 12px;
+  padding: 1.25rem;
+  border: 1px solid rgba(240, 240, 240, 0.8);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.savedPlacesHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.timePeriodSelector {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  background: #f1f5f9;
+  padding: 0.25rem;
+  border-radius: 6px;
+  margin: 1rem 0;
+}
+
+.timePeriodButton {
+  padding: 0.5rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #64748b;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.timePeriodButton.active {
+  background: #ffffff;
+  color: #1e293b;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.mainContent {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 1.5rem;
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.savedPlacesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.savedPlacesItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid rgba(240, 240, 240, 0.8);
+  transition: all 0.3s ease;
+}
+
+.savedPlacesItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.savedPlacesIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  font-size: 1rem;
+}
+
+.savedPlacesInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.savedPlacesLabel {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.savedPlacesValue {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e293b;
+} 

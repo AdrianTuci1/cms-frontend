@@ -1,0 +1,27 @@
+.container {
+  height: calc(100vh - 64px);
+  background: #ffffff;
+  border-radius: 16px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  height: calc(100vh - 64px);
+}
+
+/* Left Column Styles */
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Right Column Styles */
+.rightColumn {
+  height: 100%;
+  overflow: hidden;
+  background: #ffffff;
+  border-left: 1px solid #f0f0f0;
+} 

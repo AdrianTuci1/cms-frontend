@@ -1,0 +1,163 @@
+.receiptPanel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-secondary);
+}
+
+.receiptPanelContent {
+  padding: 1rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.receiptHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.receiptDate {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.receiptItems {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+}
+
+.receiptItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.itemInfo {
+  flex: 1;
+}
+
+.itemName {
+  display: block;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.itemCode {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.itemDetails {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.quantityControls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.quantityControls button {
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+.quantityControls button:hover {
+  background: var(--bg-hover);
+}
+
+.quantityControls span {
+  color: var(--text-primary);
+}
+
+.itemPrice {
+  font-weight: 500;
+  min-width: 80px;
+  text-align: right;
+  color: var(--text-primary);
+}
+
+.removeButton {
+  background: none;
+  border: none;
+  color: var(--color-danger);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0 0.5rem;
+}
+
+.removeButton:hover {
+  color: var(--color-danger);
+  opacity: 0.8;
+}
+
+.receiptTotal {
+  border-top: 2px solid var(--border-color);
+  padding-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.totalRow strong {
+  color: var(--text-primary);
+}
+
+.receiptActions {
+  display: flex;
+  gap: 1rem;
+}
+
+.receiptActions button {
+  flex: 1;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.validateButton {
+  background: var(--color-success);
+  color: white;
+}
+
+.validateButton:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.cancelButton {
+  background: var(--color-danger);
+  color: white;
+}
+
+.cancelButton:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.validateButton:disabled, .cancelButton:disabled {
+  background: var(--color-gray);
+  cursor: not-allowed;
+  opacity: 0.65;
+} 

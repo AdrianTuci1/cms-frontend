@@ -1,0 +1,249 @@
+.dashboardSidebar {
+  width: 80px;
+  height: calc(100vh - 60px); 
+  background-color: var(--bg-primary);
+  padding: 20px 0;
+  position: fixed;
+  left: 0;
+  top: 60px;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s ease;
+}
+
+.dashboardSidebar.expanded {
+  width: 240px;
+}
+
+.dashboardSidebar:hover .sidebarHeader {
+  opacity: 1;
+}
+
+.sidebarTop {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
+  width: 100%;
+}
+
+.expanded .sidebarTop {
+  justify-content: flex-end;
+  padding-right: 10px;
+}
+
+.sidebarMenu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.sidebarFooter {
+  margin-top: auto;
+  padding-top: 20px;
+}
+
+.sidebarItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  text-align: left;
+  position: relative;
+  height: 50px;
+}
+
+.sidebarItem:hover .label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.sidebarItem.active .iconWrapper {
+  background-color: var(--text-primary);
+  color: var(--bg-secondary);
+}
+
+.iconWrapper {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: var(--bg-hover);
+  transition: all 0.3s ease;
+  position: absolute;
+  left: 20px;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  color: currentColor;
+}
+
+.label {
+  position: absolute;
+  left: 70px;
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  color: var(--text-primary);
+}
+
+.expanded .label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.expandButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.expandButton .iconWrapper {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: var(--bg-hover);
+  transition: all 0.3s ease;
+}
+
+.expandButton:hover .iconWrapper {
+  background-color: var(--bg-active);
+}
+
+.locationSelector {
+  margin: 15px 10px;
+  position: relative;
+  width: calc(100% - 20px);
+}
+
+.currentLocation {
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-hover);
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.currentLocation:hover {
+  background-color: var(--bg-active);
+}
+
+.locationIcon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--primary-color);
+  margin-right: 10px;
+  font-size: 16px;
+}
+
+.locationInfo {
+  flex: 1;
+  overflow: hidden;
+}
+
+.locationName {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.locationIdentifier {
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dropdownIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.dropdownIcon.open {
+  transform: rotate(180deg);
+}
+
+.locationsDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: var(--bg-secondary);
+  border-radius: 8px;
+  margin-top: 5px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.locationOption {
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.locationOption:hover {
+  background-color: var(--bg-hover);
+}
+
+.locationOption.active {
+  background-color: var(--bg-active);
+}
+
+.locationOption:first-child {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.locationOption:last-child {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.menuSeparator {
+  height: 1px;
+  background-color: rgba(0, 0, 0, 0.1);
+  margin: 0.5rem 0;
+  width: 100%;
+}
+
+.sidebarItem.special .iconWrapper {
+  background-color: rgba(147, 51, 234, 0.1);
+  color: rgb(147, 51, 234);
+}
+
+.sidebarItem.special:hover .iconWrapper {
+  background-color: rgba(147, 51, 234, 0.2);
+} 
