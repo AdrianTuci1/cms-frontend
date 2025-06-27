@@ -77,11 +77,30 @@ class ApiSyncManager {
       }
 
       let endpoint = config.apiEndpoints.get;
-      const params = options.params || {};
+      const params = { ...options.params };
 
       // Handle business-specific endpoints
       if (businessType && endpoint.includes('{businessType}')) {
         endpoint = endpoint.replace('{businessType}', businessType);
+      }
+
+      // Add date range parameters for timeline
+      if (config.requiresDateRange) {
+        const { startDate, endDate } = this.getDefaultDateRange();
+        params.startDate = params.startDate || startDate;
+        params.endDate = params.endDate || endDate;
+      }
+
+      // Add pagination parameters for resources that support it
+      if (config.supportsPagination) {
+        params.page = params.page || 1;
+        params.limit = params.limit || 20;
+      }
+
+      // Add current day filter for resources that need it
+      if (config.currentDayOnly) {
+        const today = new Date().toISOString().split('T')[0];
+        params.date = params.date || today;
       }
 
       // Add query parameters
@@ -108,6 +127,24 @@ class ApiSyncManager {
       eventBus.emit('datasync:api-error', { resource, error });
       throw error;
     }
+  }
+
+  /**
+   * Get default date range for timeline (current week)
+   * @returns {Object} Object with startDate and endDate
+   */
+  getDefaultDateRange() {
+    const now = new Date();
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay()); // Start of current week (Sunday)
+    
+    const endOfWeek = new Date(now);
+    endOfWeek.setDate(now.getDate() + (6 - now.getDay())); // End of current week (Saturday)
+
+    return {
+      startDate: startOfWeek.toISOString().split('T')[0],
+      endDate: endOfWeek.toISOString().split('T')[0]
+    };
   }
 
   /**

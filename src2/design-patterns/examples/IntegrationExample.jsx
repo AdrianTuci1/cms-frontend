@@ -1,7 +1,8 @@
 /**
  * IntegrationExample - Exemplu complet de integrare API cu Design Patterns
  * Demonstrează toate aspectele integrării: data sync, business logic, observer pattern
- * Updated pentru noua structură API din requests.md
+ * Updated pentru noua structură API din requests.md - Server-First Approach
+ * Updated pentru a folosi useDataSync îmbunătățit cu Strategy Pattern
  */
 
 import React, { useState, useEffect } from 'react';
@@ -11,105 +12,110 @@ const IntegrationExample = ({ businessType = 'dental' }) => {
   const [selectedResource, setSelectedResource] = useState('timeline');
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [formData, setFormData] = useState({});
+  
+  // Date range state for timeline
+  const [startDate, setStartDate] = useState(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
+  const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
+  
+  // Pagination state for clients/members
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
 
-  // Hook-uri pentru toate resursele API din requests.md
+  // Hook-uri pentru toate resursele API din requests.md cu Strategy Pattern integrat
   const timelineSync = useDataSync('timeline', {
-    autoRefresh: true,
-    refreshInterval: 30000,
-    useCache: true,
-    maxAge: 5 * 60 * 1000,
-    businessType
+    businessType,
+    startDate,
+    endDate,
+    enableValidation: true,
+    enableBusinessLogic: true
   });
 
   const clientsSync = useDataSync('clients', {
-    autoRefresh: true,
-    refreshInterval: 60000,
-    useCache: true,
-    maxAge: 10 * 60 * 1000,
-    businessType
+    businessType,
+    page: currentPage,
+    limit: pageSize,
+    enableValidation: true,
+    enableBusinessLogic: true
   });
 
   const packagesSync = useDataSync('packages', {
-    autoRefresh: false,
-    useCache: true,
-    maxAge: 24 * 60 * 60 * 1000,
-    businessType
+    businessType,
+    enableValidation: true,
+    enableBusinessLogic: true
   });
 
   const membersSync = useDataSync('members', {
-    autoRefresh: true,
-    refreshInterval: 60000,
-    useCache: true,
-    maxAge: 10 * 60 * 1000,
-    businessType
+    businessType,
+    page: currentPage,
+    limit: pageSize,
+    enableValidation: true,
+    enableBusinessLogic: true
   });
 
   const invoicesSync = useDataSync('invoices', {
-    autoRefresh: false,
-    useCache: true,
-    maxAge: 24 * 60 * 60 * 1000
+    businessType,
+    enableValidation: true,
+    enableBusinessLogic: true
   });
 
   const stocksSync = useDataSync('stocks', {
-    autoRefresh: true,
-    refreshInterval: 120000,
-    useCache: true,
-    maxAge: 60 * 60 * 1000
+    businessType,
+    enableValidation: true,
+    enableBusinessLogic: true
   });
 
   const salesSync = useDataSync('sales', {
-    autoRefresh: true,
-    refreshInterval: 30000,
-    useCache: true,
-    maxAge: 5 * 60 * 1000
+    businessType,
+    enableValidation: true,
+    enableBusinessLogic: true
   });
 
   const agentSync = useDataSync('agent', {
-    autoRefresh: false,
-    useCache: true,
-    maxAge: 24 * 60 * 60 * 1000
+    businessType,
+    enableValidation: true,
+    enableBusinessLogic: true
   });
 
   const historySync = useDataSync('history', {
-    autoRefresh: false,
-    useCache: true,
-    maxAge: 24 * 60 * 60 * 1000
+    businessType,
+    enableValidation: true,
+    enableBusinessLogic: true
   });
 
   const workflowsSync = useDataSync('workflows', {
-    autoRefresh: false,
-    useCache: true,
-    maxAge: 24 * 60 * 60 * 1000
+    businessType,
+    enableValidation: true,
+    enableBusinessLogic: true
   });
 
   const reportsSync = useDataSync('reports', {
-    autoRefresh: false,
-    useCache: true,
-    maxAge: 24 * 60 * 60 * 1000
+    businessType,
+    enableValidation: true,
+    enableBusinessLogic: true
   });
 
   const rolesSync = useDataSync('roles', {
-    autoRefresh: false,
-    useCache: true,
-    maxAge: 24 * 60 * 60 * 1000
+    businessType,
+    enableValidation: true,
+    enableBusinessLogic: true
   });
 
   const permissionsSync = useDataSync('permissions', {
-    autoRefresh: false,
-    useCache: true,
-    maxAge: 24 * 60 * 60 * 1000
+    businessType,
+    enableValidation: true,
+    enableBusinessLogic: true
   });
 
   const userDataSync = useDataSync('userData', {
-    autoRefresh: false,
-    useCache: true,
-    maxAge: 24 * 60 * 60 * 1000
+    businessType,
+    enableValidation: true,
+    enableBusinessLogic: true
   });
 
   const businessInfoSync = useDataSync('businessInfo', {
-    autoRefresh: false,
-    useCache: true,
-    maxAge: 24 * 60 * 60 * 1000
+    businessType,
+    enableValidation: true,
+    enableBusinessLogic: true
   });
 
   // Hook pentru observer pattern
@@ -137,7 +143,21 @@ const IntegrationExample = ({ businessType = 'dental' }) => {
     businessInfo: businessInfoSync
   }[selectedResource];
 
-  const { data, loading, error, lastUpdated, isOnline, refresh, create, update, remove } = activeSync;
+  const { 
+    data, 
+    loading, 
+    error, 
+    lastUpdated, 
+    isOnline, 
+    refresh, 
+    create, 
+    update, 
+    remove,
+    validateData,
+    isOperationAllowed,
+    processData,
+    strategy
+  } = activeSync;
 
   // Setup event listeners pentru cross-feature communication
   useEffect(() => {
@@ -172,87 +192,74 @@ const IntegrationExample = ({ businessType = 'dental' }) => {
   // Procesează datele conform strategiei business
   const processedData = businessLogic.processData(data, selectedResource);
 
-  // Handler pentru operații CRUD
+  // Handlers folosind useDataSync îmbunătățit (în loc de Command Pattern redundant)
   const handleCreate = async () => {
     try {
-      // Validare business logic
-      const validation = businessLogic.validateData(formData, selectedResource);
-      if (!validation.isValid) {
-        console.error('Validation errors:', validation.errors);
-        return;
-      }
-
-      // Verificare permisiuni
-      if (!businessLogic.isOperationAllowed(`create${selectedResource.charAt(0).toUpperCase() + selectedResource.slice(1)}`, formData)) {
-        console.error('Operation not allowed');
-        return;
-      }
-
-      // Procesare date business-specific
-      const processedFormData = businessLogic.processData(formData, selectedResource);
-
-      // Creare
-      await create(processedFormData);
-
-      // Emitere eveniment
-      emit(`${selectedResource}:created`, {
-        data: processedFormData,
-        businessType,
-        timestamp: new Date().toISOString()
-      });
-
-      // Reset form
-      setFormData({});
+      // Folosește useDataSync cu validare și business logic integrat
+      await create(formData);
+      
+      console.log('✅ Created successfully using enhanced useDataSync');
+      setFormData({}); // Reset form
 
     } catch (error) {
-      console.error(`Error creating ${selectedResource}:`, error);
+      console.error('❌ Creation failed:', error.message);
     }
   };
 
   const handleUpdate = async (id, updates) => {
     try {
-      const validation = businessLogic.validateData(updates, selectedResource);
-      if (!validation.isValid) {
-        console.error('Validation errors:', validation.errors);
-        return;
-      }
-
+      // Folosește useDataSync cu validare și business logic integrat
       await update({ id, ...updates });
-
-      emit(`${selectedResource}:updated`, {
-        id,
-        updates,
-        businessType,
-        timestamp: new Date().toISOString()
-      });
+      
+      console.log('✅ Updated successfully using enhanced useDataSync');
 
     } catch (error) {
-      console.error(`Error updating ${selectedResource}:`, error);
+      console.error('❌ Update failed:', error.message);
     }
   };
 
   const handleDelete = async (id) => {
     try {
+      // Folosește useDataSync cu validare și business logic integrat
       await remove({ id });
-
-      emit(`${selectedResource}:deleted`, {
-        id,
-        businessType,
-        timestamp: new Date().toISOString()
-      });
+      
+      console.log('✅ Deleted successfully using enhanced useDataSync');
 
     } catch (error) {
-      console.error(`Error deleting ${selectedResource}:`, error);
+      console.error('❌ Deletion failed:', error.message);
     }
+  };
+
+  // Validare folosind Strategy Pattern integrat în useDataSync
+  const validateForm = () => {
+    const validation = validateData(formData, 'create');
+    
+    if (!validation.isValid) {
+      console.error('❌ Validation errors:', validation.errors);
+      return false;
+    }
+    
+    return true;
+  };
+
+  // Verificare permisiuni folosind Strategy Pattern integrat în useDataSync
+  const checkPermissions = () => {
+    const canCreate = isOperationAllowed(`create${selectedResource.charAt(0).toUpperCase() + selectedResource.slice(1)}`, formData);
+    const canUpdate = isOperationAllowed(`update${selectedResource.charAt(0).toUpperCase() + selectedResource.slice(1)}`, {});
+    const canDelete = isOperationAllowed(`delete${selectedResource.charAt(0).toUpperCase() + selectedResource.slice(1)}`, {});
+
+    return { canCreate, canUpdate, canDelete };
   };
 
   // Render form pentru resursa selectată
   const renderForm = () => {
     const fields = businessLogic.getConfig(`${selectedResource}Fields`) || [];
+    const { canCreate } = checkPermissions();
+    const isValid = validateForm();
     
     return (
       <div className="form-container">
-        <h3>Create {selectedResource}</h3>
+        <h3>Create {selectedResource} (Enhanced useDataSync + Strategy Pattern)</h3>
         {fields.map(field => (
           <div key={field.name} className="form-field">
             <label>{field.label}:</label>
@@ -267,7 +274,84 @@ const IntegrationExample = ({ businessType = 'dental' }) => {
             />
           </div>
         ))}
-        <button onClick={handleCreate}>Create</button>
+        <button 
+          onClick={handleCreate}
+          disabled={!canCreate || !isValid || loading}
+        >
+          {loading ? 'Creating...' : 'Create'}
+        </button>
+        
+        {/* Status information */}
+        <div className="status-info">
+          <p>Strategy: {strategy}</p>
+          <p>Can Create: {canCreate ? 'Yes' : 'No'}</p>
+          <p>Form Valid: {isValid ? 'Yes' : 'No'}</p>
+          {error && (
+            <p className="error">Error: {error.message}</p>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // Render controls for timeline date range
+  const renderTimelineControls = () => {
+    if (selectedResource !== 'timeline') return null;
+
+    return (
+      <div className="timeline-controls">
+        <h4>Timeline Date Range</h4>
+        <div className="date-inputs">
+          <label>
+            Start Date:
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+          </label>
+          <label>
+            End Date:
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
+          </label>
+          <button onClick={() => timelineSync.refresh()}>Refresh Timeline</button>
+        </div>
+      </div>
+    );
+  };
+
+  // Render controls for pagination
+  const renderPaginationControls = () => {
+    if (!['clients', 'members'].includes(selectedResource)) return null;
+
+    return (
+      <div className="pagination-controls">
+        <h4>Pagination</h4>
+        <div className="pagination-inputs">
+          <label>
+            Page:
+            <input
+              type="number"
+              min="1"
+              value={currentPage}
+              onChange={(e) => setCurrentPage(parseInt(e.target.value))}
+            />
+          </label>
+          <label>
+            Page Size:
+            <select value={pageSize} onChange={(e) => setPageSize(parseInt(e.target.value))}>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+          </label>
+          <button onClick={() => activeSync.refresh()}>Refresh</button>
+        </div>
       </div>
     );
   };
@@ -293,10 +377,33 @@ const IntegrationExample = ({ businessType = 'dental' }) => {
     }
 
     const items = Array.isArray(processedData) ? processedData : [processedData];
+    const { canUpdate, canDelete } = checkPermissions();
 
     return (
       <div className="data-container">
         <h3>{selectedResource} Data (Processed by {businessType} Strategy)</h3>
+        
+        {/* Show current day filter info */}
+        {['invoices', 'stocks', 'sales', 'history'].includes(selectedResource) && (
+          <div className="current-day-info">
+            <p>📅 Showing data for current day only: {new Date().toISOString().split('T')[0]}</p>
+          </div>
+        )}
+        
+        {/* Show pagination info */}
+        {['clients', 'members'].includes(selectedResource) && (
+          <div className="pagination-info">
+            <p>📄 Page {currentPage} of {items.length} items (showing {pageSize} per page)</p>
+          </div>
+        )}
+        
+        {/* Show date range info for timeline */}
+        {selectedResource === 'timeline' && (
+          <div className="date-range-info">
+            <p>📅 Date Range: {startDate} to {endDate}</p>
+          </div>
+        )}
+        
         {items.map((item, index) => (
           <div key={item.id || index} className="data-item">
             <h4>{businessLogic.format(selectedResource, item)}</h4>
@@ -308,11 +415,17 @@ const IntegrationExample = ({ businessType = 'dental' }) => {
               ))}
             </div>
             <div className="item-actions">
-              <button onClick={() => handleUpdate(item.id, { status: 'updated' })}>
-                Update
+              <button 
+                onClick={() => handleUpdate(item.id, { status: 'updated' })}
+                disabled={!canUpdate || loading}
+              >
+                {loading ? 'Updating...' : 'Update'}
               </button>
-              <button onClick={() => handleDelete(item.id)}>
-                Delete
+              <button 
+                onClick={() => handleDelete(item.id)}
+                disabled={!canDelete || loading}
+              >
+                {loading ? 'Deleting...' : 'Delete'}
               </button>
             </div>
           </div>
@@ -323,7 +436,7 @@ const IntegrationExample = ({ businessType = 'dental' }) => {
 
   return (
     <div className="integration-example">
-      <h2>API Integration Example - {businessType}</h2>
+      <h2>API Integration Example - {businessType} (Enhanced useDataSync + Strategy Pattern)</h2>
       
       {/* Resource Selection */}
       <div className="resource-selector">
@@ -332,15 +445,15 @@ const IntegrationExample = ({ businessType = 'dental' }) => {
           value={selectedResource} 
           onChange={(e) => setSelectedResource(e.target.value)}
         >
-          <option value="timeline">Timeline</option>
-          <option value="clients">Clients</option>
+          <option value="timeline">Timeline (with date range)</option>
+          <option value="clients">Clients (with pagination)</option>
           <option value="packages">Packages</option>
-          <option value="members">Members</option>
-          <option value="invoices">Invoices</option>
-          <option value="stocks">Stocks</option>
-          <option value="sales">Sales</option>
+          <option value="members">Members (with pagination)</option>
+          <option value="invoices">Invoices (current day only)</option>
+          <option value="stocks">Stocks (current day only)</option>
+          <option value="sales">Sales (current day only)</option>
           <option value="agent">Agent</option>
-          <option value="history">History</option>
+          <option value="history">History (current day only)</option>
           <option value="workflows">Workflows</option>
           <option value="reports">Reports</option>
           <option value="roles">Roles</option>
@@ -356,20 +469,54 @@ const IntegrationExample = ({ businessType = 'dental' }) => {
         <p>Last Updated: {lastUpdated ? new Date(lastUpdated).toLocaleString() : 'Never'}</p>
         <p>Business Type: {businessType}</p>
         <p>Data Count: {Array.isArray(processedData) ? processedData.length : (processedData ? 1 : 0)}</p>
+        <p>🔄 Server-First: Data fetched on demand, stored in IndexedDB</p>
+        <p>📊 Strategy Pattern: Business-specific validation and data processing</p>
+        <p>🎯 Enhanced useDataSync: Built-in CRUD operations with validation</p>
       </div>
 
       {/* Business Logic Information */}
       <div className="business-logic-info">
         <h3>Business Logic Information</h3>
-        <p>Can Create {selectedResource}: {businessLogic.isOperationAllowed(`create${selectedResource.charAt(0).toUpperCase() + selectedResource.slice(1)}`, {}) ? 'Yes' : 'No'}</p>
-        <p>Can Update {selectedResource}: {businessLogic.isOperationAllowed(`update${selectedResource.charAt(0).toUpperCase() + selectedResource.slice(1)}`, {}) ? 'Yes' : 'No'}</p>
-        <p>Can Delete {selectedResource}: {businessLogic.isOperationAllowed(`delete${selectedResource.charAt(0).toUpperCase() + selectedResource.slice(1)}`, {}) ? 'Yes' : 'No'}</p>
+        <p>Strategy: {strategy}</p>
+        <p>Can Create {selectedResource}: {isOperationAllowed(`create${selectedResource.charAt(0).toUpperCase() + selectedResource.slice(1)}`, {}) ? 'Yes' : 'No'}</p>
+        <p>Can Update {selectedResource}: {isOperationAllowed(`update${selectedResource.charAt(0).toUpperCase() + selectedResource.slice(1)}`, {}) ? 'Yes' : 'No'}</p>
+        <p>Can Delete {selectedResource}: {isOperationAllowed(`delete${selectedResource.charAt(0).toUpperCase() + selectedResource.slice(1)}`, {}) ? 'Yes' : 'No'}</p>
       </div>
+
+      {/* Resource-specific controls */}
+      {renderTimelineControls()}
+      {renderPaginationControls()}
 
       {/* Form and Data */}
       <div className="content">
         {renderForm()}
         {renderData()}
+      </div>
+
+      {/* Design Patterns Benefits */}
+      <div className="patterns-benefits">
+        <h3>Enhanced useDataSync Benefits</h3>
+        <div className="strategy-benefits">
+          <h4>Strategy Pattern Integration:</h4>
+          <ul>
+            <li>✅ Business-specific validation rules</li>
+            <li>✅ Business-specific data processing</li>
+            <li>✅ Business-specific permissions</li>
+            <li>✅ Automatic validation on CRUD operations</li>
+            <li>✅ Consistent interface across business types</li>
+          </ul>
+        </div>
+        <div className="usability-benefits">
+          <h4>Usability Benefits:</h4>
+          <ul>
+            <li>✅ No redundant Command Pattern layer</li>
+            <li>✅ Direct use of existing useDataSync</li>
+            <li>✅ Built-in validation and business logic</li>
+            <li>✅ Automatic error handling</li>
+            <li>✅ Optimistic updates</li>
+            <li>✅ Event emission</li>
+          </ul>
+        </div>
       </div>
     </div>
   );

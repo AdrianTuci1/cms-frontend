@@ -15,10 +15,12 @@ class ResourceRegistry {
    * Initialize all API resources based on requests.md structure
    */
   initializeGeneralResources() {
-    // General resources (with JWT)
+    // General resources (with JWT) - filtered for current day only
     this.registerResource('invoices', {
       enableOffline: true,
-      syncInterval: 60000,
+      requiresAuth: true,
+      forceServerFetch: true, // Always fetch from server
+      currentDayOnly: true, // Filter for current day only
       apiEndpoints: {
         get: '/invoices',
         post: '/invoices',
@@ -29,7 +31,9 @@ class ResourceRegistry {
 
     this.registerResource('stocks', {
       enableOffline: true,
-      syncInterval: 30000,
+      requiresAuth: true,
+      forceServerFetch: true, // Always fetch from server
+      currentDayOnly: true, // Filter for current day only
       apiEndpoints: {
         get: '/stocks',
         post: '/stocks',
@@ -40,7 +44,9 @@ class ResourceRegistry {
 
     this.registerResource('sales', {
       enableOffline: true,
-      syncInterval: 30000,
+      requiresAuth: true,
+      forceServerFetch: true, // Always fetch from server
+      currentDayOnly: true, // Filter for current day only
       apiEndpoints: {
         get: '/sales',
         post: '/sales',
@@ -51,7 +57,8 @@ class ResourceRegistry {
 
     this.registerResource('agent', {
       enableOffline: true,
-      syncInterval: 30000,
+      requiresAuth: true,
+      forceServerFetch: true, // Always fetch from server
       apiEndpoints: {
         get: '/agent',
         post: '/agent',
@@ -62,7 +69,9 @@ class ResourceRegistry {
 
     this.registerResource('history', {
       enableOffline: true,
-      syncInterval: 60000,
+      requiresAuth: true,
+      forceServerFetch: true, // Always fetch from server
+      currentDayOnly: true, // Filter for current day only
       apiEndpoints: {
         get: '/history',
         post: '/history',
@@ -73,7 +82,8 @@ class ResourceRegistry {
 
     this.registerResource('workflows', {
       enableOffline: true,
-      syncInterval: 60000,
+      requiresAuth: true,
+      forceServerFetch: true, // Always fetch from server
       apiEndpoints: {
         get: '/workflows',
         post: '/workflows',
@@ -84,7 +94,8 @@ class ResourceRegistry {
 
     this.registerResource('reports', {
       enableOffline: true,
-      syncInterval: 300000, // 5 minutes
+      requiresAuth: true,
+      forceServerFetch: true, // Always fetch from server
       apiEndpoints: {
         get: '/reports',
         post: '/reports',
@@ -95,7 +106,8 @@ class ResourceRegistry {
 
     this.registerResource('roles', {
       enableOffline: true,
-      syncInterval: 300000,
+      requiresAuth: true,
+      forceServerFetch: true, // Always fetch from server
       apiEndpoints: {
         get: '/roles',
         post: '/roles',
@@ -106,7 +118,8 @@ class ResourceRegistry {
 
     this.registerResource('permissions', {
       enableOffline: true,
-      syncInterval: 300000,
+      requiresAuth: true,
+      forceServerFetch: true, // Always fetch from server
       apiEndpoints: {
         get: '/permissions',
         post: '/permissions',
@@ -117,7 +130,8 @@ class ResourceRegistry {
 
     this.registerResource('userData', {
       enableOffline: true,
-      syncInterval: 60000,
+      requiresAuth: true,
+      forceServerFetch: true, // Always fetch from server
       apiEndpoints: {
         get: '/userData',
         post: '/userData',
@@ -129,8 +143,8 @@ class ResourceRegistry {
     // Business info (without JWT)
     this.registerResource('businessInfo', {
       enableOffline: true,
-      syncInterval: 300000,
       requiresAuth: false,
+      forceServerFetch: true, // Always fetch from server
       apiEndpoints: {
         get: '/business-info'
       }
@@ -140,6 +154,7 @@ class ResourceRegistry {
     this.registerResource('auth', {
       enableOffline: false,
       requiresAuth: false,
+      forceServerFetch: true, // Always fetch from server
       apiEndpoints: {
         post: '/auth'
       }
@@ -156,7 +171,9 @@ class ResourceRegistry {
     // Register business-specific resources
     this.registerResource('timeline', {
       enableOffline: true,
-      syncInterval: 30000,
+      requiresAuth: true,
+      forceServerFetch: true, // Always fetch from server
+      requiresDateRange: true, // Requires startDate and endDate parameters
       apiEndpoints: {
         get: `/${businessType}/timeline`,
         post: `/${businessType}/timeline`,
@@ -167,7 +184,9 @@ class ResourceRegistry {
 
     this.registerResource('clients', {
       enableOffline: true,
-      syncInterval: 60000,
+      requiresAuth: true,
+      forceServerFetch: true, // Always fetch from server
+      supportsPagination: true, // Supports pagination
       apiEndpoints: {
         get: `/${businessType}/clients`,
         post: `/${businessType}/clients`,
@@ -178,7 +197,8 @@ class ResourceRegistry {
 
     this.registerResource('packages', {
       enableOffline: true,
-      syncInterval: 300000,
+      requiresAuth: true,
+      forceServerFetch: true, // Always fetch from server
       apiEndpoints: {
         get: `/${businessType}/packages`,
         post: `/${businessType}/packages`,
@@ -189,7 +209,9 @@ class ResourceRegistry {
 
     this.registerResource('members', {
       enableOffline: true,
-      syncInterval: 60000,
+      requiresAuth: true,
+      forceServerFetch: true, // Always fetch from server
+      supportsPagination: true, // Supports pagination
       apiEndpoints: {
         get: `/${businessType}/members`,
         post: `/${businessType}/members`,
@@ -210,10 +232,13 @@ class ResourceRegistry {
   registerResource(resourceName, config) {
     const defaultConfig = {
       enableOffline: true,
-      syncInterval: 30000, // 30 seconds
       maxOfflineAge: 24 * 60 * 60 * 1000, // 24 hours
       priority: 'normal', // 'high', 'normal', 'low'
       socketEvents: [],
+      forceServerFetch: false, // Default to false, will be overridden for specific resources
+      requiresDateRange: false, // Default to false, will be overridden for timeline
+      supportsPagination: false, // Default to false, will be overridden for clients/members
+      currentDayOnly: false, // Default to false, will be overridden for invoices, stocks, sales, history
       apiEndpoints: {
         get: null,
         post: null,

@@ -39,6 +39,7 @@ timeline = {
                 status: 'scheduled',
                 isPaid: 'false',
                 isConfirmed: 'false',
+                createdBy: '',
             }
         }
     ]

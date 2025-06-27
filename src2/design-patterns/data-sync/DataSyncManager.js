@@ -186,11 +186,32 @@ class DataSyncManager {
    */
   async getDataWithFallback(resource, options = {}) {
     try {
+      const config = this.resourceRegistry.getResource(resource);
+      
+      // If forceServerFetch is true, always try API first
+      if (config && config.forceServerFetch && this.isOnline) {
+        try {
+          const apiData = await this.apiSyncManager.fetchFromAPI(
+            resource, 
+            options, 
+            config, 
+            this.resourceRegistry.getBusinessType()
+          );
+          
+          if (apiData) {
+            const processedData = this.dataProcessor.processResponse(resource, apiData, config);
+            await this.databaseManager.storeData(resource, processedData);
+            return processedData;
+          }
+        } catch (error) {
+          console.warn(`Failed to fetch ${resource} from API, falling back to local data:`, error);
+        }
+      }
+
       // Try to get from IndexedDB first
       let data = await this.databaseManager.getData(resource, options);
 
       // If no data or data is stale, try API
-      const config = this.resourceRegistry.getResource(resource);
       if (!data || data.length === 0 || this.dataProcessor.isDataStale(data, config)) {
         if (this.isOnline) {
           const apiData = await this.apiSyncManager.fetchFromAPI(
@@ -201,7 +222,7 @@ class DataSyncManager {
           );
           
           if (apiData) {
-            const processedData = this.dataProcessor.processResponse(resource, apiData);
+            const processedData = this.dataProcessor.processResponse(resource, apiData, config);
             await this.databaseManager.storeData(resource, processedData);
             data = processedData;
           }

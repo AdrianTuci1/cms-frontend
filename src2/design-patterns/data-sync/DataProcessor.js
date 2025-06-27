@@ -19,42 +19,125 @@ class DataProcessor {
    * Process response based on resource type
    * @param {string} resource - Resource name
    * @param {Object} response - API response data
+   * @param {Object} config - Resource configuration
    */
-  processResponse(resource, response) {
+  processResponse(resource, response, config = {}) {
+    let processedData;
+
     switch (resource) {
       case 'timeline':
-        return this.processTimelineData(response);
+        processedData = this.processTimelineData(response);
+        break;
       case 'clients':
-        return this.processClientsData(response);
+        processedData = this.processClientsData(response);
+        break;
       case 'packages':
-        return this.processPackagesData(response);
+        processedData = this.processPackagesData(response);
+        break;
       case 'members':
-        return this.processMembersData(response);
+        processedData = this.processMembersData(response);
+        break;
       case 'invoices':
-        return this.processInvoicesData(response);
+        processedData = this.processInvoicesData(response);
+        break;
       case 'stocks':
-        return this.processStocksData(response);
+        processedData = this.processStocksData(response);
+        break;
       case 'sales':
-        return this.processSalesData(response);
+        processedData = this.processSalesData(response);
+        break;
       case 'agent':
-        return this.processAgentData(response);
+        processedData = this.processAgentData(response);
+        break;
       case 'history':
-        return this.processHistoryData(response);
+        processedData = this.processHistoryData(response);
+        break;
       case 'workflows':
-        return this.processWorkflowsData(response);
+        processedData = this.processWorkflowsData(response);
+        break;
       case 'reports':
-        return this.processReportsData(response);
+        processedData = this.processReportsData(response);
+        break;
       case 'roles':
-        return this.processRolesData(data);
+        processedData = this.processRolesData(response);
+        break;
       case 'permissions':
-        return this.processPermissionsData(response);
+        processedData = this.processPermissionsData(response);
+        break;
       case 'userData':
-        return this.processUserDataData(response);
+        processedData = this.processUserDataData(response);
+        break;
       case 'businessInfo':
-        return this.processBusinessInfoData(response);
+        processedData = this.processBusinessInfoData(response);
+        break;
       default:
-        return response;
+        processedData = response;
     }
+
+    // Apply current day filtering if configured
+    if (config.currentDayOnly) {
+      processedData = this.filterForCurrentDay(processedData, resource);
+    }
+
+    return processedData;
+  }
+
+  /**
+   * Filter data for current day only
+   * @param {Array|Object} data - Data to filter
+   * @param {string} resource - Resource name
+   */
+  filterForCurrentDay(data, resource) {
+    if (!data) return data;
+
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    const items = Array.isArray(data) ? data : [data];
+
+    const filteredItems = items.filter(item => {
+      // Check different date fields based on resource type
+      const dateFields = this.getDateFieldsForResource(resource);
+      
+      return dateFields.some(field => {
+        const itemDate = item[field];
+        if (!itemDate) return false;
+        
+        // Handle different date formats
+        if (typeof itemDate === 'string') {
+          // If it's already in YYYY-MM-DD format
+          if (itemDate.length === 10) {
+            return itemDate === today;
+          }
+          // If it's a full ISO string, extract the date part
+          if (itemDate.includes('T')) {
+            return itemDate.split('T')[0] === today;
+          }
+        }
+        
+        // If it's a Date object
+        if (itemDate instanceof Date) {
+          return itemDate.toISOString().split('T')[0] === today;
+        }
+        
+        return false;
+      });
+    });
+
+    return Array.isArray(data) ? filteredItems : (filteredItems[0] || null);
+  }
+
+  /**
+   * Get date fields to check for each resource type
+   * @param {string} resource - Resource name
+   */
+  getDateFieldsForResource(resource) {
+    const dateFieldMap = {
+      invoices: ['createdAt', 'date', 'invoiceDate'],
+      stocks: ['createdAt', 'updatedAt', 'lastUpdated'],
+      sales: ['createdAt', 'saleDate', 'date'],
+      history: ['createdAt', 'date', 'timestamp']
+    };
+
+    return dateFieldMap[resource] || ['createdAt', 'date', 'timestamp'];
   }
 
   /**

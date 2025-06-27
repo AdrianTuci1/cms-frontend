@@ -1,12 +1,14 @@
 /**
  * useDataSync - Hook pentru sincronizarea datelor cu API și IndexedDB
  * Integrează serviciile API cu design patterns pentru o experiență completă
- * Updated pentru noua structură API din requests.md
+ * Updated pentru noua structură API din requests.md - Server-First Approach
+ * Enhanced cu Strategy Pattern pentru validare și business logic
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import dataSyncManager from '../data-sync/DataSyncManager';
 import eventBus from '../observer/base/EventBus';
+import { crudStrategyFactory } from '../strategy/CRUDStrategy.js';
 
 /**
  * Hook principal pentru sincronizarea datelor
@@ -16,15 +18,19 @@ import eventBus from '../observer/base/EventBus';
  */
 export const useDataSync = (resource, options = {}) => {
   const {
-    autoRefresh = true,
-    refreshInterval = 30000,
-    useCache = true,
-    forceRefresh = false,
-    maxAge = 5 * 60 * 1000, // 5 minute
     businessType = null,
     onDataUpdate = null,
     onError = null,
-    params = {}
+    params = {},
+    // Date range parameters for timeline
+    startDate = null,
+    endDate = null,
+    // Pagination parameters for clients/members
+    page = 1,
+    limit = 20,
+    // Strategy options
+    enableValidation = true,
+    enableBusinessLogic = true
   } = options;
 
   const [data, setData] = useState(null);
@@ -33,8 +39,24 @@ export const useDataSync = (resource, options = {}) => {
   const [lastUpdated, setLastUpdated] = useState(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   
-  const refreshTimeoutRef = useRef(null);
   const eventListenersRef = useRef([]);
+
+  // Strategy pentru business logic și validare
+  const strategy = useRef(null);
+
+  /**
+   * Initialize strategy based on business type
+   */
+  useEffect(() => {
+    if (enableBusinessLogic && businessType) {
+      try {
+        strategy.current = crudStrategyFactory.create(businessType);
+      } catch (err) {
+        console.warn(`No strategy found for business type: ${businessType}`);
+        strategy.current = null;
+      }
+    }
+  }, [businessType, enableBusinessLogic]);
 
   /**
    * Set business type if provided
@@ -46,27 +68,86 @@ export const useDataSync = (resource, options = {}) => {
   }, [businessType]);
 
   /**
+   * Validate data using strategy
+   */
+  const validateData = useCallback((data, operation = 'create') => {
+    if (!enableValidation || !strategy.current) {
+      return { isValid: true, errors: [] };
+    }
+
+    return strategy.current.validateData(data, resource);
+  }, [resource, enableValidation]);
+
+  /**
+   * Check if operation is allowed using strategy
+   */
+  const isOperationAllowed = useCallback((operation, data = {}) => {
+    if (!enableBusinessLogic || !strategy.current) {
+      return true;
+    }
+
+    return strategy.current.isOperationAllowed(operation, data);
+  }, [enableBusinessLogic]);
+
+  /**
+   * Process data using strategy
+   */
+  const processData = useCallback((data, operation = 'create') => {
+    if (!enableBusinessLogic || !strategy.current) {
+      return data;
+    }
+
+    return strategy.current.processData(data, resource);
+  }, [resource, enableBusinessLogic]);
+
+  /**
+   * Build request parameters based on resource configuration
+   */
+  const buildRequestParams = useCallback(() => {
+    const config = dataSyncManager.getResourceConfig(resource);
+    const requestParams = { ...params };
+
+    // Add date range parameters for timeline
+    if (config && config.requiresDateRange) {
+      if (startDate) requestParams.startDate = startDate;
+      if (endDate) requestParams.endDate = endDate;
+    }
+
+    // Add pagination parameters for resources that support it
+    if (config && config.supportsPagination) {
+      requestParams.page = page;
+      requestParams.limit = limit;
+    }
+
+    return requestParams;
+  }, [resource, params, startDate, endDate, page, limit]);
+
+  /**
    * Funcția principală de preluare date
    */
-  const fetchData = useCallback(async (force = false) => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
+      const requestParams = buildRequestParams();
+
       const fetchOptions = {
-        forceRefresh: force || forceRefresh,
-        useCache,
-        maxAge,
-        params
+        forceRefresh: true, // Always fetch from server
+        useCache: false, // Never use cache in server-first approach
+        params: requestParams
       };
 
       const result = await dataSyncManager.getDataWithFallback(resource, fetchOptions);
       
-      setData(result);
+      // Process data using strategy
+      const processedResult = processData(result, 'read');
+      
+      setData(processedResult);
       setLastUpdated(new Date().toISOString());
       
       if (onDataUpdate) {
-        onDataUpdate(result);
+        onDataUpdate(processedResult);
       }
 
     } catch (err) {
@@ -79,13 +160,13 @@ export const useDataSync = (resource, options = {}) => {
     } finally {
       setLoading(false);
     }
-  }, [resource, forceRefresh, useCache, maxAge, params, onDataUpdate, onError]);
+  }, [resource, onDataUpdate, onError, buildRequestParams, processData]);
 
   /**
    * Funcție pentru refresh manual
    */
   const refresh = useCallback(() => {
-    fetchData(true);
+    fetchData();
   }, [fetchData]);
 
   /**
@@ -107,15 +188,32 @@ export const useDataSync = (resource, options = {}) => {
   }, [resource]);
 
   /**
-   * Funcție pentru operații CRUD
+   * Funcție pentru operații CRUD cu validare și business logic
    */
   const performOperation = useCallback(async (operation, operationData) => {
     try {
       setLoading(true);
       setError(null);
 
+      // Validate data if validation is enabled
+      if (enableValidation) {
+        const validation = validateData(operationData, operation);
+        if (!validation.isValid) {
+          throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
+        }
+      }
+
+      // Check if operation is allowed
+      const operationName = `${operation}${resource.charAt(0).toUpperCase() + resource.slice(1)}`;
+      if (!isOperationAllowed(operationName, operationData)) {
+        throw new Error('Operation not allowed');
+      }
+
+      // Process data using business logic
+      const processedData = processData(operationData, operation);
+
       const dataWithOperation = {
-        ...operationData,
+        ...processedData,
         _operation: operation,
         businessType: businessType || dataSyncManager.businessType
       };
@@ -123,22 +221,22 @@ export const useDataSync = (resource, options = {}) => {
       // Actualizare optimistă
       if (operation === 'create') {
         optimisticUpdate(prevData => {
-          const newItem = { ...operationData, id: `temp_${Date.now()}` };
+          const newItem = { ...processedData, id: `temp_${Date.now()}` };
           return Array.isArray(prevData) ? [...prevData, newItem] : newItem;
         });
       } else if (operation === 'update') {
         optimisticUpdate(prevData => {
           if (Array.isArray(prevData)) {
             return prevData.map(item => 
-              item.id === operationData.id ? { ...item, ...operationData } : item
+              item.id === processedData.id ? { ...item, ...processedData } : item
             );
           }
-          return { ...prevData, ...operationData };
+          return { ...prevData, ...processedData };
         });
       } else if (operation === 'delete') {
         optimisticUpdate(prevData => {
           if (Array.isArray(prevData)) {
-            return prevData.filter(item => item.id !== operationData.id);
+            return prevData.filter(item => item.id !== processedData.id);
           }
           return null;
         });
@@ -148,14 +246,14 @@ export const useDataSync = (resource, options = {}) => {
       await dataSyncManager.handleDataChange(resource, dataWithOperation);
 
       // Refresh pentru a obține datele actualizate
-      await fetchData(true);
+      await fetchData();
 
     } catch (err) {
       console.error(`Error performing ${operation} on ${resource}:`, err);
       setError(err);
       
       // Revert optimistic update
-      await fetchData(true);
+      await fetchData();
       
       if (onError) {
         onError(err);
@@ -163,10 +261,10 @@ export const useDataSync = (resource, options = {}) => {
     } finally {
       setLoading(false);
     }
-  }, [resource, fetchData, optimisticUpdate, onError, businessType]);
+  }, [resource, fetchData, optimisticUpdate, onError, businessType, enableValidation, validateData, isOperationAllowed, processData]);
 
   /**
-   * Funcții CRUD convenabile
+   * Funcții CRUD convenabile cu validare și business logic
    */
   const create = useCallback((data) => performOperation('create', data), [performOperation]);
   const update = useCallback((data) => performOperation('update', data), [performOperation]);
@@ -180,18 +278,20 @@ export const useDataSync = (resource, options = {}) => {
 
     // Listen pentru actualizări de la WebSocket
     const socketListener = (eventData) => {
-      setData(eventData.data);
+      const processedData = processData(eventData.data, 'read');
+      setData(processedData);
       setLastUpdated(new Date().toISOString());
       
       if (onDataUpdate) {
-        onDataUpdate(eventData.data);
+        onDataUpdate(processedData);
       }
     };
 
     // Listen pentru actualizări de la API
     const apiListener = (eventData) => {
       if (eventData.source === 'api') {
-        setData(eventData.data);
+        const processedData = processData(eventData.data, 'read');
+        setData(processedData);
         setLastUpdated(new Date().toISOString());
       }
     };
@@ -230,33 +330,7 @@ export const useDataSync = (resource, options = {}) => {
     return () => {
       listeners.forEach(unsubscribe => unsubscribe());
     };
-  }, [resource, onDataUpdate, onError]);
-
-  /**
-   * Setup auto-refresh
-   */
-  useEffect(() => {
-    if (!autoRefresh) return;
-
-    const setupRefresh = () => {
-      if (refreshTimeoutRef.current) {
-        clearTimeout(refreshTimeoutRef.current);
-      }
-
-      refreshTimeoutRef.current = setTimeout(() => {
-        fetchData();
-        setupRefresh();
-      }, refreshInterval);
-    };
-
-    setupRefresh();
-
-    return () => {
-      if (refreshTimeoutRef.current) {
-        clearTimeout(refreshTimeoutRef.current);
-      }
-    };
-  }, [autoRefresh, refreshInterval, fetchData]);
+  }, [resource, onDataUpdate, onError, processData]);
 
   /**
    * Initial data fetch
@@ -266,16 +340,28 @@ export const useDataSync = (resource, options = {}) => {
   }, [fetchData]);
 
   return {
+    // Data state
     data,
     loading,
     error,
     lastUpdated,
     isOnline,
+    
+    // CRUD operations
     refresh,
     create,
     update,
     remove,
-    optimisticUpdate
+    optimisticUpdate,
+    
+    // Strategy methods
+    validateData,
+    isOperationAllowed,
+    processData,
+    
+    // Strategy info
+    strategy: strategy.current?.getName() || 'No Strategy',
+    businessType: businessType || dataSyncManager.businessType
   };
 };
 
