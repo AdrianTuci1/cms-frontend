@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import styles from './ServicesView.module.css';
 import { getBusinessType, BUSINESS_TYPES } from '../config/businessTypes';
+import { useDataSync } from '../../../design-patterns/hooks';
 import TreatmentCard from '../components/dashboard/dental/TreatmentCard/TreatmentCard';
 import PackageCard from '../components/dashboard/gym/Packages/PackageCard';
 import RoomCard from '../components/dashboard/hotel/RoomCard/RoomCard';
@@ -11,7 +12,20 @@ const ServicesView = () => {
   const businessType = getBusinessType();
   const { openDrawer } = useDrawerStore();
   const [searchQuery, setSearchQuery] = useState('');
-  const [services, setServices] = useState(() => {
+
+  // Data sync hook pentru packages
+  const {
+    data: packages,
+    loading,
+    error
+  } = useDataSync('packages', {
+    businessType: businessType.name,
+    enableValidation: true,
+    enableBusinessLogic: true
+  });
+
+  // Fallback data pentru când nu sunt date de la API
+  const fallbackServices = useMemo(() => {
     switch (businessType.name) {
       case BUSINESS_TYPES.DENTAL_CLINIC.name:
         return [
@@ -75,8 +89,10 @@ const ServicesView = () => {
       default:
         return [];
     }
-  });
+  }, [businessType.name]);
 
+  // Folosește datele de la API sau fallback data
+  const services = packages || fallbackServices;
 
   const handleAddService = () => {
     openDrawer(<AddService />, 'add service');
@@ -109,18 +125,26 @@ const ServicesView = () => {
     }
   };
 
-  const filteredServices = services.filter(service => {
+  const filteredServices = useMemo(() => {
+    if (!services || !Array.isArray(services)) {
+      return [];
+    }
+
+    if (!searchQuery.trim()) {
+      return services;
+    }
+
     const searchLower = searchQuery.toLowerCase();
-    return (
-      service.name.toLowerCase().includes(searchLower) ||
-      service.description.toLowerCase().includes(searchLower) ||
+    return services.filter(service => 
+      service.name?.toLowerCase().includes(searchLower) ||
+      service.description?.toLowerCase().includes(searchLower) ||
       (service.category && service.category.toLowerCase().includes(searchLower)) ||
       (service.type && service.type.toLowerCase().includes(searchLower)) ||
       (service.features && service.features.some(feature => 
         feature.toLowerCase().includes(searchLower)
       ))
     );
-  });
+  }, [searchQuery, services]);
 
   const renderServiceCard = (service) => {
     switch (businessType.name) {
@@ -166,7 +190,25 @@ const ServicesView = () => {
         </div>
       </div>
       <div className={styles.servicesContainer}>
-        {filteredServices.map(service => renderServiceCard(service))}
+        {loading ? (
+          <div className={styles.loading}>
+            <p>Loading services...</p>
+          </div>
+        ) : error ? (
+          <div className={styles.error}>
+            <p>Error loading services: {error.message}</p>
+          </div>
+        ) : filteredServices.length > 0 ? (
+          filteredServices.map(service => renderServiceCard(service))
+        ) : searchQuery.trim() ? (
+          <div className={styles.emptyState}>
+            <p>No services found matching "{searchQuery}". Try a different search term.</p>
+          </div>
+        ) : (
+          <div className={styles.emptyState}>
+            <p>No services found. Add a service using the button above.</p>
+          </div>
+        )}
       </div>
     </div>
   );

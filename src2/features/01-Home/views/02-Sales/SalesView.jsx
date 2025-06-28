@@ -1,67 +1,111 @@
 import React, { useState } from 'react';
 import ResizablePanels from '../components/dashboard/gym/ResizablePanels';
-import ProductsPanel from '../components/dashboard/sales/ProductsPanel';
-import ReceiptPanel from '../components/dashboard/sales/ReceiptPanel';
+import ProductsPanel from '../components/sales/ProductsPanel';
+import ReceiptPanel from '../components/sales/ReceiptPanel';
+import { useSalesStore } from '../../store';
 import styles from './SalesView.module.css';
 
-const SalesView = () => {
-  const [cart, setCart] = useState([]);
-  const [total, setTotal] = useState(0);
+const SalesView = ({ businessType = 'dental' }) => {
+  const [paymentMethod, setPaymentMethod] = useState('cash');
+
+  // Folosește sales store cu integrare API
+  const {
+    cart,
+    total,
+    stocksData,
+    stocksLoading,
+    stocksError,
+    addToCart,
+    removeFromCart,
+    updateQuantity,
+    validateCart,
+    finalizeSale,
+    cancelSale,
+    canCreateSale
+  } = useSalesStore(businessType);
 
   const handleAddToCart = (product) => {
-    const existingItem = cart.find(item => item.id === product.id);
-    
-    if (existingItem) {
-      setCart(cart.map(item =>
-        item.id === product.id
-          ? { ...item, quantity: item.quantity + 1 }
-          : item
-      ));
-    } else {
-      setCart([...cart, { ...product, quantity: 1 }]);
+    try {
+      addToCart(product);
+    } catch (error) {
+      console.error('Error adding to cart:', error.message);
     }
-    
-    updateTotal();
   };
 
   const handleRemoveFromCart = (productId) => {
-    setCart(cart.filter(item => item.id !== productId));
-    updateTotal();
+    removeFromCart(productId);
   };
 
   const handleUpdateQuantity = (productId, newQuantity) => {
-    if (newQuantity < 1) {
-      handleRemoveFromCart(productId);
-      return;
+    try {
+      updateQuantity(productId, newQuantity);
+    } catch (error) {
+      console.error('Error updating quantity:', error.message);
     }
-
-    setCart(cart.map(item =>
-      item.id === productId
-        ? { ...item, quantity: newQuantity }
-        : item
-    ));
-    updateTotal();
   };
 
-  const updateTotal = () => {
-    const newTotal = cart.reduce((sum, item) => sum + (item.currentPrice * item.quantity), 0);
-    setTotal(newTotal);
+  const handleValidate = async () => {
+    try {
+      const validation = validateCart();
+      
+      if (!validation.isValid) {
+        console.error('Cart validation failed:', validation.errors);
+        return false;
+      }
+
+      if (!canCreateSale) {
+        console.error('Insufficient permissions to create sale');
+        return false;
+      }
+
+      // Finalizează vânzarea direct
+      await handleFinalizeSale();
+      return true;
+    } catch (error) {
+      console.error('Validation error:', error);
+      return false;
+    }
   };
 
-  const handleValidate = () => {
-    // TODO: Implement validation logic
-    console.log('Validating receipt:', cart);
+  const handleFinalizeSale = async () => {
+    try {
+      const sale = await finalizeSale(paymentMethod, {});
+      console.log('Sale completed successfully:', sale);
+    } catch (error) {
+      console.error('Error finalizing sale:', error);
+    }
   };
 
   const handleCancel = () => {
-    setCart([]);
-    setTotal(0);
+    cancelSale();
   };
 
   return (
     <div className={styles.salesContainer}>
+      {/* Payment Method Selection */}
+      <div className={styles.paymentMethod}>
+        <label>Payment Method:</label>
+        <select 
+          value={paymentMethod} 
+          onChange={(e) => setPaymentMethod(e.target.value)}
+        >
+          <option value="cash">Cash</option>
+          <option value="card">Card</option>
+          <option value="transfer">Bank Transfer</option>
+          <option value="voucher">Voucher</option>
+        </select>
+      </div>
+
       <ResizablePanels
-        leftContent={<ProductsPanel onAddToCart={handleAddToCart} />}
+        leftContent={
+          <ProductsPanel 
+            onAddToCart={handleAddToCart}
+            products={stocksData}
+            loading={stocksLoading}
+            error={stocksError}
+            businessType={businessType}
+          />
+        }
         rightContent={
           <ReceiptPanel
             cart={cart}
@@ -70,6 +114,8 @@ const SalesView = () => {
             onRemoveFromCart={handleRemoveFromCart}
             onValidate={handleValidate}
             onCancel={handleCancel}
+            canCreateSale={canCreateSale}
+            businessType={businessType}
           />
         }
       />

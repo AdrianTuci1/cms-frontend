@@ -132,4 +132,16 @@
   .contactItem {
     font-size: 0.85rem;
   }
+}
+
+@media (max-width: 480px) {
+  .actions {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .actionButton {
+    width: 100%;
+    height: 32px;
+  }
 } 

@@ -1,6 +1,5 @@
 import { create } from 'zustand';
-import { mockAppointments } from '../data/mockAppointments';
-import { dataSyncManager } from '../services/dataSync/DataSyncManager.js';
+import { useDataSync } from '../../design-patterns/hooks/useDataSync';
 
 // Helper functions for date calculations
 const calculateCurrentWeek = (date) => {
@@ -34,11 +33,8 @@ const formatDateForAPI = (date) => {
 
 const useAppointmentsStore = create((set, get) => ({
   // State
-  appointments: [],
-  currentWeek: [],
   selectedDate: new Date(),
-  isLoading: false,
-  error: null,
+  currentWeek: [],
   isAllAppointments: true,
   selectedMedicId: null,
 
@@ -49,7 +45,6 @@ const useAppointmentsStore = create((set, get) => ({
       selectedDate: date, 
       currentWeek: weekDates 
     });
-    get().fetchAppointmentsForWeek(weekDates[0], weekDates[6]);
   },
 
   setAllAppointments: (isAll) => {
@@ -76,100 +71,9 @@ const useAppointmentsStore = create((set, get) => ({
     get().setSelectedDate(new Date());
   },
 
-  // Data fetching with DataSyncManager
-  fetchAppointmentsForWeek: async (startDate, endDate) => {
-    set({ isLoading: true, error: null });
-
-    try {
-      // Use DataSyncManager to get appointments
-      const dateRange = {
-        startDate: startDate.toISOString().split('T')[0],
-        endDate: endDate.toISOString().split('T')[0]
-      };
-      
-      const appointments = await dataSyncManager.getAppointments(dateRange);
-      
-      set({ 
-        appointments,
-        isLoading: false 
-      });
-    } catch (error) {
-      console.error('Error fetching appointments:', error);
-      
-      // Fallback to mock data on error
-      try {
-        const weekStart = startDate;
-        const weekEnd = endDate;
-        const filteredAppointments = mockAppointments.filter(appointment => {
-          const appointmentDate = new Date(appointment.date);
-          return appointmentDate >= weekStart && appointmentDate <= weekEnd;
-        });
-
-        set({ 
-          appointments: filteredAppointments,
-          error: 'Eroare la conectarea la server. Se afișează date demo.',
-          isLoading: false 
-        });
-      } catch (fallbackError) {
-        set({ 
-          error: error.message || 'Failed to fetch appointments',
-          isLoading: false 
-        });
-      }
-    }
-  },
-
-  // Create appointment using DataSyncManager
-  createAppointment: async (appointment) => {
-    try {
-      const newAppointment = await dataSyncManager.createAppointment(appointment);
-      
-      // The store will be updated automatically via observer
-      // But we can also update optimistically here
-      set(state => ({
-        appointments: [...state.appointments, newAppointment]
-      }));
-
-      return newAppointment;
-    } catch (error) {
-      console.error('Error creating appointment:', error);
-      throw error;
-    }
-  },
-
-  // Update appointment
-  updateAppointment: async (id, updates) => {
-    try {
-      // This would be implemented in DataSyncManager
-      // For now, just update locally
-      set(state => ({
-        appointments: state.appointments.map(appointment =>
-          appointment.id === id ? { ...appointment, ...updates } : appointment
-        )
-      }));
-    } catch (error) {
-      console.error('Error updating appointment:', error);
-      throw error;
-    }
-  },
-
-  // Delete appointment
-  deleteAppointment: async (id) => {
-    try {
-      // This would be implemented in DataSyncManager
-      // For now, just remove locally
-      set(state => ({
-        appointments: state.appointments.filter(appointment => appointment.id !== id)
-      }));
-    } catch (error) {
-      console.error('Error deleting appointment:', error);
-      throw error;
-    }
-  },
-
   // Computed values
-  getDisplayedAppointments: () => {
-    const { appointments, isAllAppointments, selectedMedicId } = get();
+  getDisplayedAppointments: (appointments) => {
+    const { isAllAppointments, selectedMedicId } = get();
     
     if (isAllAppointments) {
       return appointments;
@@ -180,9 +84,8 @@ const useAppointmentsStore = create((set, get) => ({
     );
   },
 
-  getAppointmentsCountForDate: (date) => {
-    const { getDisplayedAppointments } = get();
-    const displayedAppointments = getDisplayedAppointments();
+  getAppointmentsCountForDate: (appointments, date) => {
+    const displayedAppointments = get().getDisplayedAppointments(appointments);
     
     return displayedAppointments.filter(appointment => {
       const appointmentDate = new Date(appointment.date);
@@ -192,7 +95,7 @@ const useAppointmentsStore = create((set, get) => ({
     }).length;
   },
 
-  // Initialize store and subscribe to DataSyncManager
+  // Initialize store
   initialize: () => {
     const today = new Date();
     const weekDates = calculateCurrentWeek(today);
@@ -200,94 +103,91 @@ const useAppointmentsStore = create((set, get) => ({
       selectedDate: today, 
       currentWeek: weekDates 
     });
-    get().fetchAppointmentsForWeek(weekDates[0], weekDates[6]);
-
-    // Subscribe to DataSyncManager events
-    const unsubscribeAppointmentCreated = dataSyncManager.subscribe(
-      'APPOINTMENT_CREATED',
-      (data) => {
-        console.log('AppointmentsStore: Received APPOINTMENT_CREATED event', data);
-        set(state => ({
-          appointments: [...state.appointments, data]
-        }));
-      },
-      'AppointmentsStore'
-    );
-
-    const unsubscribeAppointmentUpdated = dataSyncManager.subscribe(
-      'APPOINTMENT_UPDATED',
-      (data) => {
-        console.log('AppointmentsStore: Received APPOINTMENT_UPDATED event', data);
-        set(state => ({
-          appointments: state.appointments.map(appointment =>
-            appointment.id === data.id ? { ...appointment, ...data } : appointment
-          )
-        }));
-      },
-      'AppointmentsStore'
-    );
-
-    const unsubscribeAppointmentDeleted = dataSyncManager.subscribe(
-      'APPOINTMENT_DELETED',
-      (data) => {
-        console.log('AppointmentsStore: Received APPOINTMENT_DELETED event', data);
-        set(state => ({
-          appointments: state.appointments.filter(appointment => appointment.id !== data.id)
-        }));
-      },
-      'AppointmentsStore'
-    );
-
-    const unsubscribeDataChanged = dataSyncManager.subscribe(
-      'DATA_CHANGED',
-      (data) => {
-        console.log('AppointmentsStore: Received DATA_CHANGED event', data);
-        
-        // Handle general data changes
-        if (data.type === 'appointments') {
-          switch (data.action) {
-            case 'created':
-              set(state => ({
-                appointments: [...state.appointments, data.data]
-              }));
-              break;
-            case 'updated':
-              set(state => ({
-                appointments: state.appointments.map(appointment =>
-                  appointment.id === data.data.id ? { ...appointment, ...data.data } : appointment
-                )
-              }));
-              break;
-            case 'deleted':
-              set(state => ({
-                appointments: state.appointments.filter(appointment => appointment.id !== data.data.id)
-              }));
-              break;
-          }
-        }
-      },
-      'AppointmentsStore'
-    );
-
-    // Store unsubscribe functions for cleanup
-    set({ 
-      _unsubscribeFunctions: [
-        unsubscribeAppointmentCreated,
-        unsubscribeAppointmentUpdated,
-        unsubscribeAppointmentDeleted,
-        unsubscribeDataChanged
-      ]
-    });
   },
 
-  // Cleanup subscriptions
+  // Cleanup
   cleanup: () => {
-    const { _unsubscribeFunctions } = get();
-    if (_unsubscribeFunctions) {
-      _unsubscribeFunctions.forEach(unsubscribe => unsubscribe());
-    }
-    set({ _unsubscribeFunctions: [] });
+    set({ 
+      selectedDate: new Date(),
+      currentWeek: [],
+      isAllAppointments: true,
+      selectedMedicId: null
+    });
   }
 }));
+
+/**
+ * Hook pentru dental timeline cu integrare API
+ * @param {Object} options - Opțiuni pentru useDataSync
+ */
+export const useDentalTimelineWithAPI = (options = {}) => {
+  const {
+    startDate = null,
+    endDate = null,
+    enableValidation = true,
+    enableBusinessLogic = true
+  } = options;
+
+  // Folosește useDataSync pentru integrarea cu API
+  const timelineSync = useDataSync('timeline', {
+    businessType: 'dental',
+    startDate,
+    endDate,
+    enableValidation,
+    enableBusinessLogic
+  });
+
+  // Folosește store-ul local pentru state management
+  const appointmentsStore = useAppointmentsStore();
+
+  return {
+    // API integration
+    ...timelineSync,
+    
+    // Local state management
+    ...appointmentsStore,
+    
+    // Business-specific data
+    getAppointments: () => {
+      const { data } = timelineSync;
+      return {
+        appointments: data?.reservations || [],
+        displayedAppointments: appointmentsStore.getDisplayedAppointments(data?.reservations || []),
+        getAppointmentsCountForDate: (date) => 
+          appointmentsStore.getAppointmentsCountForDate(data?.reservations || [], date)
+      };
+    },
+    
+    // Business-specific actions
+    createAppointment: async (appointment) => {
+      try {
+        const newAppointment = await timelineSync.create(appointment);
+        return newAppointment;
+      } catch (error) {
+        console.error('Error creating appointment:', error);
+        throw error;
+      }
+    },
+
+    updateAppointment: async (id, updates) => {
+      try {
+        const updatedAppointment = await timelineSync.update({ id, ...updates });
+        return updatedAppointment;
+      } catch (error) {
+        console.error('Error updating appointment:', error);
+        throw error;
+      }
+    },
+
+    deleteAppointment: async (id) => {
+      try {
+        await timelineSync.remove({ id });
+      } catch (error) {
+        console.error('Error deleting appointment:', error);
+        throw error;
+      }
+    }
+  };
+};
 
 export default useAppointmentsStore; 

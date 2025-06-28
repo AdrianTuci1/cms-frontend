@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import styles from './Occupancy.module.css';
 
-const Occupancy = () => {
+const Occupancy = ({ occupancy = [], totalOccupancy, loading }) => {
   const [viewMode, setViewMode] = useState('classes'); // 'classes' or 'trainers'
 
-  // Mock data - replace with actual data from your backend
+  // Use data from props instead of mock data
   const classes = [
     { id: 1, name: 'Zumba', trainer: 'Maria Popescu', time: '10:00', capacity: '15/20' },
     { id: 2, name: 'Yoga', trainer: 'Ion Ionescu', time: '11:30', capacity: '8/15' },
@@ -19,12 +19,27 @@ const Occupancy = () => {
     { id: 4, name: 'Alexandru Marin', specialization: 'CrossFit, Fitness', status: 'Active' },
   ];
 
-  const areas = [
+  // Use occupancy data from props, fallback to mock data if not available
+  const areas = occupancy.length > 0 ? occupancy.map(item => ({
+    name: item.facilityName,
+    current: parseInt(item.occupancy.split('/')[0]),
+    max: parseInt(item.occupancy.split('/')[1])
+  })) : [
     { name: 'Sala Fitness', current: 30, max: 50 },
     { name: 'Bazin', current: 15, max: 30 },
     { name: 'Sala Zumba', current: 12, max: 20 },
     { name: 'Sala Yoga', current: 8, max: 15 },
   ];
+
+  if (loading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loadingState}>
+          <p>Se încarcă datele de ocupare...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
@@ -79,6 +94,11 @@ const Occupancy = () => {
       {/* Occupancy Section */}
       <div className={styles.occupancySection}>
         <h3 className={styles.sectionTitle}>Grad de Ocupare</h3>
+        {totalOccupancy && (
+          <div className={styles.totalOccupancy}>
+            <span>Total: {totalOccupancy.current}/{totalOccupancy.max}</span>
+          </div>
+        )}
         <div className={styles.occupancyList}>
           {areas.map((area, index) => (
             <div key={index} className={styles.occupancyItem}>

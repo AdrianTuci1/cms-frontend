@@ -2,12 +2,183 @@
   height: 100%;
   width: 100%;
   background: #f5f5f5;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
+/* Status Information */
+.statusInfo {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  font-size: 14px;
+}
+
+.statusItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.statusItem span:first-child {
+  font-weight: 500;
+  color: #6c757d;
+}
+
+.statusItem span:last-child {
+  font-weight: 600;
+  color: #495057;
+}
+
+/* Customer Form */
+.customerForm {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.customerForm h3 {
+  margin: 0 0 15px 0;
+  color: #856404;
+  font-size: 1.2rem;
+}
+
+.formFields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+}
+
+.formField label {
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #495057;
+  font-size: 14px;
+}
+
+.formField input,
+.formField select {
+  padding: 10px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+.formField input:focus,
+.formField select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
+.formField label input[type="checkbox"] {
+  margin-right: 8px;
+  width: auto;
+}
+
+.formActions {
+  display: flex;
+  gap: 12px;
+}
+
+.formActions button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.formActions button:first-child {
+  background: #28a745;
+  color: white;
+}
+
+.formActions button:first-child:hover:not(:disabled) {
+  background: #218838;
+  transform: translateY(-1px);
+}
+
+.formActions button:last-child {
+  background: #6c757d;
+  color: white;
+}
+
+.formActions button:last-child:hover {
+  background: #5a6268;
+  transform: translateY(-1px);
+}
+
+.formActions button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Payment Method */
+.paymentMethod {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.paymentMethod label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #495057;
+  font-size: 14px;
+}
+
+.paymentMethod select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  transition: border-color 0.2s ease;
+}
+
+.paymentMethod select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
+/* Main Content */
+.mainContent {
+  flex: 1;
+  display: flex;
+  gap: 20px;
+  min-height: 0;
+}
+
+/* Products Panel */
 .productsPanel {
   background-color: #ffffff;
   border-radius: 12px;
-  height: calc(100vh - 64px);
+  height: calc(100vh - 200px);
+  border: 1px solid #dee2e6;
+  overflow: hidden;
 }
 
 .productsHeader {
@@ -15,6 +186,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  padding: 20px 20px 0 20px;
 }
 
 .productsHeader h2 {
@@ -32,7 +204,9 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 16px;
-  padding: 10px 0;
+  padding: 20px;
+  overflow-y: auto;
+  height: calc(100% - 80px);
 }
 
 .productCard {
@@ -78,13 +252,28 @@
   font-size: 0.85rem;
 }
 
+.loading,
+.error,
+.noProducts {
+  text-align: center;
+  padding: 40px;
+  color: #6c757d;
+  font-size: 14px;
+}
+
+.error {
+  color: #dc3545;
+}
+
+/* Receipt Panel */
 .receiptPanel {
-  height: calc(100vh - 64px);
+  height: calc(100vh - 200px);
   background-color: #ffffff;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid #dee2e6;
 }
 
 .receiptHeader {
@@ -92,6 +281,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  padding: 20px 20px 0 20px;
 }
 
 .receiptHeader h2 {
@@ -108,7 +298,19 @@
 .receiptItems {
   flex: 1;
   overflow-y: auto;
-  margin: 20px 0;
+  margin: 20px;
+  padding-right: 10px;
+}
+
+.emptyCart {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6c757d;
+}
+
+.emptyCart p {
+  margin: 8px 0;
+  font-size: 14px;
 }
 
 .receiptItem {
@@ -118,6 +320,8 @@
   padding: 12px;
   border-bottom: 1px solid #e0e0e0;
   background-color: #ffffff;
+  border-radius: 8px;
+  margin-bottom: 8px;
 }
 
 .itemInfo {
@@ -160,15 +364,22 @@
   transition: all 0.2s ease;
 }
 
-.quantityControls button:hover {
+.quantityControls button:hover:not(:disabled) {
   background-color: #f5f5f5;
   border-color: #d0d0d0;
+}
+
+.quantityControls button:disabled {
+  background-color: #f8f9fa;
+  cursor: not-allowed;
+  color: #adb5bd;
 }
 
 .quantityControls span {
   min-width: 24px;
   text-align: center;
   color: #1a1a1a;
+  font-weight: 600;
 }
 
 .itemPrice {
@@ -186,72 +397,274 @@
   cursor: pointer;
   padding: 0 5px;
   transition: color 0.2s ease;
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .removeButton:hover {
   color: #c82333;
+  background-color: #f8d7da;
 }
 
+/* Receipt Total */
 .receiptTotal {
-  padding: 20px 0;
+  padding: 20px;
   border-top: 2px solid #e0e0e0;
   background-color: #ffffff;
+  border-radius: 0 0 12px 12px;
 }
 
 .totalRow {
   display: flex;
   justify-content: space-between;
-  padding: 8px 0;
-  color: #1a1a1a;
+  margin-bottom: 8px;
+  padding: 4px 0;
 }
 
 .totalRow:last-child {
-  margin-top: 8px;
-  padding-top: 12px;
   border-top: 1px solid #e0e0e0;
+  padding-top: 12px;
+  margin-top: 8px;
+  font-size: 1.1rem;
 }
 
 .totalRow strong {
   color: #1a1a1a;
 }
 
+/* Receipt Actions */
 .receiptActions {
   display: flex;
   gap: 12px;
-  margin-top: 20px;
+  padding: 0 20px 20px 20px;
 }
 
 .validateButton, .cancelButton {
   flex: 1;
-  padding: 12px;
+  padding: 12px 20px;
   border: none;
   border-radius: 8px;
-  font-weight: 600;
   cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
   transition: all 0.2s ease;
-  font-size: 1rem;
 }
 
 .validateButton {
-  background-color: #1a1a1a;
+  background: #28a745;
   color: white;
 }
 
 .validateButton:hover:not(:disabled) {
-  background-color: #333;
+  background: #218838;
+  transform: translateY(-1px);
 }
 
 .cancelButton {
-  background-color: #dc3545;
+  background: #6c757d;
   color: white;
 }
 
 .cancelButton:hover:not(:disabled) {
-  background-color: #c82333;
+  background: #5a6268;
+  transform: translateY(-1px);
 }
 
 .validateButton:disabled, .cancelButton:disabled {
-  opacity: 0.65;
+  background: #adb5bd;
   cursor: not-allowed;
-  background-color: #666;
+  transform: none;
+}
+
+/* Success and Error Messages */
+.successMessage,
+.errorMessage {
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  font-weight: 500;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  animation: slideIn 0.3s ease;
+}
+
+.successMessage {
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+}
+
+.errorMessage {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Refresh Button */
+.refreshButton {
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.refreshButton:hover:not(:disabled) {
+  background: #0056b3;
+  transform: translateY(-1px);
+}
+
+.refreshButton:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Sale History */
+.saleHistory {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.saleHistory h3 {
+  margin: 0 0 15px 0;
+  color: #495057;
+  font-size: 1.1rem;
+}
+
+.historyList {
+  display: grid;
+  gap: 10px;
+}
+
+.historyItem {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 12px;
+  transition: all 0.2s ease;
+}
+
+.historyItem:hover {
+  border-color: #007bff;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
+}
+
+.historyInfo {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 15px;
+  align-items: center;
+  font-size: 14px;
+}
+
+.historyDate {
+  color: #6c757d;
+  font-size: 13px;
+}
+
+.historyTotal {
+  font-weight: 600;
+  color: #28a745;
+  text-align: right;
+}
+
+.historyItems {
+  color: #6c757d;
+  font-size: 13px;
+  text-align: center;
+}
+
+.historyPayment {
+  color: #495057;
+  font-size: 13px;
+  text-align: center;
+  text-transform: capitalize;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .salesContainer {
+    padding: 10px;
+    gap: 15px;
+  }
+  
+  .mainContent {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .productsPanel,
+  .receiptPanel {
+    height: auto;
+    min-height: 400px;
+  }
+  
+  .productsGrid {
+    grid-template-columns: 1fr;
+    padding: 10px;
+  }
+  
+  .receiptItems {
+    margin: 10px;
+  }
+  
+  .itemDetails {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  
+  .statusInfo {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .salesContainer {
+    padding: 5px;
+  }
+  
+  .productsGrid {
+    padding: 5px;
+  }
+  
+  .receiptItems {
+    margin: 5px;
+  }
+  
+  .itemDetails {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  
+  .successMessage,
+  .errorMessage {
+    padding: 10px 15px;
+    font-size: 13px;
+  }
 } 

@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { useDataSync } from '../../design-patterns/hooks/useDataSync';
 import roomsData from '../data/rooms.json';
 import reservationsData from '../data/reservations.json';
 
@@ -71,11 +72,10 @@ const useCalendarStore = create((set, get) => ({
     set({ highlightedRoom: roomNumber });
   },
 
-  isRoomAvailable: (roomNumber, startDate, endDate) => {
-    const { reservations } = get();
-    return !reservations.some(res =>
-      res.rooms.some(room =>
-        room.roomNumber === roomNumber &&
+  isRoomAvailable: (roomNumber, startDate, endDate, bookings) => {
+    return !bookings.some(booking =>
+      booking.rooms.some(room =>
+        room.roomId === roomNumber &&
         isDateRangeOverlapping(
           startDate,
           endDate,
@@ -84,7 +84,100 @@ const useCalendarStore = create((set, get) => ({
         )
       )
     );
+  },
+
+  // Initialize store
+  initialize: () => {
+    // Initialize with default state
+    set({
+      selectedRoom: null,
+      highlightedRoom: null,
+      defaultDates: null
+    });
+  },
+
+  // Cleanup
+  cleanup: () => {
+    set({
+      selectedRoom: null,
+      highlightedRoom: null,
+      defaultDates: null
+    });
   }
 }));
+
+/**
+ * Hook pentru hotel timeline cu integrare API
+ * @param {Object} options - Opțiuni pentru useDataSync
+ */
+export const useHotelTimelineWithAPI = (options = {}) => {
+  const {
+    startDate = null,
+    endDate = null,
+    enableValidation = true,
+    enableBusinessLogic = true
+  } = options;
+
+  // Folosește useDataSync pentru integrarea cu API
+  const timelineSync = useDataSync('timeline', {
+    businessType: 'hotel',
+    startDate,
+    endDate,
+    enableValidation,
+    enableBusinessLogic
+  });
+
+  // Folosește store-ul local pentru state management
+  const calendarStore = useCalendarStore();
+
+  return {
+    // API integration
+    ...timelineSync,
+    
+    // Local state management
+    ...calendarStore,
+    
+    // Business-specific data
+    getBookings: () => {
+      const { data } = timelineSync;
+      return {
+        bookings: data?.bookings || [],
+        rooms: data?.packages?.rooms || [],
+        isRoomAvailable: (roomNumber, startDate, endDate) =>
+          calendarStore.isRoomAvailable(roomNumber, startDate, endDate, data?.bookings || [])
+      };
+    },
+    
+    // Business-specific actions
+    createBooking: async (booking) => {
+      try {
+        const newBooking = await timelineSync.create(booking);
+        return newBooking;
+      } catch (error) {
+        console.error('Error creating booking:', error);
+        throw error;
+      }
+    },
+
+    updateBooking: async (id, updates) => {
+      try {
+        const updatedBooking = await timelineSync.update({ id, ...updates });
+        return updatedBooking;
+      } catch (error) {
+        console.error('Error updating booking:', error);
+        throw error;
+      }
+    },
+
+    deleteBooking: async (id) => {
+      try {
+        await timelineSync.remove({ id });
+      } catch (error) {
+        console.error('Error deleting booking:', error);
+        throw error;
+      }
+    }
+  };
+};
 
 export default useCalendarStore; 

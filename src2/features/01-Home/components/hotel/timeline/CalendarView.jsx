@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import useCalendarStore from "../../../store/calendarStore";
+import { useHotelTimelineWithAPI } from "../../../store";
 import { generateDatesArray, isDateRangeOverlapping, isDateInRange } from "./utils/dateUtils";
 import { useDragScroll } from "./hooks/useDragScroll";
 import DateSelector from "./components/DateSelector";
@@ -28,15 +28,33 @@ const STATUS_LABELS = {
 };
 
 const CalendarView = () => {
-  const { 
-    rooms, 
-    reservations, 
-    startDate, 
-    endDate, 
+  // Use the new timeline integration hook
+  const timeline = useHotelTimelineWithAPI({
+    startDate: '2024-01-01',
+    endDate: '2024-01-31',
+    enableValidation: true,
+    enableBusinessLogic: true
+  });
+
+  const {
+    data,
+    loading,
+    error,
+    refresh,
+    createBooking,
+    updateBooking,
+    deleteBooking,
+    getBookings,
+    rooms,
+    reservations,
+    startDate,
+    endDate,
     setDateRange,
     highlightedRoom,
     setHighlightedRoom
-  } = useCalendarStore();
+  } = timeline;
+
+  const { bookings, isRoomAvailable } = getBookings();
 
   const [days, setDays] = useState([]);
   const [previewDate, setPreviewDate] = useState(null);
@@ -51,26 +69,26 @@ const CalendarView = () => {
     const dragDuration = Date.now() - dragStartTimeRef.current;
     if (dragDuration > 200) return;
 
-    const reservation = reservations.find(res =>
+    const reservation = bookings.find(res =>
       res.rooms.some(room =>
-        room.roomNumber === roomNumber &&
+        room.roomId === roomNumber &&
         date.toISOString().split("T")[0] >= room.startDate.split("T")[0] &&
         date.toISOString().split("T")[0] < room.endDate.split("T")[0]
       )
     );
 
     if (reservation) {
-      const room = rooms.find(r => r.number === roomNumber);
+      const room = rooms.find(r => r.roomId === roomNumber);
       if (!room) return;
 
-      const reservedRoom = reservation.rooms.find(r => r.roomNumber === roomNumber);
+      const reservedRoom = reservation.rooms.find(r => r.roomId === roomNumber);
       if (!reservedRoom) return;
 
       setTooltipData({
         roomNumber,
         reservation: {
-          guestName: reservation.fullName,
-          phone: reservation.phone,
+          guestName: reservation.client?.clientName || 'Unknown',
+          phone: reservation.client?.phone || '',
           status: reservedRoom.status,
           checkIn: reservedRoom.startDate,
           checkOut: reservedRoom.endDate
@@ -79,7 +97,7 @@ const CalendarView = () => {
     } else {
       setTooltipData(null);
     }
-  }, [reservations, rooms, dragStartTimeRef]);
+  }, [bookings, rooms, dragStartTimeRef]);
 
   const handleCellHover = useCallback((roomNumber, date) => {
     if (isDragging) return;
@@ -102,9 +120,9 @@ const CalendarView = () => {
       return false;
     }
 
-    const isReserved = reservations.some((res) => 
+    const isReserved = bookings.some((res) => 
       res.rooms.some(room => 
-        room.roomNumber === roomNumber &&
+        room.roomId === roomNumber &&
         dayStr >= room.startDate.split("T")[0] &&
         dayStr < room.endDate.split("T")[0]
       )
@@ -115,24 +133,46 @@ const CalendarView = () => {
     }
 
     return true;
-  }, [previewDate, reservations]);
+  }, [previewDate, bookings]);
 
   const getRoomStatus = useCallback((roomNumber, date) => {
     const dayStr = date.toISOString().split("T")[0];
-    const reservation = reservations.find(res =>
+    const reservation = bookings.find(res =>
       res.rooms.some(room =>
-        room.roomNumber === roomNumber &&
+        room.roomId === roomNumber &&
         dayStr >= room.startDate.split("T")[0] &&
         dayStr < room.endDate.split("T")[0]
       )
     );
 
     if (reservation) {
-      const room = reservation.rooms.find(r => r.roomNumber === roomNumber);
+      const room = reservation.rooms.find(r => r.roomId === roomNumber);
       return room.status || ROOM_STATUS.OCCUPIED;
     }
     return ROOM_STATUS.AVAILABLE;
-  }, [reservations]);
+  }, [bookings]);
+
+  if (error) {
+    return (
+      <div className={styles.calendarContainer}>
+        <div className={styles.errorState}>
+          <h3>Eroare la încărcarea calendarului</h3>
+          <p>{error.message || error}</p>
+          <button onClick={refresh}>Încearcă din nou</button>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className={styles.calendarContainer}>
+        <div className={styles.loadingState}>
+          <p>Se încarcă calendarul...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.calendarContainer}>
