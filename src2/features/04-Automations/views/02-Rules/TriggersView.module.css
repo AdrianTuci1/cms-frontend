@@ -38,7 +38,38 @@
   background-color: #2563eb;
 }
 
+.addButton:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
 .icon {
+  font-size: 1rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: #64748b;
+}
+
+.error {
+  text-align: center;
+  padding: 2rem;
+  color: #dc2626;
+  background-color: #fef2f2;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #64748b;
+}
+
+.emptyState p {
+  margin-bottom: 1rem;
   font-size: 1rem;
 }
 
@@ -53,6 +84,11 @@
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   padding: 1.5rem;
+  transition: box-shadow 0.2s;
+}
+
+.triggerCard:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .triggerHeader {
@@ -87,6 +123,11 @@
   color: #1a1a1a;
 }
 
+.actionButton:disabled {
+  color: #d1d5db;
+  cursor: not-allowed;
+}
+
 .triggerDetails {
   display: flex;
   flex-direction: column;
@@ -101,7 +142,10 @@
 
 .triggerStatus {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .statusBadge {
@@ -111,14 +155,51 @@
   font-weight: 500;
 }
 
-.statusBadge:first-child {
+.statusBadge.active {
   background-color: #dcfce7;
   color: #166534;
 }
 
-.statusBadge:last-child {
+.statusBadge.inactive {
   background-color: #fee2e2;
   color: #991b1b;
+}
+
+.toggleButton {
+  padding: 0.25rem 0.75rem;
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.toggleButton:hover {
+  background-color: #e5e7eb;
+}
+
+.toggleButton:disabled {
+  background-color: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.triggerStats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  background-color: #f1f5f9;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: #475569;
+}
+
+.triggerStats span {
+  display: flex;
+  justify-content: space-between;
 }
 
 @media (max-width: 768px) {
@@ -131,5 +212,10 @@
   .addButton {
     width: 100%;
     justify-content: center;
+  }
+
+  .triggerStatus {
+    flex-direction: column;
+    align-items: flex-start;
   }
 } 

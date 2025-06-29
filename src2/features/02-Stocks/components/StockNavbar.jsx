@@ -1,9 +1,13 @@
 import React from 'react';
 import styles from './StockNavbar.module.css';
 
-const StockNavbar = ({ onPrint, onAddStock }) => {
+const StockNavbar = ({ onPrint, onAddStock, canCreateStock = true, businessType = 'gym' }) => {
   return (
     <div className={styles.header}>
+      <div className={styles.headerInfo}>
+        <h2>Inventory Management</h2>
+        <span className={styles.businessType}>{businessType.toUpperCase()}</span>
+      </div>
       <div className={styles.headerActions}>
         <button 
           className={styles.printButton}
@@ -14,8 +18,9 @@ const StockNavbar = ({ onPrint, onAddStock }) => {
         <button 
           className={styles.addButton}
           onClick={onAddStock}
+          disabled={!canCreateStock}
         >
-          Add New Stock
+          {canCreateStock ? 'Add New Stock' : 'No Permission'}
         </button>
       </div>
     </div>

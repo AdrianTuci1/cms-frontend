@@ -1,42 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styles from './MembersTab.module.css';
-import { FaEnvelope, FaPhone, FaCalendarAlt } from 'react-icons/fa';
+import { FaEnvelope, FaPhone } from 'react-icons/fa';
+import useMembersStore from '../../store/membersStore';
 
 const MembersTab = () => {
-  const [members, setMembers] = useState([
-    { 
-      id: 1, 
-      name: 'John Doe', 
-      email: 'john@example.com', 
-      phone: '0712 345 678',
-      role: 'Manager', 
-      workDays: [0, 1, 2, 3, 4], // Monday to Friday
-      photoUrl: 'https://randomuser.me/api/portraits/men/32.jpg',
-    },
-    { 
-      id: 2, 
-      name: 'Jane Smith', 
-      email: 'jane@example.com', 
-      phone: '0723 456 789',
-      role: 'Receptioner', 
-      workDays: [1, 3, 5, 6], // Tuesday, Thursday, Saturday, Sunday
-      photoUrl: 'https://randomuser.me/api/portraits/women/44.jpg',
-    },
-    { 
-      id: 3, 
-      name: 'Robert Johnson', 
-      email: 'robert@example.com', 
-      phone: '0734 567 890',
-      role: 'Camerista', 
-      workDays: [0, 2, 4, 6], // Monday, Wednesday, Friday, Sunday
-      photoUrl: 'https://randomuser.me/api/portraits/men/55.jpg',
-    },
-  ]);
-
-  const getDayPill = (day) => {
-    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    return days[day];
-  };
+  const { members, getDayPill } = useMembersStore();
 
   return (
     <div className={styles.membersContainer}>

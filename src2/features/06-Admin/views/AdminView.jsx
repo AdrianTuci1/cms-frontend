@@ -1,52 +1,21 @@
 import { useState } from 'react';
 import styles from './AdminView.module.css';
 import { FaPlus } from 'react-icons/fa';
-import MembersTab from '../../components/dashboard/admin/MembersTab';
-import RolesTab from '../../components/dashboard/admin/RolesTab';
+import MembersTab from './Members/MembersTab';
+import RolesTab from './Permissions/RolesTab';
 import StaffProfileModal from '../../components/dashboard/admin/StaffProfileModal';
-import useTabsStore from '../../store/tabsStore';
+import useTabsStore from '../../layout/tabsStore';
 
 const AdminView = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { activeTab } = useTabsStore();
-  const [staffEmails, setStaffEmails] = useState({
-    manager: ['manager@example.com'],
-    receptioner: ['receptioner@example.com'],
-    camerista: ['camerista@example.com']
-  });
-
-  const handleAddEmail = (role, email) => {
-    setStaffEmails(prev => ({
-      ...prev,
-      [role]: [...prev[role], email]
-    }));
-  };
-
-  const handleRemoveEmail = (role, email) => {
-    setStaffEmails(prev => ({
-      ...prev,
-      [role]: prev[role].filter(e => e !== email)
-    }));
-  };
-
-  const handleViewProfile = (email) => {
-    // TODO: Implement view profile functionality
-    console.log('View profile for:', email);
-  };
 
   const renderContent = () => {
     switch (activeTab) {
       case 'members':
         return <MembersTab />;
       case 'roles':
-        return (
-          <RolesTab
-            staffEmails={staffEmails}
-            onAddEmail={handleAddEmail}
-            onRemoveEmail={handleRemoveEmail}
-            onViewProfile={handleViewProfile}
-          />
-        );
+        return <RolesTab />;
       default:
         return <MembersTab />; // Default to members tab
     }

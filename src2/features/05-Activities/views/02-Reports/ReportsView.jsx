@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import styles from './ReportsView.module.css';
-import MonthlyReport from './reports/MonthlyReport';
-import DailyReport from './reports/DailyReport';
-import ServicesReport from './reports/ServicesReport';
-import TrendsReport from './reports/TrendsReport';
+import MonthlyReport from '../../components/reports/MonthlyReport';
+import DailyReport from '../../components/reports/DailyReport';
+import ServicesReport from '../../components/reports/ServicesReport';
+import TrendsReport from '../../components/reports/TrendsReport';
 
 const REPORT_TYPES = {
   MONTHLY: 'monthly',

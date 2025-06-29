@@ -6,6 +6,14 @@ const useHistoryStore = create((set, get) => ({
   historyItems: [],
   isLoading: false,
   error: null,
+  
+  // UI State (moved from component)
+  search: '',
+  selectedDate: '2025-03-19',
+  selectedTypes: [],
+  timeRange: 'all',
+  customRange: null,
+  
   filters: {
     dateFrom: null,
     dateTo: null,
@@ -17,6 +25,183 @@ const useHistoryStore = create((set, get) => ({
     page: 1,
     limit: 20,
     total: 0
+  },
+
+  // Mock data (moved from component)
+  mockHistoryData: [
+    {
+      id: 1,
+      timestamp: '2025-03-19 10:30',
+      title: 'Check-out camera 101',
+      type: 'checkout',
+      details: 'Camera 101 mutată în status murdar',
+      user: {
+        name: 'Ana Popescu',
+        role: 'Receptioner',
+        avatar: 'AP',
+        isAI: false
+      }
+    },
+    {
+      id: 2,
+      timestamp: '2025-03-19 11:15',
+      title: 'Problemă raportată camera 202',
+      type: 'problem',
+      details: 'Aer condiționat defect',
+      user: {
+        name: 'AI Assistant',
+        role: 'AI',
+        avatar: '🤖',
+        isAI: true
+      }
+    },
+    {
+      id: 3,
+      timestamp: '2025-03-19 12:00',
+      title: 'Curățenie camera 303',
+      type: 'cleaning',
+      details: 'Curățenie finalizată în 15 min',
+      user: {
+        name: 'Elena Popa',
+        role: 'Cameristă',
+        avatar: 'EP',
+        isAI: false
+      }
+    },
+    {
+      id: 4,
+      timestamp: '2025-03-19 13:30',
+      title: 'Sugestie optimizare program',
+      type: 'suggestion',
+      details: 'Programul de curățenie poate fi optimizat pentru etajul 2',
+      user: {
+        name: 'AI Assistant',
+        role: 'AI',
+        avatar: '🤖',
+        isAI: true
+      }
+    },
+    {
+      id: 5,
+      timestamp: '2025-03-19 14:45',
+      title: 'Check-in camera 205',
+      type: 'checkout',
+      details: 'Clientul a sosit cu 2 ore înainte de check-in. Camera era disponibilă și a fost alocată imediat.',
+      user: {
+        name: 'Maria Ionescu',
+        role: 'Receptioner',
+        avatar: 'MI',
+        isAI: false
+      }
+    },
+    {
+      id: 6,
+      timestamp: '2025-03-19 15:20',
+      title: 'Solicitare servicii camera 402',
+      type: 'service',
+      details: 'Clientul a solicitat servicii de room service: 2 cafele și desert',
+      user: {
+        name: 'AI Assistant',
+        role: 'AI',
+        avatar: '🤖',
+        isAI: true
+      }
+    },
+    {
+      id: 7,
+      timestamp: '2025-03-19 16:00',
+      title: 'Mentenanță camera 202',
+      type: 'maintenance',
+      details: 'Aer condiționat reparat și testat. Funcționează normal.',
+      user: {
+        name: 'Ion Popa',
+        role: 'Tehnician',
+        avatar: 'IP',
+        isAI: false
+      }
+    },
+    {
+      id: 8,
+      timestamp: '2025-03-19 16:30',
+      title: 'Curățenie camera 101',
+      type: 'cleaning',
+      details: 'Curățenie completă finalizată. Toate lenjerii schimbate.',
+      user: {
+        name: 'Sofia Dumitrescu',
+        role: 'Cameristă',
+        avatar: 'SD',
+        isAI: false
+      }
+    },
+    {
+      id: 9,
+      timestamp: '2025-03-19 17:15',
+      title: 'Raport inventar',
+      type: 'report',
+      details: 'Inventarul zilnic finalizat. Toate articolele prezente și în stare bună.',
+      user: {
+        name: 'Alexandru Marin',
+        role: 'Manager',
+        avatar: 'AM',
+        isAI: false
+      }
+    },
+    {
+      id: 10,
+      timestamp: '2025-03-19 18:00',
+      title: 'Sugestie optimizare energie',
+      type: 'suggestion',
+      details: 'Consumul de energie poate fi redus cu 15% prin ajustarea programului de aer condiționat',
+      user: {
+        name: 'AI Assistant',
+        role: 'AI',
+        avatar: '🤖',
+        isAI: true
+      }
+    },
+    {
+      id: 11,
+      timestamp: '2025-03-19 19:30',
+      title: 'Check-in camera 505',
+      type: 'checkout',
+      details: 'Check-in finalizat. Documentele verificate și copiate.',
+      user: {
+        name: 'Ana Popescu',
+        role: 'Receptioner',
+        avatar: 'AP',
+        isAI: false
+      }
+    },
+    {
+      id: 12,
+      timestamp: '2025-03-19 20:15',
+      title: 'Solicitare asistență',
+      type: 'service',
+      details: 'Clientul din camera 303 a solicitat asistență pentru conectarea la WiFi',
+      user: {
+        name: 'AI Assistant',
+        role: 'AI',
+        avatar: '🤖',
+        isAI: true
+      }
+    }
+  ],
+
+  // UI Actions (moved from component)
+  setSearch: (search) => set({ search }),
+  
+  setSelectedDate: (selectedDate) => set({ selectedDate }),
+  
+  setTimeRange: (timeRange) => set({ timeRange }),
+  
+  setCustomRange: (customRange) => set({ customRange }),
+  
+  toggleType: (type) => {
+    set(state => ({
+      selectedTypes: state.selectedTypes.includes(type)
+        ? state.selectedTypes.filter(t => t !== type)
+        : [...state.selectedTypes, type]
+    }));
   },
 
   // Actions
@@ -225,6 +410,13 @@ const useHistoryStore = create((set, get) => ({
         return acc;
       }, {})
     };
+  },
+
+  // Get current history data (combines real data with mock data for now)
+  getCurrentHistoryData: () => {
+    const { historyItems, mockHistoryData } = get();
+    // For now, return mock data. In production, this would return historyItems
+    return mockHistoryData;
   }
 }));
 

@@ -1,137 +1,107 @@
-import React, { useState, useCallback } from 'react';
-import { stocksData } from '../../data/stocksData';
+import React from 'react';
 import styles from './StocksView.module.css';
 import ResizablePanels from '../../components/dashboard/gym/ResizablePanels';
 import StockNavbar from '../../components/dashboard/stocks/StockNavbar';
 import InventoryCard from '../../components/dashboard/stocks/InventoryCard';
 import LowStockCard from '../../components/dashboard/stocks/LowStockCard';
 import AddStockForm from '../../components/dashboard/stocks/AddStockForm';
+import useStocksStore from '../store/stocksStore';
 
-const StocksView = () => {
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [newItem, setNewItem] = useState({
-    code: '',
-    name: '',
-    currentPrice: '',
-    quantity: '',
-    category: 'Drinks'
-  });
+const StocksView = ({ businessType = 'gym' }) => {
+  // Folosește store-ul pentru toată logica de business
+  const {
+    // State
+    showAddForm,
+    setShowAddForm,
+    newItem,
+    setNewItem,
+    searchTerm,
+    setSearchTerm,
+    selectedCategory,
+    setSelectedCategory,
+    sortBy,
+    setSortBy,
+    sortOrder,
+    setSortOrder,
+    
+    // Data
+    stocksData,
+    stocksLoading,
+    stocksError,
+    lastUpdated,
+    isOnline,
+    
+    // Functions
+    formatCurrency,
+    handleAddItem,
+    handleUpdateItem,
+    handleDeleteItem,
+    handlePrint,
+    refreshStocks,
+    
+    // Business logic
+    businessLogic,
+    
+    // Permissions
+    canCreateStock,
+    canUpdateStock,
+    canDeleteStock
+  } = useStocksStore(businessType);
 
-  const formatCurrency = useCallback((value) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(value);
-  }, []);
-
-  const handleAddItem = useCallback((e) => {
-    e.preventDefault();
-    console.log('Adding new item:', newItem);
-    setShowAddForm(false);
-    setNewItem({
-      code: '',
-      name: '',
-      currentPrice: '',
-      quantity: '',
-      category: 'Drinks'
-    });
-  }, [newItem]);
-
-  const handlePrint = useCallback(() => {
-    const printContent = document.createElement('div');
-    printContent.innerHTML = `
-      <style>
-        body { font-family: Arial, sans-serif; }
-        .print-header { text-align: center; margin-bottom: 20px; }
-        .print-section { margin-bottom: 30px; }
-        .print-table { width: 100%; border-collapse: collapse; }
-        .print-table th, .print-table td { 
-          border: 1px solid #ddd; 
-          padding: 8px; 
-          text-align: left; 
-        }
-        .print-table th { background-color: #f5f5f5; }
-        .low-stock { color: #e74c3c; }
-        @media print {
-          .no-print { display: none; }
-        }
-      </style>
-      <div class="print-header">
-        <h1>Inventory Report</h1>
-        <p>Generated on: ${new Date().toLocaleString()}</p>
+  // Render loading state
+  if (stocksLoading) {
+    return (
+      <div className={styles.stocksView}>
+        <div className={styles.loadingContainer}>
+          <h3>Loading inventory...</h3>
+          <p>Fetching data from server...</p>
+        </div>
       </div>
-      <div class="print-section">
-        <h2>Current Inventory</h2>
-        <table class="print-table">
-          <thead>
-            <tr>
-              <th>Code</th>
-              <th>Name</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Quantity</th>
-              <th>Total Value</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${stocksData.inventory.map(item => `
-              <tr>
-                <td>${item.code}</td>
-                <td>${item.name}</td>
-                <td>${item.category}</td>
-                <td>${formatCurrency(item.currentPrice)}</td>
-                <td>${item.quantity}</td>
-                <td>${formatCurrency(item.value)}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>
-      <div class="print-section">
-        <h2>Low Stock Items</h2>
-        <table class="print-table">
-          <thead>
-            <tr>
-              <th>Code</th>
-              <th>Name</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Quantity</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${stocksData.lowStock.map(item => `
-              <tr>
-                <td>${item.code}</td>
-                <td>${item.name}</td>
-                <td>${item.category}</td>
-                <td>${formatCurrency(item.currentPrice)}</td>
-                <td class="low-stock">${item.quantity}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>
-    `;
+    );
+  }
 
-    const originalContent = document.body.innerHTML;
-    document.body.innerHTML = printContent.innerHTML;
-    window.print();
-    document.body.innerHTML = originalContent;
-  }, [formatCurrency]);
+  // Render error state
+  if (stocksError) {
+    return (
+      <div className={styles.stocksView}>
+        <div className={styles.errorContainer}>
+          <h3>Error loading inventory</h3>
+          <p>{stocksError.message}</p>
+          <button onClick={refreshStocks} className={styles.retryButton}>
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const leftContent = (
     <div className={styles.inventorySection}>
       <div className={styles.sectionHeader}>
         <h3>Current Inventory</h3>
         <span className={styles.itemCount}>{stocksData.inventory.length} items</span>
+        <div className={styles.statusInfo}>
+          <span className={isOnline ? styles.online : styles.offline}>
+            {isOnline ? '🟢 Online' : '🔴 Offline'}
+          </span>
+          {lastUpdated && (
+            <span className={styles.lastUpdated}>
+              Last updated: {new Date(lastUpdated).toLocaleTimeString()}
+            </span>
+          )}
+        </div>
       </div>
+      
       <div className={styles.inventoryList}>
         {stocksData.inventory.map((item) => (
           <InventoryCard 
             key={item.id} 
             item={item} 
             formatCurrency={formatCurrency}
+            onUpdate={handleUpdateItem}
+            onDelete={handleDeleteItem}
+            canUpdate={canUpdateStock}
+            canDelete={canDeleteStock}
           />
         ))}
       </div>
@@ -150,6 +120,10 @@ const StocksView = () => {
             key={item.id} 
             item={item} 
             formatCurrency={formatCurrency}
+            onUpdate={handleUpdateItem}
+            onDelete={handleDeleteItem}
+            canUpdate={canUpdateStock}
+            canDelete={canDeleteStock}
           />
         ))}
       </div>
@@ -161,6 +135,8 @@ const StocksView = () => {
       <StockNavbar 
         onPrint={handlePrint}
         onAddStock={() => setShowAddForm(true)}
+        canCreateStock={canCreateStock}
+        businessType={businessType}
       />
 
       {showAddForm && (
@@ -169,6 +145,7 @@ const StocksView = () => {
           setNewItem={setNewItem}
           onSubmit={handleAddItem}
           onCancel={() => setShowAddForm(false)}
+          canCreateStock={canCreateStock}
         />
       )}
 

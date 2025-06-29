@@ -1,87 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styles from './InvoicesSection.module.css';
 import InvoiceCard from '../../components/dashboard/invoices/InvoiceCard';
-import { FaBuilding, FaStore, FaHome } from 'react-icons/fa';
+import useInvoicesStore from '../store';
 
 const InvoicesSection = () => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const {
+    searchQuery,
+    setSearchQuery,
+    getFilteredInvoices,
+    getFilteredSuggestions,
+    getTotalItemsCount
+  } = useInvoicesStore();
 
-  const recentInvoices = [
-    {
-      id: 1,
-      number: 'INV-2024-001',
-      businessType: 'hotel',
-      customer: 'John Smith',
-      amount: '€450.00',
-      date: '2024-03-15',
-      status: 'Paid',
-      icon: <FaBuilding />
-    },
-    {
-      id: 2,
-      number: 'INV-2024-002',
-      businessType: 'restaurant',
-      customer: 'Maria Garcia',
-      amount: '€125.50',
-      date: '2024-03-14',
-      status: 'Pending',
-      icon: <FaStore />
-    },
-    {
-      id: 3,
-      number: 'INV-2024-003',
-      businessType: 'apartment',
-      customer: 'Alex Johnson',
-      amount: '€850.00',
-      date: '2024-03-13',
-      status: 'Paid',
-      icon: <FaHome />
-    }
-  ];
-
-  const billingSuggestions = [
-    {
-      id: 1,
-      customer: 'Sarah Wilson',
-      businessType: 'hotel',
-      lastVisit: '2024-03-10',
-      suggestedAmount: '€380.00',
-      icon: <FaBuilding />
-    },
-    {
-      id: 2,
-      customer: 'Michael Brown',
-      businessType: 'restaurant',
-      lastVisit: '2024-03-12',
-      suggestedAmount: '€95.00',
-      icon: <FaStore />
-    },
-    {
-      id: 3,
-      customer: 'Emma Davis',
-      businessType: 'apartment',
-      lastVisit: '2024-03-08',
-      suggestedAmount: '€720.00',
-      icon: <FaHome />
-    }
-  ];
-
-  const filteredInvoices = recentInvoices.filter(invoice => {
-    const searchLower = searchQuery.toLowerCase();
-    return (
-      invoice.number.toLowerCase().includes(searchLower) ||
-      invoice.customer.toLowerCase().includes(searchLower) ||
-      invoice.amount.toLowerCase().includes(searchLower)
-    );
-  });
-
-  const filteredSuggestions = billingSuggestions.filter(suggestion => {
-    const searchLower = searchQuery.toLowerCase();
-    return (
-      suggestion.customer.toLowerCase().includes(searchLower) ||
-      suggestion.suggestedAmount.toLowerCase().includes(searchLower)
-    );
-  });
+  const filteredInvoices = getFilteredInvoices();
+  const filteredSuggestions = getFilteredSuggestions();
+  const totalItemsCount = getTotalItemsCount();
 
   return (
     <div className={styles.invoicesContainer}>
@@ -112,7 +45,7 @@ const InvoicesSection = () => {
               </button>
             </div>
             <span className={styles.invoiceCount}>
-              {filteredInvoices.length + filteredSuggestions.length} items
+              {totalItemsCount} items
             </span>
           </div>
         </div>

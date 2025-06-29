@@ -1,9 +1,9 @@
 import React from 'react';
 import styles from '../styles/RecentActivities.module.css';
 
-const RecentActivities = () => {
-  // Mock data for automation events
-  const automationEvents = [
+const RecentActivities = ({ activities, isLoading }) => {
+  // Use activities from store if available, otherwise use mock data
+  const automationEvents = activities || [
     {
       id: 1,
       type: 'booking',
@@ -37,6 +37,16 @@ const RecentActivities = () => {
       status: 'completed'
     }
   ];
+
+  if (isLoading) {
+    return (
+      <div className={styles.eventsList}>
+        <div className={styles.loading}>
+          <p>Se încarcă activitățile...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.eventsList}>

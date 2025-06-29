@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styles from '../styles/AutomationSections.module.css';
 
-const AutomationSections = ({ assistants, onToggle, onConfigUpdate }) => {
+const AutomationSections = ({ assistants, onToggle, onConfigUpdate, isLoading }) => {
   const [showApiKey, setShowApiKey] = useState({
     booking: false,
     whatsapp: false,
@@ -14,7 +14,9 @@ const AutomationSections = ({ assistants, onToggle, onConfigUpdate }) => {
   });
 
   const handleApiKeyUpdate = (assistantId, apiKey) => {
-    onConfigUpdate(assistantId, { apiKey });
+    if (onConfigUpdate) {
+      onConfigUpdate(assistantId, { apiKey });
+    }
   };
 
   const toggleApiKeyVisibility = (assistantId) => {
@@ -31,14 +33,21 @@ const AutomationSections = ({ assistants, onToggle, onConfigUpdate }) => {
     }));
   };
 
+  const handleToggle = (assistantId) => {
+    if (onToggle && !isLoading) {
+      onToggle(assistantId);
+    }
+  };
+
   const renderAutomationSection = (id, title, icon, type) => (
     <div className={styles.automationSection}>
       <div className={styles.automationHeader}>
         <label className={styles.switch}>
           <input
             type="checkbox"
-            checked={assistants[id]?.isActive || false}
-            onChange={() => onToggle(id)}
+            checked={assistants?.[id]?.isActive || false}
+            onChange={() => handleToggle(id)}
+            disabled={isLoading}
           />
           <span className={styles.slider}></span>
         </label>
@@ -84,9 +93,10 @@ const AutomationSections = ({ assistants, onToggle, onConfigUpdate }) => {
             <div className={styles.apiKeyInput}>
               <input
                 type={showApiKey[type] ? 'text' : 'password'}
-                value={assistants[id]?.config?.apiKey || ''}
+                value={assistants?.[id]?.config?.apiKey || ''}
                 onChange={(e) => handleApiKeyUpdate(id, e.target.value)}
                 placeholder={`Introduceti API Key-ul ${title}`}
+                disabled={isLoading}
               />
             </div>
           </div>
@@ -94,6 +104,16 @@ const AutomationSections = ({ assistants, onToggle, onConfigUpdate }) => {
       </div>
     );
   };
+
+  if (isLoading) {
+    return (
+      <div className={styles.automationSections}>
+        <div className={styles.loading}>
+          <p>Se încarcă asistenții...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>

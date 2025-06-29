@@ -2,15 +2,25 @@ import React, { useState } from 'react';
 import { FaPlay, FaStop, FaCoins, FaUser, FaRobot } from 'react-icons/fa';
 import styles from '../styles/SystemHealth.module.css';
 
-const SystemHealth = () => {
+const SystemHealth = ({ systemHealth, isLoading }) => {
   const [isRunning, setIsRunning] = useState(false);
   const [tokenUsage, setTokenUsage] = useState(0);
   const [delay, setDelay] = useState(0);
   const [availableTokens, setAvailableTokens] = useState(1000);
   const [timePeriod, setTimePeriod] = useState('daily'); // 'daily' or 'weekly'
 
-  // Sample data - in a real app, this would come from props or an API
-  const metrics = {
+  // Use systemHealth from store if available, otherwise use sample data
+  const metrics = systemHealth ? {
+    reservations: {
+      human: 45,
+      booking: 120,
+      whatsapp: 85
+    },
+    profit: {
+      percentage: 15,
+      extraProfit: 2500
+    }
+  } : {
     reservations: {
       human: 45,
       booking: 120,
@@ -34,6 +44,16 @@ const SystemHealth = () => {
   const handlePurchaseTokens = () => {
     console.log('Purchase tokens clicked');
   };
+
+  if (isLoading) {
+    return (
+      <div className={styles.systemHealthBox}>
+        <div className={styles.loading}>
+          <p>Se încarcă starea sistemului...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.systemHealthBox}>
