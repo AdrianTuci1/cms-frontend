@@ -1,14 +1,13 @@
 import { useOutletContext } from 'react-router-dom';
-import AutomationSection from '../../sections/AutomationSection';
-import HistorySection from '../../sections/HistorySection';
-import StaffSection from '../../sections/StaffSection';
-import StocksSection from '../../sections/Stocks/StocksSection';
-import TimelineView from '../../views/TimelineView';
-import SalesView from '../../views/SalesView';
-import ClientsView from '../../views/ClientsView';
-import ServicesView from '../../views/ServicesView';
-import InvoicesSection from '../../sections/Invoices/InvoicesSection';
-import BlitzSection from '../../sections/Blitz/BlitzSection';
+import AutomationSection from '../../features/04-Automations/views/AutomationSection';
+import HistorySection from '../../features/05-Activities/views/HistorySection';
+import AdminView from '../../features/06-Admin/views/AdminView';
+import StocksView from '../../features/02-Stocks/views/StocksView';
+import TimelineView from '../../features/01-Home/views/01-Timeline/TimelineView';
+import SalesView from '../../features/01-Home/views/02-Sales/SalesView';
+import ClientsView from '../../features/01-Home/views/03-Clients/ClientsView';
+import ServicesView from '../../features/01-Home/views/04-Services/ServicesView';
+import InvoicesSection from '../../features/03-Invoices/views/InvoicesSection';
 
 const Dashboard = () => {
   const { currentSection, currentView } = useOutletContext();
@@ -33,17 +32,15 @@ const Dashboard = () => {
       case 'dashboard':
         return renderDashboardViews();
       case 'stocks':
-        return <StocksSection view={currentView} />;
+        return <StocksView view={currentView} />;
       case 'automations':
         return <AutomationSection />;
       case 'activities':
         return <HistorySection />;
       case 'admin':
-        return <StaffSection />;
+        return <AdminView />;
       case 'invoices':
         return <InvoicesSection />;
-      case 'blitz':
-        return <BlitzSection />;
       default:
         return null;
     }

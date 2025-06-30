@@ -1,12 +1,12 @@
 import React, { useState, useMemo } from 'react';
 import styles from './ServicesView.module.css';
-import { getBusinessType, BUSINESS_TYPES } from '../config/businessTypes';
-import { useDataSync } from '../../../design-patterns/hooks';
-import TreatmentCard from '../components/dashboard/dental/TreatmentCard/TreatmentCard';
-import PackageCard from '../components/dashboard/gym/Packages/PackageCard';
-import RoomCard from '../components/dashboard/hotel/RoomCard/RoomCard';
-import useDrawerStore from '../store/drawerStore';
-import AddService from '../components/drawer/AddService/AddService';
+import { getBusinessType, BUSINESS_TYPES } from '../../../../config/businessTypes';
+import { useDataSync } from '../../../../design-patterns/hooks';
+import TreatmentCard from '../../components/dental/services/TreatmentCard.jsx';
+import PackageCard from '../../components/gym/services/PackageCard.jsx';
+import RoomCard from '../../components/hotel/services/RoomCard.jsx';
+import useDrawerStore from '../../../00-Drawers/store/drawerStore';
+// import AddService from '../components/drawer/AddService/AddService';
 
 const ServicesView = () => {
   const businessType = getBusinessType();
@@ -95,7 +95,8 @@ const ServicesView = () => {
   const services = packages || fallbackServices;
 
   const handleAddService = () => {
-    openDrawer(<AddService />, 'add service');
+    // openDrawer(<AddService />, 'add service');
+    console.log('Add service functionality not implemented yet');
   }
 
   const getSearchPlaceholder = () => {

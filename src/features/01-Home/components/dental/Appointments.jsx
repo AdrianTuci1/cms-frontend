@@ -1,16 +1,16 @@
-import { useEffect, lazy, Suspense, useState } from 'react';
-import AppointmentHeader from './appointmentsSection/AppointmentHeader';
-import WeekNavigator from './appointmentsSection/WeekNavigator';
-import styles from './appointmentsSection/Appointments.module.css';
-import AddAppointment from '../../components/drawer/AddAppointment/AddAppointment';
-import useDrawerStore from '../../store/drawerStore';
+import { useEffect, lazy, Suspense, useState, useMemo } from 'react';
+import AppointmentHeader from './timeline/AppointmentHeader';
+import WeekNavigator from './timeline/WeekNavigator';
+import styles from './timeline/Appointments.module.css';
+// import AddAppointment from '../../components/drawer/AddAppointment/AddAppointment';
+// import useDrawerStore from '../../store/drawerStore';
 import { useDentalTimelineWithAPI } from '../../store';
 
 // Lazy load WeekView component
-const WeekView = lazy(() => import('./appointmentsSection/WeekView'));
+const WeekView = lazy(() => import('./timeline/WeekView'));
 
 const Appointments = () => {
-  const { openDrawer } = useDrawerStore();
+  // const { openDrawer } = useDrawerStore();
   
   // Date range for timeline
   const [startDate, setStartDate] = useState(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
@@ -40,20 +40,25 @@ const Appointments = () => {
     goToNextWeek,
     goToToday,
     isAllAppointments,
-    setAllAppointments
+    setAllAppointments,
+    initialize
   } = timeline;
 
+  // Extragem appointments și displayedAppointments din hook
   const { appointments, displayedAppointments, getAppointmentsCountForDate } = getAppointments();
+
+  // Folosim useMemo pentru displayedAppointments dacă este derivat
+  const memoizedDisplayedAppointments = useMemo(() => displayedAppointments, [displayedAppointments]);
 
   useEffect(() => {
     // Initialize the timeline when component mounts
-    if (timeline.initialize) {
-      timeline.initialize();
+    if (initialize) {
+      initialize();
     }
-  }, [timeline]);
+  }, []); // Empty dependency array to run only once
 
   const handleAddAppointment = () => {
-    openDrawer(<AddAppointment />, 'addAppointment');
+    // openDrawer(<AddAppointment />, 'addAppointment');
   };
 
   const handleAppointmentClick = (appointment) => {
@@ -110,7 +115,7 @@ const Appointments = () => {
       }>
         <WeekView
           selectedWeek={currentWeek}
-          appointments={displayedAppointments}
+          appointments={memoizedDisplayedAppointments}
           onAppointmentClick={handleAppointmentClick}
           onPatientClick={handlePatientClick}
           isLoading={loading}

@@ -266,4 +266,7 @@ export const useOfflineStatus = () => {
     syncStatus,
     offlineStatus
   };
-}; 
+};
+
+// Default export
+export default useOfflineData; 

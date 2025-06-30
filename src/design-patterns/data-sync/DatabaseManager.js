@@ -84,15 +84,57 @@ class DatabaseManager {
     }
 
     const timestamp = new Date().toISOString();
+    
+    // Ensure data has a valid id
+    let dataWithId = data;
+    if (!data.id) {
+      // Generate a unique id if none exists
+      dataWithId = {
+        ...data,
+        id: `${resource}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+      };
+    }
+
     const dataWithMeta = {
-      ...data,
+      ...dataWithId,
       _syncTimestamp: timestamp,
       _lastModified: timestamp,
-      _version: (data._version || 0) + 1
+      _version: (data._version || 0) + 1,
+      _resource: resource
     };
 
-    await this.db.put(resource, dataWithMeta);
-    eventBus.emit('datasync:stored', { resource, data: dataWithMeta });
+    try {
+      // Verifică dacă datele există deja pentru a evita duplicarea
+      if (Array.isArray(dataWithMeta)) {
+        // Pentru array-uri, verifică fiecare element
+        for (const item of dataWithMeta) {
+          if (item.id) {
+            const existingItem = await this.db.get(resource, item.id);
+            if (!existingItem) {
+              await this.db.put(resource, item);
+            }
+          } else {
+            await this.db.put(resource, item);
+          }
+        }
+      } else {
+        // Pentru obiecte singulare
+        if (dataWithMeta.id) {
+          const existingItem = await this.db.get(resource, dataWithMeta.id);
+          if (!existingItem) {
+            await this.db.put(resource, dataWithMeta);
+          }
+        } else {
+          await this.db.put(resource, dataWithMeta);
+        }
+      }
+      
+      eventBus.emit('datasync:stored', { resource, data: dataWithMeta });
+    } catch (error) {
+      console.error(`Failed to store data in IndexedDB for ${resource}:`, error);
+      console.error('Data that failed to store:', dataWithMeta);
+      throw error;
+    }
   }
 
   /**

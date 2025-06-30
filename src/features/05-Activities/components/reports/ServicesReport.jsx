@@ -13,8 +13,8 @@ import {
   ResponsiveContainer,
   Legend
 } from 'recharts';
-import styles from '../ReportsView.module.css';
-import { DASHBOARD_DATA } from '../../../data/dashboardData';
+import styles from '../../views/02-Reports/ReportsView.module.css';
+// import { DASHBOARD_DATA } from '../../../data/dashboardData';
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
@@ -33,7 +33,13 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 export default function ServicesReport() {
-  const { categories } = DASHBOARD_DATA.DENTAL_CLINIC.reports.services;
+  // Mock data to replace DASHBOARD_DATA
+  const categories = [
+    { name: 'Dental Cleaning', value: 2500, color: '#3b82f6', icon: '🦷' },
+    { name: 'Root Canal', value: 8000, color: '#ef4444', icon: '🔧' },
+    { name: 'Crown', value: 12000, color: '#10b981', icon: '👑' },
+    { name: 'Whitening', value: 3500, color: '#f59e0b', icon: '✨' }
+  ];
 
   return (
     <>

@@ -36,6 +36,11 @@ export class ApiClient extends BaseClient {
   setupAuthInterceptors() {
     // Request interceptor pentru auth headers
     this.addRequestInterceptor((config) => {
+      // Inițializează headers dacă nu există
+      if (!config.headers) {
+        config.headers = {};
+      }
+
       // Adaugă tenant ID și location ID
       if (this.tenantId) {
         config.headers['X-Tenant-ID'] = this.tenantId;
@@ -64,6 +69,9 @@ export class ApiClient extends BaseClient {
             const newToken = await this.authManager.refreshAuthToken();
             if (newToken) {
               // Reexecută request-ul original cu noul token
+              if (!error.config.headers) {
+                error.config.headers = {};
+              }
               error.config.headers['Authorization'] = `Bearer ${newToken}`;
               return this.request(error.config);
             }
@@ -391,6 +399,17 @@ export class ApiClient extends BaseClient {
         status: error.status
       };
     }
+  }
+
+  /**
+   * Inițializează client-ul
+   */
+  initialize() {
+    console.log('ApiClient initialized with:', {
+      baseURL: this.baseURL,
+      tenantId: this.tenantId,
+      locationId: this.locationId
+    });
   }
 }
 

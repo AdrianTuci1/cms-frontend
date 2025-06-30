@@ -13,7 +13,6 @@ const useInvoicesStore = create((set, get) => ({
       amount: '€450.00',
       date: '2024-03-15',
       status: 'Paid',
-      icon: <FaBuilding />
     },
     {
       id: 2,
@@ -23,7 +22,6 @@ const useInvoicesStore = create((set, get) => ({
       amount: '€125.50',
       date: '2024-03-14',
       status: 'Pending',
-      icon: <FaStore />
     },
     {
       id: 3,
@@ -33,7 +31,6 @@ const useInvoicesStore = create((set, get) => ({
       amount: '€850.00',
       date: '2024-03-13',
       status: 'Paid',
-      icon: <FaHome />
     }
   ],
   billingSuggestions: [
@@ -43,7 +40,6 @@ const useInvoicesStore = create((set, get) => ({
       businessType: 'hotel',
       lastVisit: '2024-03-10',
       suggestedAmount: '€380.00',
-      icon: <FaBuilding />
     },
     {
       id: 2,
@@ -51,7 +47,6 @@ const useInvoicesStore = create((set, get) => ({
       businessType: 'restaurant',
       lastVisit: '2024-03-12',
       suggestedAmount: '€95.00',
-      icon: <FaStore />
     },
     {
       id: 3,
@@ -59,7 +54,6 @@ const useInvoicesStore = create((set, get) => ({
       businessType: 'apartment',
       lastVisit: '2024-03-08',
       suggestedAmount: '€720.00',
-      icon: <FaHome />
     }
   ],
 

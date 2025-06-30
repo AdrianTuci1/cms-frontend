@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './GymTimeline.module.css';
-import SpecialNavbar from '../../../layout/navbar/SpecialNavbar';
+import SpecialNavbar from '../../../../layout/navbar/SpecialNavbar.jsx';
 import ResizablePanels from './timeline/ResizablePanels';
 import Occupancy from './timeline/Occupancy';
 import Timeline from './timeline/Timeline';
@@ -27,7 +27,8 @@ const GymTimeline = () => {
     getClassesAfterTime,
     calculateTotalOccupancy,
     showFullDay,
-    setShowFullDay
+    setShowFullDay,
+    initialize
   } = timeline;
 
   const { checkedIn, classes, occupancy } = getGymData();
@@ -35,10 +36,10 @@ const GymTimeline = () => {
 
   useEffect(() => {
     // Initialize the timeline when component mounts
-    if (timeline.initialize) {
-      timeline.initialize();
+    if (initialize) {
+      initialize();
     }
-  }, [timeline]);
+  }, []); // Empty dependency array to run only once
 
   if (error) {
     return (

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useOutletContext } from 'react-router-dom';
-import AssistantsView from './Assistants/AssistantsView';
-import TriggersView from './Assistants/TriggersView';
+import AssistantsView from './01-Workflows/AssistantsView';
+import TriggersView from './02-Rules/TriggersView';
 
 const AutomationSection = () => {
   const { currentView } = useOutletContext();

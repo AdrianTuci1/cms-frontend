@@ -3,8 +3,8 @@ import styles from './AdminView.module.css';
 import { FaPlus } from 'react-icons/fa';
 import MembersTab from './Members/MembersTab';
 import RolesTab from './Permissions/RolesTab';
-import StaffProfileModal from '../../components/dashboard/admin/StaffProfileModal';
-import useTabsStore from '../../layout/tabsStore';
+import StaffProfileModal from '../components/admin/StaffProfileModal';
+import useTabsStore from '../../../layout/tabsStore';
 
 const AdminView = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);

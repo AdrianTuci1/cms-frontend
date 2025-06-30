@@ -3,6 +3,10 @@
  * Exportă doar componentele esențiale pentru API
  */
 
+import { ApiClient } from './client/ApiClient.js';
+import { default as ApiError } from './errors/index.js';
+import { default as ApiConfig } from './config/index.js';
+
 // Exportă sistemul de configurații simplu
 export * from './config/index.js';
 export { default as ApiConfig } from './config/index.js';
@@ -13,7 +17,7 @@ export { default as ApiError } from './errors/index.js';
 
 // Exportă sistemul de client simplu
 export * from './client/index.js';
-export { default as ApiClient } from './client/index.js';
+export { ApiClient } from './client/ApiClient.js';
 
 /**
  * Clasa principală pentru API - simplificată pentru DataSyncManager
@@ -31,7 +35,7 @@ export class ApiCore {
   initialize(config) {
     this.config = config;
     this.client = new ApiClient(config);
-    this.errorHandler = new ApiError();
+    this.errorHandler = ApiError;
     return this;
   }
 

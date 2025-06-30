@@ -5,7 +5,7 @@
  */
 
 import { useCallback, useMemo } from 'react';
-import { StrategyRegistry } from '../strategy/base/StrategyRegistry';
+import strategyRegistry from '../strategy/base/StrategyRegistry';
 
 /**
  * Hook pentru business logic
@@ -14,7 +14,7 @@ import { StrategyRegistry } from '../strategy/base/StrategyRegistry';
  */
 export const useBusinessLogic = (businessType) => {
   const strategy = useMemo(() => {
-    return StrategyRegistry.get(businessType);
+    return strategyRegistry.get(businessType);
   }, [businessType]);
 
   /**

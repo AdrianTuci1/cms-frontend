@@ -1,10 +1,11 @@
 import React from 'react';
 import { FaClock } from 'react-icons/fa';
 import styles from './SpecialNavbar.module.css';
-import useTimelineStore from '../../store/timelineStore';
+// import useTimelineStore from '../../store/timelineStore';
 
 const SpecialNavbar = () => {
-  const { showFullDay, setShowFullDay } = useTimelineStore();
+  // const { showFullDay, setShowFullDay } = useTimelineStore();
+  const [showFullDay, setShowFullDay] = React.useState(false);
 
   return (
     <div className={styles.navbar}>

@@ -4,20 +4,32 @@
  */
 
 import eventBus from '../observer/base/EventBus';
+import { getMockData } from '../../api/mockData/index.js';
 
 class DataSyncManager {
   constructor(components = {}) {
-    // Initialize modular components
-    this.resourceRegistry = components.resourceRegistry;
-    this.databaseManager = components.databaseManager;
-    this.apiSyncManager = components.apiSyncManager;
-    this.webSocketManager = components.webSocketManager;
-    this.dataProcessor = components.dataProcessor;
-
-    // State management
-    this.syncQueue = [];
+    // Check if we're in test mode
+    this.testMode = import.meta.env.VITE_TEST_MODE === 'true';
+    
+    if (this.testMode) {
+      console.log('DataSyncManager: Running in TEST MODE - API calls disabled');
+    }
+    
+    // Initialize components
+    this.apiSyncManager = components.apiSyncManager || createApiSyncManager();
+    this.databaseManager = components.databaseManager || createDatabaseManager();
+    this.webSocketManager = components.webSocketManager || createWebSocketManager();
+    this.dataProcessor = components.dataProcessor || createDataProcessor();
+    this.resourceRegistry = components.resourceRegistry || createResourceRegistry();
+    
+    // State
     this.isOnline = navigator.onLine;
     this.syncInProgress = false;
+    this.syncQueue = [];
+    
+    // Setup listeners
+    this.setupNetworkListeners();
+    this.setupEventListeners();
 
     // Initialize the system
     this.initialize();
@@ -157,7 +169,7 @@ class DataSyncManager {
 
     try {
       // Sync via API
-      if (config.apiEndpoints.post) {
+      if (config.apiEndpoints.post && !this.testMode) {
         await this.apiSyncManager.syncViaAPI(
           resource, 
           data, 
@@ -180,61 +192,160 @@ class DataSyncManager {
   }
 
   /**
-   * Get data with fallback to API
-   * @param {string} resource - Resource name
-   * @param {Object} options - Query options
+   * Obține datele cu fallback la IndexedDB
    */
   async getDataWithFallback(resource, options = {}) {
-    try {
-      const config = this.resourceRegistry.getResource(resource);
+    const {
+      forceRefresh = false,
+      useCache = true,
+      params = {}
+    } = options;
+
+    // In test mode, skip API calls and go directly to IndexedDB/mock data
+    if (this.testMode) {
+      console.log(`TEST MODE: Skipping API call for ${resource} - using local data`);
       
-      // If forceServerFetch is true, always try API first
-      if (config && config.forceServerFetch && this.isOnline) {
-        try {
-          const apiData = await this.apiSyncManager.fetchFromAPI(
-            resource, 
-            options, 
-            config, 
-            this.resourceRegistry.getBusinessType()
-          );
+      try {
+        const cachedData = await this.databaseManager.getData(resource);
+        
+        if (cachedData && cachedData.length > 0) {
+          // Emite eveniment pentru date din cache
+          eventBus.emit(`${resource}:updated`, {
+            data: cachedData,
+            source: 'indexeddb',
+            timestamp: new Date().toISOString()
+          });
           
-          if (apiData) {
-            const processedData = this.dataProcessor.processResponse(resource, apiData, config);
-            await this.databaseManager.storeData(resource, processedData);
-            return processedData;
-          }
-        } catch (error) {
-          console.warn(`Failed to fetch ${resource} from API, falling back to local data:`, error);
-        }
-      }
-
-      // Try to get from IndexedDB first
-      let data = await this.databaseManager.getData(resource, options);
-
-      // If no data or data is stale, try API
-      if (!data || data.length === 0 || this.dataProcessor.isDataStale(data, config)) {
-        if (this.isOnline) {
-          const apiData = await this.apiSyncManager.fetchFromAPI(
-            resource, 
-            options, 
-            config, 
-            this.resourceRegistry.getBusinessType()
-          );
+          return cachedData;
+        } else {
+          // Dacă nu există date în IndexedDB, folosește date mock
+          const mockData = this.getMockData(resource);
           
-          if (apiData) {
-            const processedData = this.dataProcessor.processResponse(resource, apiData, config);
-            await this.databaseManager.storeData(resource, processedData);
-            data = processedData;
+          // Verifică dacă datele mock au fost deja salvate pentru a evita duplicarea
+          const existingMockData = await this.databaseManager.getData(resource);
+          if (!existingMockData || existingMockData.length === 0) {
+            // Salvează datele mock în IndexedDB doar dacă nu există deja
+            await this.databaseManager.storeData(resource, mockData);
           }
+          
+          // Emite eveniment pentru date mock
+          eventBus.emit(`${resource}:updated`, {
+            data: mockData,
+            source: 'mock',
+            timestamp: new Date().toISOString()
+          });
+          
+          return mockData;
         }
+      } catch (dbError) {
+        // Ultimul fallback - date mock
+        const mockData = this.getMockData(resource);
+        
+        // Emite eveniment pentru date mock
+        eventBus.emit(`${resource}:updated`, {
+          data: mockData,
+          source: 'mock-fallback',
+          timestamp: new Date().toISOString()
+        });
+        
+        return mockData;
       }
-
-      return data;
-    } catch (error) {
-      console.error(`Error getting data for ${resource}:`, error);
-      eventBus.emit('datasync:get-failed', { resource, error });
-      throw error;
     }
+
+    try {
+      // Încearcă să obțină datele de la API
+      const apiData = await this.apiSyncManager.fetchFromAPI(
+        resource, 
+        { params }, 
+        this.getResourceConfig(resource),
+        this.resourceRegistry.getBusinessType()
+      );
+
+      // Salvează în IndexedDB
+      await this.databaseManager.storeData(resource, apiData);
+      
+      // Emite eveniment pentru actualizare
+      eventBus.emit(`${resource}:updated`, {
+        data: apiData,
+        source: 'api',
+        timestamp: new Date().toISOString()
+      });
+
+      return apiData;
+    } catch (error) {
+      // Verifică dacă eroarea este de conectivitate
+      const isConnectivityError = error.message.includes('Backend indisponibil') || 
+                                 error.message.includes('fetch') ||
+                                 error.code === 'NETWORK_ERROR' ||
+                                 error.name === 'TypeError';
+      
+      if (isConnectivityError) {
+        // Emite o singură eroare pentru conectivitate (fără logging excesiv)
+        eventBus.emit('datasync:connectivity-error', {
+          resource,
+          message: 'Backend indisponibil - folosind datele din IndexedDB',
+          timestamp: new Date().toISOString()
+        });
+      } else {
+        // Log doar erorile care nu sunt de conectivitate
+        console.error(`Error fetching ${resource} from API:`, error);
+        eventBus.emit('datasync:api-error', { resource, error });
+      }
+
+      // Încearcă să obțină datele din IndexedDB
+      try {
+        const cachedData = await this.databaseManager.getData(resource);
+        
+        if (cachedData && cachedData.length > 0) {
+          // Emite eveniment pentru date din cache
+          eventBus.emit(`${resource}:updated`, {
+            data: cachedData,
+            source: 'indexeddb',
+            timestamp: new Date().toISOString()
+          });
+          
+          return cachedData;
+        } else {
+          // Dacă nu există date în IndexedDB, folosește date mock
+          const mockData = this.getMockData(resource);
+          
+          // Verifică dacă datele mock au fost deja salvate pentru a evita duplicarea
+          const existingMockData = await this.databaseManager.getData(resource);
+          if (!existingMockData || existingMockData.length === 0) {
+            // Salvează datele mock în IndexedDB doar dacă nu există deja
+            await this.databaseManager.storeData(resource, mockData);
+          }
+          
+          // Emite eveniment pentru date mock
+          eventBus.emit(`${resource}:updated`, {
+            data: mockData,
+            source: 'mock',
+            timestamp: new Date().toISOString()
+          });
+          
+          return mockData;
+        }
+      } catch (dbError) {
+        // Ultimul fallback - date mock
+        const mockData = this.getMockData(resource);
+        
+        // Emite eveniment pentru date mock
+        eventBus.emit(`${resource}:updated`, {
+          data: mockData,
+          source: 'mock-fallback',
+          timestamp: new Date().toISOString()
+        });
+        
+        return mockData;
+      }
+    }
+  }
+
+  /**
+   * Returnează date mock pentru development
+   */
+  getMockData(resource) {
+    return getMockData(resource, this.resourceRegistry?.getBusinessType());
   }
 
   /**
@@ -320,6 +431,13 @@ class DataSyncManager {
    */
   getResourceRegistry() {
     return this.resourceRegistry;
+  }
+
+  /**
+   * Check if we're in test mode
+   */
+  isTestMode() {
+    return this.testMode;
   }
 }
 

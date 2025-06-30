@@ -1,12 +1,12 @@
 import styles from './DashboardNavbar.module.css';
 import { FaChartLine, FaShoppingCart, FaUsers, FaRobot, FaUser, FaCalendarAlt, FaHistory, FaCog, FaDumbbell, FaHome, FaTooth, FaBed } from 'react-icons/fa';
-import useTabsStore from '../../store/tabsStore';
-import useDrawerStore from '../../store/drawerStore';
+import useTabsStore from '../tabsStore';
+import useDrawerStore from '../../features/00-Drawers/store/drawerStore';
 
 import { useEffect } from 'react';
 import { getBusinessType, BUSINESS_TYPES } from '../../config/businessTypes';
-import AIAssistantChat from '../drawer/AIAssistant';
-import UserDrawer from '../drawer/UserDrawer/UserDrawer';
+// import AIAssistantChat from '../drawer/AIAssistant';
+// import UserDrawer from '../drawer/UserDrawer/UserDrawer';
 
 const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
   const { activeTab, setActiveTab, getTabsBySection } = useTabsStore();
@@ -134,14 +134,20 @@ const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
       <div className={styles.navbarEnd}>
         <button 
           className={styles.navIcon}
-          onClick={() => openDrawer(<AIAssistantChat />, 'Assistants', 'ai-assistant')}
+          onClick={() => {
+            // openDrawer(<AIAssistantChat />, 'Assistants', 'ai-assistant')
+            console.log('AI Assistant not implemented yet');
+          }}
         >
           <FaRobot className={styles.icon}/>
         </button>
         
         <button 
           className={styles.navIcon}
-          onClick={() => openDrawer(<UserDrawer />, 'User Profile')}
+          onClick={() => {
+            // openDrawer(<UserDrawer />, 'User Profile')
+            console.log('User Profile not implemented yet');
+          }}
         >
           <FaUser className={styles.icon} />
         </button>

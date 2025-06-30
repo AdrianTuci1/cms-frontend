@@ -3,6 +3,13 @@
  * Exportă doar componentele esențiale pentru gestionarea erorilor
  */
 
+import { BaseError } from './BaseError.js';
+import { NetworkError } from './NetworkError.js';
+import { AuthenticationError, AuthorizationError } from './AuthError.js';
+import { ValidationError } from './ValidationError.js';
+import { ServerError } from './ServerError.js';
+import { NotFoundError, ConflictError } from './ResourceError.js';
+
 // Base Error
 export { BaseError } from './BaseError.js';
 

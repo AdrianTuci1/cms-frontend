@@ -4,19 +4,11 @@
  * Acest fișier exportă toate utilitarele din directorul utils
  * pentru a facilita importurile în alte părți ale aplicației.
  */
+import requestBuilder from './requestBuilder.js';
 
 // Request Builder
-export {
-  buildUrl,
-  buildHeaders,
-  validateParams,
-  formatBody,
-  buildRequest,
-  requestUtils
-} from './requestBuilder.js';
-
-// Importuri pentru exportare ca default
-import requestBuilder from './requestBuilder.js';
+export * from './requestBuilder.js';
+export { default as requestBuilder } from './requestBuilder.js';
 
 /**
  * Export default care combină toate utilitarele

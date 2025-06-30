@@ -13,7 +13,7 @@ export { useHotelTimelineWithAPI } from './hotelTimeline';
 export { useGymTimelineWithAPI } from './gymTimeline';
 
 // Export exemple și documentație
-export { default as TimelineIntegrationExample } from '../components/TimelineIntegrationExample';
+// export { default as TimelineIntegrationExample } from '../components/TimelineIntegrationExample';
 
 // Export tipuri și constante
 export const TIMELINE_BUSINESS_TYPES = {

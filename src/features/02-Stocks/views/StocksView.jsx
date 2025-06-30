@@ -1,10 +1,10 @@
 import React from 'react';
 import styles from './StocksView.module.css';
-import ResizablePanels from '../../components/dashboard/gym/ResizablePanels';
-import StockNavbar from '../../components/dashboard/stocks/StockNavbar';
-import InventoryCard from '../../components/dashboard/stocks/InventoryCard';
-import LowStockCard from '../../components/dashboard/stocks/LowStockCard';
-import AddStockForm from '../../components/dashboard/stocks/AddStockForm';
+import ResizablePanels from '../../01-Home/components/gym/timeline/ResizablePanels.jsx';
+import StockNavbar from '../components/StockNavbar.jsx';
+import InventoryCard from '../components/InventoryCard.jsx';
+import LowStockCard from '../components/LowStockCard.jsx';
+import AddStockForm from '../components/AddStockForm.jsx';
 import useStocksStore from '../store/stocksStore';
 
 const StocksView = ({ businessType = 'gym' }) => {

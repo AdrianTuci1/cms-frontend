@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import styles from './HistoryView.module.css';
-import HistoryList from './HistoryList/HistoryList';
-import TimeframeView from './TimeframeView/TimeframeView';
+import HistoryList from '../../components/HistoryList/HistoryList';
+import TimeframeView from '../../components/TimeframeView/TimeframeView';
 import useHistoryStore from '../../store/historyStore';
 
 const HistoryView = () => {
@@ -36,7 +36,7 @@ const HistoryView = () => {
     return () => {
       cleanup();
     };
-  }, [initialize, cleanup]);
+  }, []); // Empty dependency array to run only once
 
   const historyData = getCurrentHistoryData();
 

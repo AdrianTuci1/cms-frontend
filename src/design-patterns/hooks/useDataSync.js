@@ -6,9 +6,10 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import dataSyncManager from '../data-sync/DataSyncManager';
+import dataSyncManager from '../data-sync/index.js';
 import eventBus from '../observer/base/EventBus';
 import { crudStrategyFactory } from '../strategy/CRUDStrategy.js';
+import { getMockData } from '../../api/mockData/index.js';
 
 /**
  * Hook principal pentru sincronizarea datelor
@@ -40,9 +41,19 @@ export const useDataSync = (resource, options = {}) => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   
   const eventListenersRef = useRef([]);
+  const resourceRef = useRef(resource);
+  const businessTypeRef = useRef(businessType);
+  const onDataUpdateRef = useRef(onDataUpdate);
+  const onErrorRef = useRef(onError);
 
   // Strategy pentru business logic și validare
   const strategy = useRef(null);
+
+  // Update refs when props change
+  resourceRef.current = resource;
+  businessTypeRef.current = businessType;
+  onDataUpdateRef.current = onDataUpdate;
+  onErrorRef.current = onError;
 
   /**
    * Initialize strategy based on business type
@@ -75,8 +86,8 @@ export const useDataSync = (resource, options = {}) => {
       return { isValid: true, errors: [] };
     }
 
-    return strategy.current.validateData(data, resource);
-  }, [resource, enableValidation]);
+    return strategy.current.validateData(data, resourceRef.current);
+  }, [enableValidation]);
 
   /**
    * Check if operation is allowed using strategy
@@ -97,14 +108,14 @@ export const useDataSync = (resource, options = {}) => {
       return data;
     }
 
-    return strategy.current.processData(data, resource);
-  }, [resource, enableBusinessLogic]);
+    return strategy.current.processData(data, resourceRef.current);
+  }, [enableBusinessLogic]);
 
   /**
    * Build request parameters based on resource configuration
    */
   const buildRequestParams = useCallback(() => {
-    const config = dataSyncManager.getResourceConfig(resource);
+    const config = dataSyncManager.getResourceConfig(resourceRef.current);
     const requestParams = { ...params };
 
     // Add date range parameters for timeline
@@ -120,7 +131,7 @@ export const useDataSync = (resource, options = {}) => {
     }
 
     return requestParams;
-  }, [resource, params, startDate, endDate, page, limit]);
+  }, [params, startDate, endDate, page, limit]);
 
   /**
    * Funcția principală de preluare date
@@ -138,7 +149,7 @@ export const useDataSync = (resource, options = {}) => {
         params: requestParams
       };
 
-      const result = await dataSyncManager.getDataWithFallback(resource, fetchOptions);
+      const result = await dataSyncManager.getDataWithFallback(resourceRef.current, fetchOptions);
       
       // Process data using strategy
       const processedResult = processData(result, 'read');
@@ -146,21 +157,54 @@ export const useDataSync = (resource, options = {}) => {
       setData(processedResult);
       setLastUpdated(new Date().toISOString());
       
-      if (onDataUpdate) {
-        onDataUpdate(processedResult);
+      if (onDataUpdateRef.current) {
+        onDataUpdateRef.current(processedResult);
       }
 
     } catch (err) {
-      console.error(`Error fetching ${resource}:`, err);
-      setError(err);
+      console.error(`Error fetching ${resourceRef.current}:`, err);
       
-      if (onError) {
-        onError(err);
+      // Verifică dacă eroarea este de conectivitate
+      const isConnectivityError = err.message.includes('Backend indisponibil') || 
+                                 err.message.includes('fetch') ||
+                                 err.code === 'NETWORK_ERROR';
+      
+      if (isConnectivityError) {
+        // Pentru erori de conectivitate, nu setează eroarea în state
+        // Datele vor fi preluate din IndexedDB sau mock data
+        console.warn(`Connectivity error for ${resourceRef.current}, using fallback data`);
+        
+        // Încearcă să obțină date din cache sau mock
+        try {
+          const fallbackData = await dataSyncManager.getDataWithFallback(resourceRef.current, {
+            forceRefresh: false,
+            useCache: true,
+            params: buildRequestParams()
+          });
+          
+          const processedResult = processData(fallbackData, 'read');
+          setData(processedResult);
+          setLastUpdated(new Date().toISOString());
+          
+          if (onDataUpdateRef.current) {
+            onDataUpdateRef.current(processedResult);
+          }
+          
+          return; // Nu setează eroarea
+        } catch (fallbackError) {
+          console.error(`Fallback data also failed for ${resourceRef.current}:`, fallbackError);
+        }
+      }
+      
+      // Pentru alte erori, setează eroarea în state
+      setError(err);
+      if (onErrorRef.current) {
+        onErrorRef.current(err);
       }
     } finally {
       setLoading(false);
     }
-  }, [resource, onDataUpdate, onError, buildRequestParams, processData]);
+  }, [buildRequestParams, processData]);
 
   /**
    * Funcție pentru refresh manual
@@ -177,7 +221,7 @@ export const useDataSync = (resource, options = {}) => {
       const newData = typeof updater === 'function' ? updater(prevData) : updater;
       
       // Emite eveniment pentru DataSyncManager
-      eventBus.emit(`${resource}:updated`, {
+      eventBus.emit(`${resourceRef.current}:updated`, {
         data: newData,
         source: 'optimistic',
         timestamp: new Date().toISOString()
@@ -185,7 +229,7 @@ export const useDataSync = (resource, options = {}) => {
       
       return newData;
     });
-  }, [resource]);
+  }, []);
 
   /**
    * Funcție pentru operații CRUD cu validare și business logic
@@ -204,7 +248,7 @@ export const useDataSync = (resource, options = {}) => {
       }
 
       // Check if operation is allowed
-      const operationName = `${operation}${resource.charAt(0).toUpperCase() + resource.slice(1)}`;
+      const operationName = `${operation}${resourceRef.current.charAt(0).toUpperCase() + resourceRef.current.slice(1)}`;
       if (!isOperationAllowed(operationName, operationData)) {
         throw new Error('Operation not allowed');
       }
@@ -215,7 +259,7 @@ export const useDataSync = (resource, options = {}) => {
       const dataWithOperation = {
         ...processedData,
         _operation: operation,
-        businessType: businessType || dataSyncManager.businessType
+        businessType: businessTypeRef.current || dataSyncManager.businessType
       };
 
       // Actualizare optimistă
@@ -243,25 +287,25 @@ export const useDataSync = (resource, options = {}) => {
       }
 
       // Sincronizare cu API
-      await dataSyncManager.handleDataChange(resource, dataWithOperation);
+      await dataSyncManager.handleDataChange(resourceRef.current, dataWithOperation);
 
       // Refresh pentru a obține datele actualizate
       await fetchData();
 
     } catch (err) {
-      console.error(`Error performing ${operation} on ${resource}:`, err);
+      console.error(`Error performing ${operation} on ${resourceRef.current}:`, err);
       setError(err);
       
       // Revert optimistic update
       await fetchData();
       
-      if (onError) {
-        onError(err);
+      if (onErrorRef.current) {
+        onErrorRef.current(err);
       }
     } finally {
       setLoading(false);
     }
-  }, [resource, fetchData, optimisticUpdate, onError, businessType, enableValidation, validateData, isOperationAllowed, processData]);
+  }, [enableValidation, validateData, isOperationAllowed, processData, optimisticUpdate, fetchData]);
 
   /**
    * Funcții CRUD convenabile cu validare și business logic
@@ -282,8 +326,8 @@ export const useDataSync = (resource, options = {}) => {
       setData(processedData);
       setLastUpdated(new Date().toISOString());
       
-      if (onDataUpdate) {
-        onDataUpdate(processedData);
+      if (onDataUpdateRef.current) {
+        onDataUpdateRef.current(processedData);
       }
     };
 
@@ -298,10 +342,10 @@ export const useDataSync = (resource, options = {}) => {
 
     // Listen pentru erori
     const errorListener = (eventData) => {
-      if (eventData.resource === resource) {
+      if (eventData.resource === resourceRef.current) {
         setError(eventData.error);
-        if (onError) {
-          onError(eventData.error);
+        if (onErrorRef.current) {
+          onErrorRef.current(eventData.error);
         }
       }
     };
@@ -311,15 +355,15 @@ export const useDataSync = (resource, options = {}) => {
     const offlineListener = () => setIsOnline(false);
 
     // Adaugă listeners
-    eventBus.on(`${resource}:socket-update`, socketListener);
-    eventBus.on(`${resource}:api-update`, apiListener);
+    eventBus.on(`${resourceRef.current}:socket-update`, socketListener);
+    eventBus.on(`${resourceRef.current}:api-update`, apiListener);
     eventBus.on('datasync:api-error', errorListener);
     eventBus.on('datasync:online', onlineListener);
     eventBus.on('datasync:offline', offlineListener);
 
     listeners.push(
-      () => eventBus.off(`${resource}:socket-update`, socketListener),
-      () => eventBus.off(`${resource}:api-update`, apiListener),
+      () => eventBus.off(`${resourceRef.current}:socket-update`, socketListener),
+      () => eventBus.off(`${resourceRef.current}:api-update`, apiListener),
       () => eventBus.off('datasync:api-error', errorListener),
       () => eventBus.off('datasync:online', onlineListener),
       () => eventBus.off('datasync:offline', offlineListener)
@@ -330,14 +374,14 @@ export const useDataSync = (resource, options = {}) => {
     return () => {
       listeners.forEach(unsubscribe => unsubscribe());
     };
-  }, [resource, onDataUpdate, onError, processData]);
+  }, [processData]); // Doar processData ca dependență
 
   /**
-   * Initial data fetch
+   * Initial data fetch - only run once on mount
    */
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+  }, []); // Empty dependency array to run only once
 
   return {
     // Data state

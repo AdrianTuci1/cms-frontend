@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './InvoicesSection.module.css';
-import InvoiceCard from '../../components/dashboard/invoices/InvoiceCard';
+import InvoiceCard from '../components/invoices/InvoiceCard';
 import useInvoicesStore from '../store';
 
 const InvoicesSection = () => {

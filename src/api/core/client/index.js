@@ -3,6 +3,8 @@
  * Exportă doar ApiClient-ul esențial
  */
 
+import { ApiClient } from './ApiClient.js';
+
 // Main ApiClient
 export { ApiClient } from './ApiClient.js';
 export { default as apiClient } from './ApiClient.js';

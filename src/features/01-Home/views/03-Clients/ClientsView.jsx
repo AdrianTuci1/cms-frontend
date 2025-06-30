@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { getBusinessType } from '../../../config/businessTypes';
+import { getBusinessType } from '../../../../config/businessTypes';
 import { FaSearch, FaPlus } from 'react-icons/fa';
-import { useDataSync } from '../../../design-patterns/hooks';
+import { useDataSync } from '../../../../design-patterns/hooks';
 import GymClientCard from '../../components/gym/clients/GymClientCard';
 import DentalClientCard from '../../components/dental/clients/DentalClientCard';
 import HotelClientCard from '../../components/hotel/clients/HotelClientCard';

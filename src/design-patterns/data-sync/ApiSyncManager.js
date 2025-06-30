@@ -7,6 +7,13 @@ import eventBus from '../observer/base/EventBus';
 
 class ApiSyncManager {
   constructor() {
+    // Check if we're in test mode
+    this.testMode = import.meta.env.VITE_TEST_MODE === 'true';
+    
+    if (this.testMode) {
+      console.log('API Sync Manager: Running in TEST MODE - API calls disabled');
+    }
+    
     // Initialize API Manager with simplified structure
     this.apiManager = createApiManager({
       baseURL: 'http://localhost:3001/api',
@@ -23,6 +30,13 @@ class ApiSyncManager {
    * @param {string} businessType - Business type for dynamic endpoints
    */
   async syncViaAPI(resource, data, config, businessType = null) {
+    // In test mode, simulate successful sync without making API calls
+    if (this.testMode) {
+      console.log(`TEST MODE: Simulating API sync for ${resource}`, data);
+      eventBus.emit('datasync:api-synced', { resource, operation: data._operation || 'update', data });
+      return { success: true, message: 'Test mode - sync simulated' };
+    }
+
     try {
       const operation = data._operation || 'update';
       const endpoint = config.apiEndpoints[operation.toLowerCase()];
@@ -48,17 +62,27 @@ class ApiSyncManager {
       
       if (config.requiresAuth === false) {
         // Resources that don't require JWT
-        response = await this.apiManager.generalRequest(operation.toUpperCase(), url, data);
+        response = await this.apiManager.generalRequest(operation.toUpperCase(), url, data, { noRetry: true });
       } else {
         // Resources that require JWT
-        response = await this.apiManager.secureRequest(operation.toUpperCase(), url, data);
+        response = await this.apiManager.secureRequest(operation.toUpperCase(), url, data, { noRetry: true });
       }
 
       eventBus.emit('datasync:api-synced', { resource, operation, data: response });
       return response;
     } catch (error) {
-      console.error(`API sync failed for ${resource}:`, error);
-      eventBus.emit('datasync:sync-failed', { resource, data, error });
+      // Check if it's a connectivity error
+      const isConnectivityError = error.message.includes('Backend indisponibil') || 
+                                 error.message.includes('fetch') ||
+                                 error.code === 'NETWORK_ERROR' ||
+                                 error.name === 'TypeError';
+      
+      // Don't log connectivity errors as they're expected in offline mode
+      if (!isConnectivityError) {
+        console.error(`API sync failed for ${resource}:`, error.message);
+        eventBus.emit('datasync:sync-failed', { resource, data, error });
+      }
+      
       throw error;
     }
   }
@@ -71,6 +95,14 @@ class ApiSyncManager {
    * @param {string} businessType - Business type for dynamic endpoints
    */
   async fetchFromAPI(resource, options = {}, config, businessType = null) {
+    // In test mode, throw a connectivity error to force fallback to IndexedDB/mock data
+    if (this.testMode) {
+      console.log(`TEST MODE: Simulating API fetch for ${resource} - forcing fallback to local data`);
+      const testError = new Error('Backend indisponibil - folosind datele din IndexedDB');
+      testError.code = 'NETWORK_ERROR';
+      throw testError;
+    }
+
     try {
       if (!config || !config.apiEndpoints.get) {
         throw new Error(`No API endpoint configured for ${resource}`);
@@ -114,17 +146,27 @@ class ApiSyncManager {
       
       if (config.requiresAuth === false) {
         // Resources that don't require JWT
-        response = await this.apiManager.generalRequest('GET', endpoint);
+        response = await this.apiManager.generalRequest('GET', endpoint, null, { noRetry: true });
       } else {
         // Resources that require JWT
-        response = await this.apiManager.secureRequest('GET', endpoint);
+        response = await this.apiManager.secureRequest('GET', endpoint, null, { noRetry: true });
       }
 
       eventBus.emit('datasync:api-fetched', { resource, data: response });
       return response;
     } catch (error) {
-      console.error(`Error fetching ${resource} from API:`, error);
-      eventBus.emit('datasync:api-error', { resource, error });
+      // Check if it's a connectivity error
+      const isConnectivityError = error.message.includes('Backend indisponibil') || 
+                                 error.message.includes('fetch') ||
+                                 error.code === 'NETWORK_ERROR' ||
+                                 error.name === 'TypeError';
+      
+      // Don't log connectivity errors as they're expected in offline mode
+      if (!isConnectivityError) {
+        console.error(`Error fetching ${resource} from API:`, error.message);
+        eventBus.emit('datasync:api-error', { resource, error });
+      }
+      
       throw error;
     }
   }
@@ -152,6 +194,13 @@ class ApiSyncManager {
    */
   isInitialized() {
     return this.apiManager !== null;
+  }
+
+  /**
+   * Check if we're in test mode
+   */
+  isTestMode() {
+    return this.testMode;
   }
 
   /**

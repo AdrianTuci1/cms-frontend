@@ -1,7 +1,7 @@
 import styles from './DashboardSidebar.module.css';
 import { FaHome, FaRobot, FaHistory, FaUsers, FaArrowLeft, FaArrowRight, FaMapMarkerAlt, FaAngleDown, FaChartLine, FaFileInvoiceDollar, FaBolt } from 'react-icons/fa';
-import useTabsStore from '../../store/tabsStore';
-import useLocationsStore from '../../store/locationsStore';
+import useTabsStore from '../tabsStore';
+import useLocationsStore from '../locationsStore';
 import { useState, useEffect } from 'react';
 import React from 'react';
 

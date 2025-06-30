@@ -1,3 +1,5 @@
+import { useApiCall, useApiCallWithParams } from './useApiCall.js';
+
 /**
  * Exporturi pentru hooks API simplificate
  * Doar useApiCall și useApiCallWithParams - fără duplicare

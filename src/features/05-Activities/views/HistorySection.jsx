@@ -1,7 +1,7 @@
 import React from 'react';
 import { useOutletContext } from 'react-router-dom';
-import HistoryView from './History/HistoryView';
-import ReportsView from './History/ReportsView';
+import HistoryView from './01-History/HistoryView';
+import ReportsView from './02-Reports/ReportsView';
 
 const HistorySection = () => {
   const { currentView } = useOutletContext();

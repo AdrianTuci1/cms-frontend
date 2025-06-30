@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { getBusinessType } from '../config/businessTypes';
-import DashboardNavbar from '../components/navbar/DashboardNavbar';
-import DashboardSidebar from '../components/sidebar/DashboardSidebar';
-import DashboardDrawer from '../components/drawer/DashboardDrawer';
+import DashboardNavbar from './navbar/DashboardNavbar';
+import DashboardSidebar from './sidebar/DashboardSidebar';
+import DrawerManager from '../features/00-Drawers/DrawerManager';
 import { Outlet } from 'react-router-dom';
 import styles from './DashboardLayout.module.css';
 
@@ -68,7 +68,7 @@ const DashboardLayout = () => {
           }} />
         </main>
       </div>
-      <DashboardDrawer />
+      <DrawerManager />
     </div>
   );
 };

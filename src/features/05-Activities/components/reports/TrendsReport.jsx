@@ -1,6 +1,9 @@
 import React from 'react';
-import { MdShowChart, MdTrendingUp, MdAnalytics } from 'react-icons/md';
+import { MdPieChart, MdShowChart, MdTrendingUp, MdAnalytics } from 'react-icons/md';
 import {
+  PieChart,
+  Pie,
+  Cell,
   LineChart,
   Line,
   XAxis,
@@ -12,8 +15,8 @@ import {
   AreaChart,
   Area
 } from 'recharts';
-import styles from '../ReportsView.module.css';
-import { DASHBOARD_DATA } from '../../../data/dashboardData';
+import styles from '../../views/02-Reports/ReportsView.module.css';
+// import { DASHBOARD_DATA } from '../../../data/dashboardData';
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {

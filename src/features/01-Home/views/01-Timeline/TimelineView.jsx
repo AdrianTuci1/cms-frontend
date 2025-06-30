@@ -1,9 +1,9 @@
 import React from 'react';
-import { getBusinessType } from '../config/businessTypes';
+import { getBusinessType } from '../../../../config/businessTypes';
 import styles from './TimelineView.module.css';
-import DentalTimeline from './dental/DentalTimeline';
-import GymTimeline from './gym/GymTimeline';
-import HotelTimeline from './hotel/HotelTimeline';
+import DentalTimeline from '../../components/dental/Appointments.jsx';
+import GymTimeline from '../../components/gym/GymTimeline.jsx';
+import HotelTimeline from '../../components/hotel/timeline/CalendarView.jsx';
 
 const TimelineView = () => {
   const businessType = getBusinessType();

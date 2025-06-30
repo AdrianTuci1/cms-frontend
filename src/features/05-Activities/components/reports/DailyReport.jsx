@@ -1,18 +1,22 @@
 import React from 'react';
-import { MdBarChart, MdCreditCard, MdPayments, MdInventory } from 'react-icons/md';
+import { MdPieChart, MdShowChart, MdTrendingUp, MdBarChart } from 'react-icons/md';
 import {
-  ComposedChart,
-  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  LineChart,
   Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend
+  Legend,
+  BarChart,
+  Bar
 } from 'recharts';
-import styles from '../ReportsView.module.css';
-import { DASHBOARD_DATA } from '../../../data/dashboardData';
+import styles from '../../views/02-Reports/ReportsView.module.css';
+// import { DASHBOARD_DATA } from '../../../data/dashboardData';
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
@@ -117,7 +121,7 @@ export default function DailyReport() {
       </div>
 
       <div className={styles.bentoCard} style={{ gridColumn: '1 / 2', gridRow: '2 / 3' }}>
-        <div className={styles.bentoCardTitle}><MdCreditCard size={32} color="#3b82f6" /></div>
+        <div className={styles.bentoCardTitle}><MdPieChart size={32} color="#3b82f6" /></div>
         <div className={styles.statsGrid}>
           <div className={styles.statItem}>
             <span className={styles.statLabel}>Medie Card/Zi</span>
@@ -141,7 +145,7 @@ export default function DailyReport() {
       </div>
 
       <div className={styles.bentoCard} style={{ gridColumn: '2 / 3', gridRow: '2 / 3' }}>
-        <div className={styles.bentoCardTitle}><MdPayments size={32} color="#3b82f6" /></div>
+        <div className={styles.bentoCardTitle}><MdShowChart size={32} color="#3b82f6" /></div>
         <div className={styles.statsGrid}>
           <div className={styles.statItem}>
             <span className={styles.statLabel}>Medie Numerar/Zi</span>
@@ -165,7 +169,7 @@ export default function DailyReport() {
       </div>
 
       <div className={styles.bentoCard} style={{ gridColumn: '3 / 4', gridRow: '2 / 3' }}>
-        <div className={styles.bentoCardTitle}><MdInventory size={32} color="#3b82f6" /></div>
+        <div className={styles.bentoCardTitle}><MdTrendingUp size={32} color="#3b82f6" /></div>
         <div className={styles.statsGrid}>
           <div className={styles.statItem}>
             <span className={styles.statLabel}>Medie Produse/Zi</span>

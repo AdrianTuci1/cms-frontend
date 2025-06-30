@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { useDataSync } from '../../design-patterns/hooks/useDataSync';
+import { useDataSync } from '../../../design-patterns/hooks';
+import { useMemo, useCallback } from 'react';
 
 // Helper functions for date calculations
 const calculateCurrentWeek = (date) => {
@@ -140,6 +141,19 @@ export const useDentalTimelineWithAPI = (options = {}) => {
   // Folosește store-ul local pentru state management
   const appointmentsStore = useAppointmentsStore();
 
+  // Memoizează datele derivate pentru a evita infinite re-renders
+  const appointments = useMemo(() => timelineSync.data?.reservations || [], [timelineSync.data?.reservations]);
+  
+  const displayedAppointments = useMemo(() => 
+    appointmentsStore.getDisplayedAppointments(appointments),
+    [appointments, appointmentsStore.isAllAppointments, appointmentsStore.selectedMedicId]
+  );
+
+  const getAppointmentsCountForDate = useCallback((date) => 
+    appointmentsStore.getAppointmentsCountForDate(appointments, date),
+    [appointments, appointmentsStore.isAllAppointments, appointmentsStore.selectedMedicId]
+  );
+
   return {
     // API integration
     ...timelineSync,
@@ -147,16 +161,12 @@ export const useDentalTimelineWithAPI = (options = {}) => {
     // Local state management
     ...appointmentsStore,
     
-    // Business-specific data
-    getAppointments: () => {
-      const { data } = timelineSync;
-      return {
-        appointments: data?.reservations || [],
-        displayedAppointments: appointmentsStore.getDisplayedAppointments(data?.reservations || []),
-        getAppointmentsCountForDate: (date) => 
-          appointmentsStore.getAppointmentsCountForDate(data?.reservations || [], date)
-      };
-    },
+    // Business-specific data - memoizat pentru a evita infinite re-renders
+    getAppointments: () => ({
+      appointments,
+      displayedAppointments,
+      getAppointmentsCountForDate
+    }),
     
     // Business-specific actions
     createAppointment: async (appointment) => {

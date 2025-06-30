@@ -319,8 +319,19 @@ class DataProcessor {
    */
   addMetadata(data, resource) {
     const timestamp = new Date().toISOString();
+    
+    // Ensure data has a valid id
+    let dataWithId = data;
+    if (!data.id) {
+      // Generate a unique id if none exists
+      dataWithId = {
+        ...data,
+        id: `${resource}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+      };
+    }
+    
     return {
-      ...data,
+      ...dataWithId,
       _syncTimestamp: timestamp,
       _lastModified: timestamp,
       _version: (data._version || 0) + 1,

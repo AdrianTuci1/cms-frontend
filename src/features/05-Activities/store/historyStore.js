@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { dataSyncManager } from '../services/dataSync/DataSyncManager.js';
+// import DataSyncManager from '../../../design-patterns/data-sync/DataSyncManager.js';
 
 const useHistoryStore = create((set, get) => ({
   // State
@@ -221,36 +221,41 @@ const useHistoryStore = create((set, get) => ({
 
     try {
       const { filters, pagination } = get();
-      const historyItems = await dataSyncManager.getHistoryItems({
-        ...filters,
-        page: pagination.page,
-        limit: pagination.limit
-      });
-
+      // const historyItems = await DataSyncManager.getHistoryItems({
+      //   ...filters,
+      //   page: pagination.page,
+      //   limit: pagination.limit
+      // });
+      
+      // For now, use mock data
+      const historyItems = get().mockHistoryData;
+      
       set({ 
         historyItems,
-        isLoading: false 
+        isLoading: false,
+        pagination: { ...pagination, total: historyItems.length }
       });
     } catch (error) {
-      console.error('Error loading history items:', error);
-      set({ 
-        error: error.message || 'Failed to load history items',
-        isLoading: false 
-      });
+      set({ error: error.message, isLoading: false });
     }
   },
 
   // Create history item
   createHistoryItem: async (historyItem) => {
     try {
-      const newItem = await dataSyncManager.createHistoryItem(historyItem);
+      // const newItem = await DataSyncManager.createHistoryItem(historyItem);
       
-      // The store will be updated automatically via observer
-      // But we can also update optimistically here
+      // For now, just add to mock data
+      const newItem = {
+        id: Date.now(),
+        ...historyItem,
+        timestamp: new Date().toISOString()
+      };
+      
       set(state => ({
         historyItems: [newItem, ...state.historyItems]
       }));
-
+      
       return newItem;
     } catch (error) {
       console.error('Error creating history item:', error);
@@ -285,78 +290,78 @@ const useHistoryStore = create((set, get) => ({
     get().loadHistoryItems();
 
     // Subscribe to DataSyncManager events
-    const unsubscribeHistoryCreated = dataSyncManager.subscribe(
-      'HISTORY_ITEM_CREATED',
-      (data) => {
-        console.log('HistoryStore: Received HISTORY_ITEM_CREATED event', data);
-        set(state => ({
-          historyItems: [data, ...state.historyItems]
-        }));
-      },
-      'HistoryStore'
-    );
+    // const unsubscribeHistoryCreated = DataSyncManager.subscribe(
+    //   'HISTORY_ITEM_CREATED',
+    //   (data) => {
+    //     console.log('HistoryStore: Received HISTORY_ITEM_CREATED event', data);
+    //     set(state => ({
+    //       historyItems: [data, ...state.historyItems]
+    //     }));
+    //   },
+    //   'HistoryStore'
+    // );
 
-    const unsubscribeHistoryUpdated = dataSyncManager.subscribe(
-      'HISTORY_ITEM_UPDATED',
-      (data) => {
-        console.log('HistoryStore: Received HISTORY_ITEM_UPDATED event', data);
-        set(state => ({
-          historyItems: state.historyItems.map(item =>
-            item.id === data.id ? { ...item, ...data } : item
-          )
-        }));
-      },
-      'HistoryStore'
-    );
+    // const unsubscribeHistoryUpdated = DataSyncManager.subscribe(
+    //   'HISTORY_ITEM_UPDATED',
+    //   (data) => {
+    //     console.log('HistoryStore: Received HISTORY_ITEM_UPDATED event', data);
+    //     set(state => ({
+    //       historyItems: state.historyItems.map(item =>
+    //         item.id === data.id ? { ...item, ...data } : item
+    //       )
+    //     }));
+    //   },
+    //   'HistoryStore'
+    // );
 
-    const unsubscribeDataChanged = dataSyncManager.subscribe(
-      'DATA_CHANGED',
-      (data) => {
-        console.log('HistoryStore: Received DATA_CHANGED event', data);
-        
-        // Handle general data changes
-        if (data.type === 'history') {
-          switch (data.action) {
-            case 'created':
-              set(state => ({
-                historyItems: [data.data, ...state.historyItems]
-              }));
-              break;
-            case 'updated':
-              set(state => ({
-                historyItems: state.historyItems.map(item =>
-                  item.id === data.data.id ? { ...item, ...data.data } : item
-                )
-              }));
-              break;
-            case 'deleted':
-              set(state => ({
-                historyItems: state.historyItems.filter(item => item.id !== data.data.id)
-              }));
-              break;
-          }
-        }
-      },
-      'HistoryStore'
-    );
+    // const unsubscribeDataChanged = DataSyncManager.subscribe(
+    //   'DATA_CHANGED',
+    //   (data) => {
+    //     console.log('HistoryStore: Received DATA_CHANGED event', data);
+    //     
+    //     // Handle general data changes
+    //     if (data.type === 'history') {
+    //       switch (data.action) {
+    //         case 'created':
+    //           set(state => ({
+    //             historyItems: [data.data, ...state.historyItems]
+    //           }));
+    //           break;
+    //         case 'updated':
+    //           set(state => ({
+    //             historyItems: state.historyItems.map(item =>
+    //               item.id === data.data.id ? { ...item, ...data.data } : item
+    //             )
+    //           }));
+    //           break;
+    //         case 'deleted':
+    //           set(state => ({
+    //             historyItems: state.historyItems.filter(item => item.id !== data.data.id)
+    //           }));
+    //           break;
+    //       }
+    //     }
+    //   },
+    //   'HistoryStore'
+    // );
 
-    // Store unsubscribe functions for cleanup
-    set({ 
-      _unsubscribeFunctions: [
-        unsubscribeHistoryCreated,
-        unsubscribeHistoryUpdated,
-        unsubscribeDataChanged
-      ]
-    });
+    // // Store unsubscribe functions for cleanup
+    // set({ 
+    //   _unsubscribeFunctions: [
+    //     unsubscribeHistoryCreated,
+    //     unsubscribeHistoryUpdated,
+    //     unsubscribeDataChanged
+    //   ]
+    // });
   },
 
   // Cleanup subscriptions
   cleanup: () => {
-    const { _unsubscribeFunctions } = get();
-    if (_unsubscribeFunctions) {
-      _unsubscribeFunctions.forEach(unsubscribe => unsubscribe());
-    }
-    set({ _unsubscribeFunctions: [] });
+    // const { _unsubscribeFunctions } = get();
+    // if (_unsubscribeFunctions) {
+    //   _unsubscribeFunctions.forEach(unsubscribe => unsubscribe());
+    // }
+    // set({ _unsubscribeFunctions: [] });
   },
 
   // Computed values

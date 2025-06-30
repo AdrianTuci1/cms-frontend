@@ -1,5 +1,5 @@
 /**
- * SecureService - Serviciu pentru endpoint-urile care necesită JWT
+ * SecureService - Serviciu pentru endpoint-urile securizate cu JWT
  * 
  * Acest serviciu se ocupă de endpoint-urile care necesită JWT:
  * - /api/invoices
@@ -16,8 +16,9 @@
  * Folosește utilitarele pentru construirea cererilor și validarea parametrilor.
  */
 
-import { ApiClient } from '../core/index.js';
-import { requestBuilder } from '../utils/requestBuilder.js';
+import { ApiClient } from '../core/client/ApiClient.js';
+import requestBuilder from '../utils/requestBuilder.js';
+import { tenantUtils } from '../mockData/index.js';
 
 class SecureService {
   constructor(apiClient = null) {
@@ -323,6 +324,39 @@ class SecureService {
 
       const response = await this.apiClient.get(requestConfig.url, { params: validatedParams });
       return response.data;
+    } catch (error) {
+      throw this.handleSecureError(error);
+    }
+  }
+
+  /**
+   * Metoda generică pentru request-uri
+   */
+  async request(method, endpoint, data = null, options = {}) {
+    try {
+      // Adaugă tenant ID-ul din cookie la headers dacă există
+      const tenantId = tenantUtils.getTenantId();
+      if (tenantId) {
+        options.headers = {
+          ...options.headers,
+          'X-Tenant-ID': tenantId
+        };
+      }
+
+      switch (method.toUpperCase()) {
+        case 'GET':
+          return await this.apiClient.get(endpoint, options);
+        case 'POST':
+          return await this.apiClient.post(endpoint, data, options);
+        case 'PUT':
+          return await this.apiClient.put(endpoint, data, options);
+        case 'DELETE':
+          return await this.apiClient.delete(endpoint, options);
+        case 'PATCH':
+          return await this.apiClient.patch(endpoint, data, options);
+        default:
+          throw new Error(`Unsupported HTTP method: ${method}`);
+      }
     } catch (error) {
       throw this.handleSecureError(error);
     }

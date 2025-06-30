@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import ResizablePanels from '../components/dashboard/gym/ResizablePanels';
-import ProductsPanel from '../components/sales/ProductsPanel';
-import ReceiptPanel from '../components/sales/ReceiptPanel';
+import ResizablePanels from '../../components/gym/timeline/ResizablePanels.jsx';
+import ProductsPanel from '../../components/sales/ProductsPanel.jsx';
+import ReceiptPanel from '../../components/sales/ReceiptPanel.jsx';
 import { useSalesStore } from '../../store';
 import styles from './SalesView.module.css';
 

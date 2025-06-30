@@ -1,7 +1,28 @@
 import { create } from 'zustand';
-import { useDataSync } from '../../design-patterns/hooks/useDataSync';
-import roomsData from '../data/rooms.json';
-import reservationsData from '../data/reservations.json';
+import { useDataSync } from '../../../design-patterns/hooks';
+import { useMemo, useCallback } from 'react';
+// import roomsData from '../data/rooms.json';
+// import reservationsData from '../data/reservations.json';
+
+// Mock data temporar
+const mockRoomsData = {
+  rooms: [
+    { id: 1, roomNumber: '101', type: 'single', price: 100 },
+    { id: 2, roomNumber: '102', type: 'double', price: 150 },
+    { id: 3, roomNumber: '103', type: 'suite', price: 250 }
+  ]
+};
+
+const mockReservationsData = {
+  reservations: [
+    {
+      id: 1,
+      rooms: [
+        { roomId: '101', startDate: '2024-01-01', endDate: '2024-01-05' }
+      ]
+    }
+  ]
+};
 
 // Helper function for date range overlap
 const isDateRangeOverlapping = (start1, end1, start2, end2) => {
@@ -45,11 +66,11 @@ const getDateRangeFromReservations = (reservations) => {
   return { startDate: minDate, endDate: maxDate };
 };
 
-const { startDate, endDate } = getDateRangeFromReservations(reservationsData.reservations);
+const { startDate, endDate } = getDateRangeFromReservations(mockReservationsData.reservations);
 
 const useCalendarStore = create((set, get) => ({
-  rooms: roomsData.rooms,
-  reservations: reservationsData.reservations,
+  rooms: mockRoomsData.rooms,
+  reservations: mockReservationsData.reservations,
   startDate,
   endDate,
   defaultDates: null,
@@ -130,6 +151,15 @@ export const useHotelTimelineWithAPI = (options = {}) => {
   // Folosește store-ul local pentru state management
   const calendarStore = useCalendarStore();
 
+  // Memoizează datele derivate pentru a evita infinite re-renders
+  const bookings = useMemo(() => timelineSync.data?.bookings || [], [timelineSync.data?.bookings]);
+  const rooms = useMemo(() => timelineSync.data?.packages?.rooms || [], [timelineSync.data?.packages?.rooms]);
+
+  const isRoomAvailable = useCallback((roomNumber, startDate, endDate) =>
+    calendarStore.isRoomAvailable(roomNumber, startDate, endDate, bookings),
+    [bookings]
+  );
+
   return {
     // API integration
     ...timelineSync,
@@ -137,16 +167,12 @@ export const useHotelTimelineWithAPI = (options = {}) => {
     // Local state management
     ...calendarStore,
     
-    // Business-specific data
-    getBookings: () => {
-      const { data } = timelineSync;
-      return {
-        bookings: data?.bookings || [],
-        rooms: data?.packages?.rooms || [],
-        isRoomAvailable: (roomNumber, startDate, endDate) =>
-          calendarStore.isRoomAvailable(roomNumber, startDate, endDate, data?.bookings || [])
-      };
-    },
+    // Business-specific data - memoizat pentru a evita infinite re-renders
+    getBookings: () => ({
+      bookings,
+      rooms,
+      isRoomAvailable
+    }),
     
     // Business-specific actions
     createBooking: async (booking) => {

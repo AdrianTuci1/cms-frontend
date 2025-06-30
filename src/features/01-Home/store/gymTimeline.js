@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { useDataSync } from '../../design-patterns/hooks/useDataSync';
+import { useDataSync } from '../../../design-patterns/hooks';
+import { useMemo, useCallback } from 'react';
 
 const useTimelineStore = create((set) => ({
   showFullDay: false,
@@ -50,6 +51,32 @@ export const useGymTimelineWithAPI = (options = {}) => {
   // Folosește store-ul local pentru state management
   const timelineStore = useTimelineStore();
 
+  // Memoizează datele derivate pentru a evita infinite re-renders
+  const checkedIn = useMemo(() => timelineSync.data?.checkedIn || [], [timelineSync.data?.checkedIn]);
+  const classes = useMemo(() => timelineSync.data?.classes || [], [timelineSync.data?.classes]);
+  const occupancy = useMemo(() => timelineSync.data?.occupancy || [], [timelineSync.data?.occupancy]);
+
+  const activeMembers = useMemo(() => 
+    checkedIn.filter(member => !member.checkOutTime),
+    [checkedIn]
+  );
+
+  const getClassesAfterTime = useCallback((time) => 
+    classes.filter(cls => cls.startHour > time),
+    [classes]
+  );
+
+  const calculateTotalOccupancy = useCallback(() => 
+    occupancy.reduce((total, facility) => {
+      const [current, max] = facility.occupancy.split('/').map(Number);
+      return {
+        current: total.current + current,
+        max: total.max + max
+      };
+    }, { current: 0, max: 0 }),
+    [occupancy]
+  );
+
   return {
     // API integration
     ...timelineSync,
@@ -57,15 +84,12 @@ export const useGymTimelineWithAPI = (options = {}) => {
     // Local state management
     ...timelineStore,
     
-    // Business-specific data
-    getGymData: () => {
-      const { data } = timelineSync;
-      return {
-        checkedIn: data?.checkedIn || [],
-        classes: data?.classes || [],
-        occupancy: data?.occupancy || []
-      };
-    },
+    // Business-specific data - memoizat pentru a evita infinite re-renders
+    getGymData: () => ({
+      checkedIn,
+      classes,
+      occupancy
+    }),
     
     // Business-specific actions
     checkInMember: async (memberData) => {
@@ -96,27 +120,10 @@ export const useGymTimelineWithAPI = (options = {}) => {
       }
     },
 
-    // Helper functions
-    getActiveMembers: () => {
-      const { data } = timelineSync;
-      return (data?.checkedIn || []).filter(member => !member.checkOutTime);
-    },
-
-    getClassesAfterTime: (time) => {
-      const { data } = timelineSync;
-      return (data?.classes || []).filter(cls => cls.startHour > time);
-    },
-
-    calculateTotalOccupancy: () => {
-      const { data } = timelineSync;
-      return (data?.occupancy || []).reduce((total, facility) => {
-        const [current, max] = facility.occupancy.split('/').map(Number);
-        return {
-          current: total.current + current,
-          max: total.max + max
-        };
-      }, { current: 0, max: 0 });
-    }
+    // Helper functions - memoizate
+    getActiveMembers: () => activeMembers,
+    getClassesAfterTime,
+    calculateTotalOccupancy
   };
 };
 
