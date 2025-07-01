@@ -12,9 +12,9 @@ const WeekView = lazy(() => import('./timeline/WeekView'));
 const Appointments = () => {
   // const { openDrawer } = useDrawerStore();
   
-  // Date range for timeline
-  const [startDate, setStartDate] = useState(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
-  const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
+  // Date range for timeline - Updated to match test data
+  const [startDate, setStartDate] = useState('2024-01-15');
+  const [endDate, setEndDate] = useState('2024-01-21');
 
   // Use the new timeline integration hook
   const timeline = useDentalTimelineWithAPI({
@@ -55,6 +55,9 @@ const Appointments = () => {
     if (initialize) {
       initialize();
     }
+    
+    // Set selected date to match test data period
+    setSelectedDate(new Date('2024-01-16'));
   }, []); // Empty dependency array to run only once
 
   const handleAddAppointment = () => {

@@ -15,6 +15,7 @@ const generateInitials = (text) => {
 const statusColors = {
   done: '#4caf50',        // Green for completed appointments
   upcoming: '#1976d2',    // Blue for upcoming appointments
+  scheduled: '#1976d2',   // Blue for scheduled appointments (same as upcoming)
   missed: '#f44336',      // Red for missed appointments
   notpaid: '#ff9800',     // Orange for unpaid appointments
 };
@@ -25,9 +26,9 @@ const AppointmentCard = ({
   onPatientClick,
 }) => {
   const {
-    status = 'upcoming',
-    initialTreatment = 'No Treatment',
-    patientName,
+    status = 'scheduled',
+    displayTreatment = 'No Treatment',
+    clientName,
     medicName,
     date,
     duration,
@@ -66,10 +67,10 @@ const AppointmentCard = ({
           className={styles.treatmentInitials}
           style={{ backgroundColor: color }}
         >
-          {generateInitials(initialTreatment)}
+          {generateInitials(displayTreatment)}
         </div>
         <div className={styles.treatmentName}>
-          {initialTreatment}
+          {displayTreatment}
         </div>
       </div>
 
@@ -88,7 +89,7 @@ const AppointmentCard = ({
       >
         <FaUser className={styles.patientAvatar} />
         <span className={styles.patientName}>
-          {patientName}
+          {clientName}
         </span>
       </div>
 

@@ -3,6 +3,9 @@
  * Centralizează toate datele mock într-un singur loc pentru ușurință de gestionare
  */
 
+// Import comprehensive test data for dental timeline
+import dentalTimelineData from '../../testData/dentalTimeline/dental-timeline-week.json';
+
 // Mock data pentru business-info
 const businessInfoMock = {
   id: 'business-info-001',
@@ -45,44 +48,8 @@ const businessInfoMock = {
   }
 };
 
-// Mock data pentru timeline (dental)
-const dentalTimelineMock = {
-  id: 'dental-timeline-001',
-  businessType: 'dental',
-  appointments: [
-    {
-      id: 'apt-001',
-      clientId: 'client-001',
-      clientName: 'Maria Popescu',
-      service: 'Consultare',
-      date: '2024-01-15',
-      time: '10:00',
-      duration: 60,
-      status: 'confirmed',
-      notes: 'Prima consultație'
-    },
-    {
-      id: 'apt-002',
-      clientId: 'client-002',
-      clientName: 'Ion Ionescu',
-      service: 'Tratament',
-      date: '2024-01-15',
-      time: '14:00',
-      duration: 90,
-      status: 'confirmed',
-      notes: 'Continuare tratament'
-    }
-  ],
-  sales: [
-    {
-      id: 'sale-001',
-      clientId: 'client-001',
-      amount: 150,
-      date: '2024-01-15',
-      items: ['Consultare', 'Radiografie']
-    }
-  ]
-};
+// Mock data pentru timeline (dental) - Updated to use comprehensive test data
+const dentalTimelineMock = dentalTimelineData.response.data;
 
 // Mock data pentru timeline (gym)
 const gymTimelineMock = {
