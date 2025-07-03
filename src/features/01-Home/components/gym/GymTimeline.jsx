@@ -4,24 +4,28 @@ import SpecialNavbar from '../../../../layout/navbar/SpecialNavbar.jsx';
 import ResizablePanels from './timeline/ResizablePanels';
 import Occupancy from './timeline/Occupancy';
 import Timeline from './timeline/Timeline';
-import { useGymTimelineWithAPI } from '../../store';
+import { useGymTimelineWithAPI } from '../../store/gymTimeline';
+import { useDataSync } from '../../../../design-patterns/hooks';
 
 const GymTimeline = () => {
   const [viewMode, setViewMode] = useState('active');
 
-  // Use the new timeline integration hook
-  const timeline = useGymTimelineWithAPI({
+  // Use useDataSync hook directly for timeline data
+  const timelineSync = useDataSync('timeline', {
+    businessType: 'gym',
+    enableValidation: true,
+    enableBusinessLogic: true
+  });
+
+  const timelineData = timelineSync.data;
+
+  // Use the updated timeline integration hook with shared data
+  const timeline = useGymTimelineWithAPI(timelineData, {
     enableValidation: true,
     enableBusinessLogic: true
   });
 
   const {
-    data,
-    loading,
-    error,
-    refresh,
-    checkInMember,
-    checkOutMember,
     getGymData,
     getActiveMembers,
     getClassesAfterTime,
@@ -41,13 +45,28 @@ const GymTimeline = () => {
     }
   }, []); // Empty dependency array to run only once
 
-  if (error) {
+  // Show loading state if timeline data is loading
+  if (timelineSync.loading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loadingState}>
+          <div className={styles.loadingStateContent}>
+            <div className={styles.spinner}></div>
+            <p>Se încarcă datele gym...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if timeline data has error
+  if (timelineSync.error) {
     return (
       <div className={styles.container}>
         <div className={styles.errorState}>
           <h3>Eroare la încărcarea datelor gym</h3>
-          <p>{error.message || error}</p>
-          <button onClick={refresh}>Încearcă din nou</button>
+          <p>{timelineSync.error.message || timelineSync.error}</p>
+          <button onClick={timelineSync.refresh}>Încearcă din nou</button>
         </div>
       </div>
     );
@@ -55,28 +74,31 @@ const GymTimeline = () => {
 
   return (
     <div className={styles.container}>
-      <SpecialNavbar viewMode={viewMode} setViewMode={setViewMode} />
-      
+      <SpecialNavbar
+        title="Gym Timeline"
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        showFullDay={showFullDay}
+        onToggleFullDay={setShowFullDay}
+      />
+
       <ResizablePanels
         leftContent={
-          <>
-            <Timeline 
-              timeline={timeline}
-              checkedIn={checkedIn}
-              classes={classes}
-              activeMembers={activeMembers}
-              loading={loading}
-            />
-          </>
+          <Occupancy
+            occupancy={occupancy}
+            activeMembers={activeMembers}
+            calculateTotalOccupancy={calculateTotalOccupancy}
+          />
         }
         rightContent={
-          <>
-            <Occupancy 
-              occupancy={occupancy}
-              totalOccupancy={calculateTotalOccupancy()}
-              loading={loading}
-            />
-          </>
+          <Timeline
+            checkedIn={checkedIn}
+            classes={classes}
+            activeMembers={activeMembers}
+            getClassesAfterTime={getClassesAfterTime}
+            viewMode={viewMode}
+            showFullDay={showFullDay}
+          />
         }
       />
     </div>

@@ -1,11 +1,13 @@
 import { describe, test, expect, beforeEach } from 'vitest';
 import {
   TimelineDataFlowTest,
-  MockTimelineService,
   TestDataProcessor,
   TestTimelineStore,
-  dentalTimelineData
+  dentalTimelineData,
+  MockTimelineService
 } from './timeline-test-utils';
+import dataSyncManager from '../../design-patterns/data-sync/index.js';
+import { getMockData } from '../../api/mockData/index.js';
 
 // Main integration/data flow test
 describe('Dental Timeline Data Flow', () => {
@@ -92,5 +94,82 @@ describe('TestTimelineStore', () => {
     store.setAllAppointments(false);
     const { displayedAppointments } = store.getAppointments();
     expect(displayedAppointments.length).toBe(11); // Dr. Alexandru Dumitrescu has 11 appointments
+  });
+});
+
+// Test the complete data flow from API → Design Patterns → Features
+describe('Timeline Data Flow Tests', () => {
+  let apiService;
+  let dataProcessor;
+  let store;
+
+  beforeEach(() => {
+    apiService = new MockTimelineService();
+    dataProcessor = new TestDataProcessor();
+    store = new TestTimelineStore();
+  });
+
+  describe('Complete Data Flow', () => {
+    test('should flow data from DataSyncManager to useDentalTimelineWithAPI', async () => {
+      // Set business type
+      dataSyncManager.setBusinessType('dental');
+      
+      // Get mock data from DataSyncManager
+      const mockData = getMockData('timeline', 'dental');
+      console.log('Mock data structure:', {
+        hasReservations: !!mockData.reservations,
+        reservationsCount: mockData.reservations?.length || 0,
+        isArray: Array.isArray(mockData)
+      });
+      
+      // Get standardized data from DataSyncManager
+      const standardizedData = dataSyncManager.standardizeTimelineData(mockData);
+      console.log('Standardized data structure:', {
+        isArray: Array.isArray(standardizedData),
+        count: standardizedData.length,
+        sampleItem: standardizedData[0]
+      });
+      
+      // Simulate what useDataSync would do - wrap array in reservations
+      const timelineDataForHook = { reservations: standardizedData };
+      console.log('Timeline data for hook structure:', {
+        hasReservations: !!timelineDataForHook.reservations,
+        reservationsCount: timelineDataForHook.reservations?.length || 0
+      });
+      
+      // Simulate what useDentalTimelineWithAPI would do
+      const appointments = timelineDataForHook?.reservations || [];
+      console.log('Appointments extracted:', {
+        count: appointments.length,
+        sampleAppointment: appointments[0]
+      });
+      
+      // Verify the data flow
+      expect(mockData).toHaveProperty('reservations');
+      expect(Array.isArray(mockData.reservations)).toBe(true);
+      expect(mockData.reservations.length).toBeGreaterThan(0);
+      
+      expect(Array.isArray(standardizedData)).toBe(true);
+      expect(standardizedData.length).toBeGreaterThan(0);
+      
+      expect(timelineDataForHook).toHaveProperty('reservations');
+      expect(Array.isArray(timelineDataForHook.reservations)).toBe(true);
+      expect(timelineDataForHook.reservations.length).toBeGreaterThan(0);
+      
+      expect(Array.isArray(appointments)).toBe(true);
+      expect(appointments.length).toBeGreaterThan(0);
+      
+      // Verify appointment structure
+      const firstAppointment = appointments[0];
+      expect(firstAppointment).toHaveProperty('id');
+      expect(firstAppointment).toHaveProperty('clientName');
+      expect(firstAppointment).toHaveProperty('medicName');
+      expect(firstAppointment).toHaveProperty('displayTreatment');
+      expect(firstAppointment).toHaveProperty('date');
+      expect(firstAppointment).toHaveProperty('duration');
+      expect(firstAppointment).toHaveProperty('status');
+      expect(firstAppointment).toHaveProperty('color');
+      expect(firstAppointment).toHaveProperty('treatments');
+    });
   });
 }); 

@@ -5,16 +5,16 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { useDataSync } from '../../../design-patterns/hooks/useDataSync';
 import { useObserver } from '../../../design-patterns/hooks/useObserver';
 import { useBusinessLogic } from '../../../design-patterns/hooks/useBusinessLogic';
 
 /**
  * Hook principal pentru Stocks Store
  * @param {string} businessType - Tipul de business (dental, gym, hotel)
+ * @param {Array} stockItems - Datele de stocks din useDataSync
  * @returns {Object} State-ul și funcțiile pentru gestionarea stocurilor
  */
-const useStocksStore = (businessType = 'gym') => {
+const useStocksStore = (businessType = 'gym', stockItems = []) => {
   // State pentru UI și formular
   const [showAddForm, setShowAddForm] = useState(false);
   const [newItem, setNewItem] = useState({
@@ -36,29 +36,6 @@ const useStocksStore = (businessType = 'gym') => {
   
   // Hook pentru business logic
   const businessLogic = useBusinessLogic(businessType);
-  
-  // Hook pentru sincronizarea datelor cu API
-  const stocksSync = useDataSync('stocks', {
-    businessType,
-    enableValidation: true,
-    enableBusinessLogic: true
-  });
-
-  // Extrag datele și funcțiile din sync hook
-  const {
-    data: stocksData,
-    loading: stocksLoading,
-    error: stocksError,
-    lastUpdated,
-    isOnline,
-    refresh: refreshStocks,
-    create: createStock,
-    update: updateStock,
-    remove: removeStock,
-    validateData: validateStockData,
-    isOperationAllowed: isStockOperationAllowed,
-    processData: processStockData
-  } = stocksSync;
 
   /**
    * Formatează valoarea monetară
@@ -74,17 +51,14 @@ const useStocksStore = (businessType = 'gym') => {
    * Procesează datele stocurilor pentru afișare
    */
   const processedStocksData = useCallback(() => {
-    if (!stocksData) return { inventory: [], lowStock: [] };
+    if (!stockItems || stockItems.length === 0) return { inventory: [], lowStock: [] };
 
-    // Procesează datele conform strategiei business
-    const processedData = processStockData(stocksData, 'read');
-    
     // Separă inventarul de stocul scăzut
-    const inventory = processedData.filter(item => item.quantity > 10);
-    const lowStock = processedData.filter(item => item.quantity <= 10);
+    const inventory = stockItems.filter(item => item.quantity > 10);
+    const lowStock = stockItems.filter(item => item.quantity <= 10);
     
     return { inventory, lowStock };
-  }, [stocksData, processStockData]);
+  }, [stockItems]);
 
   /**
    * Filtrează și sortează datele
@@ -139,21 +113,24 @@ const useStocksStore = (businessType = 'gym') => {
     e.preventDefault();
     
     try {
-      // Validează datele
-      const validation = validateStockData(newItem, 'create');
+      // Validează datele folosind business logic
+      const validation = businessLogic.validateData(newItem, 'stocks');
       if (!validation.isValid) {
         console.error('Validation errors:', validation.errors);
         return;
       }
 
       // Verifică permisiunile
-      if (!isStockOperationAllowed('createStock', newItem)) {
+      if (!businessLogic.isOperationAllowed('createStock', newItem)) {
         console.error('Operation not allowed');
         return;
       }
 
-      // Creează item-ul
-      await createStock(newItem);
+      // Procesează datele folosind business logic
+      const processedData = businessLogic.processData(newItem, 'stocks');
+      
+      // Emite eveniment pentru crearea item-ului
+      emit('stocks:create', processedData);
       
       console.log('✅ Stock item created successfully');
       
@@ -170,35 +147,38 @@ const useStocksStore = (businessType = 'gym') => {
     } catch (error) {
       console.error('❌ Failed to create stock item:', error.message);
     }
-  }, [newItem, validateStockData, isStockOperationAllowed, createStock]);
+  }, [newItem, businessLogic, emit]);
 
   /**
    * Actualizează un item din stoc
    */
   const handleUpdateItem = useCallback(async (id, updates) => {
     try {
-      // Validează datele
-      const validation = validateStockData(updates, 'update');
+      // Validează datele folosind business logic
+      const validation = businessLogic.validateData(updates, 'stocks');
       if (!validation.isValid) {
         console.error('Validation errors:', validation.errors);
         return;
       }
 
       // Verifică permisiunile
-      if (!isStockOperationAllowed('updateStock', updates)) {
+      if (!businessLogic.isOperationAllowed('updateStock', updates)) {
         console.error('Operation not allowed');
         return;
       }
 
-      // Actualizează item-ul
-      await updateStock({ id, ...updates });
+      // Procesează datele folosind business logic
+      const processedData = businessLogic.processData({ id, ...updates }, 'stocks');
+      
+      // Emite eveniment pentru actualizarea item-ului
+      emit('stocks:update', processedData);
       
       console.log('✅ Stock item updated successfully');
 
     } catch (error) {
       console.error('❌ Failed to update stock item:', error.message);
     }
-  }, [validateStockData, isStockOperationAllowed, updateStock]);
+  }, [businessLogic, emit]);
 
   /**
    * Șterge un item din stoc
@@ -206,20 +186,20 @@ const useStocksStore = (businessType = 'gym') => {
   const handleDeleteItem = useCallback(async (id) => {
     try {
       // Verifică permisiunile
-      if (!isStockOperationAllowed('deleteStock', { id })) {
+      if (!businessLogic.isOperationAllowed('deleteStock', { id })) {
         console.error('Operation not allowed');
         return;
       }
 
-      // Șterge item-ul
-      await removeStock({ id });
+      // Emite eveniment pentru ștergerea item-ului
+      emit('stocks:delete', { id });
       
       console.log('✅ Stock item deleted successfully');
 
     } catch (error) {
       console.error('❌ Failed to delete stock item:', error.message);
     }
-  }, [isStockOperationAllowed, removeStock]);
+  }, [businessLogic, emit]);
 
   /**
    * Gestionează printarea raportului
@@ -354,31 +334,24 @@ const useStocksStore = (businessType = 'gym') => {
     sortOrder,
     setSortOrder,
     
-    // Data
-    stocksData: filteredAndSortedData(),
-    stocksLoading,
-    stocksError,
-    lastUpdated,
-    isOnline,
-    
     // Functions
     formatCurrency,
     handleAddItem,
     handleUpdateItem,
     handleDeleteItem,
     handlePrint,
-    refreshStocks,
+    refreshStocks: () => emit('stocks:refresh'),
     
     // Business logic
     businessLogic,
     
     // Permissions
-    canCreateStock: isStockOperationAllowed('createStock', newItem),
-    canUpdateStock: isStockOperationAllowed('updateStock', {}),
-    canDeleteStock: isStockOperationAllowed('deleteStock', {}),
+    canCreateStock: businessLogic.isOperationAllowed('createStock', newItem),
+    canUpdateStock: businessLogic.isOperationAllowed('updateStock', {}),
+    canDeleteStock: businessLogic.isOperationAllowed('deleteStock', {}),
     
     // Validation
-    validateStockData: (data, operation) => validateStockData(data, operation)
+    validateStockData: (data, operation) => businessLogic.validateData(data, 'stocks')
   };
 };
 

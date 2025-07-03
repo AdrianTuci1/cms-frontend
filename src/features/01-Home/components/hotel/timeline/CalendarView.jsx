@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useHotelTimelineWithAPI } from "../../../store";
+import { useHotelTimelineWithAPI } from "../../../store/hotelTimeline";
+import { useDataSync } from "../../../../../design-patterns/hooks";
 import { generateDatesArray, isDateRangeOverlapping, isDateInRange } from "./utils/dateUtils";
 import { useDragScroll } from "./hooks/useDragScroll";
 import DateSelector from "./components/DateSelector";
@@ -28,8 +29,19 @@ const STATUS_LABELS = {
 };
 
 const CalendarView = () => {
-  // Use the new timeline integration hook
-  const timeline = useHotelTimelineWithAPI({
+  // Use useDataSync hook directly for timeline data
+  const timelineSync = useDataSync('timeline', {
+    businessType: 'hotel',
+    startDate: '2024-01-01',
+    endDate: '2024-01-31',
+    enableValidation: true,
+    enableBusinessLogic: true
+  });
+
+  const timelineData = timelineSync.data;
+
+  // Use the updated timeline integration hook with shared data
+  const timeline = useHotelTimelineWithAPI(timelineData, {
     startDate: '2024-01-01',
     endDate: '2024-01-31',
     enableValidation: true,
@@ -37,13 +49,6 @@ const CalendarView = () => {
   });
 
   const {
-    data,
-    loading,
-    error,
-    refresh,
-    createBooking,
-    updateBooking,
-    deleteBooking,
     getBookings,
     rooms,
     reservations,
@@ -99,106 +104,65 @@ const CalendarView = () => {
     }
   }, [bookings, rooms, dragStartTimeRef]);
 
-  const handleCellHover = useCallback((roomNumber, date) => {
-    if (isDragging) return;
-    setPreviewDate({ roomNumber, date });
-  }, [isDragging]);
+  const handleDateRangeChange = useCallback((newStartDate, newEndDate) => {
+    setDateRange(newStartDate, newEndDate);
+  }, [setDateRange]);
 
-  const handleCellLeave = useCallback(() => {
-    setPreviewDate(null);
-  }, []);
-
-  const isInSelectedPeriod = useCallback((date, roomNumber) => {
-    if (!previewDate || previewDate.roomNumber !== roomNumber) {
-      return false;
-    }
-    
-    const dayStr = date.toISOString().split("T")[0];
-    const previewDayStr = previewDate.date.toISOString().split("T")[0];
-    
-    if (dayStr !== previewDayStr) {
-      return false;
-    }
-
-    const isReserved = bookings.some((res) => 
-      res.rooms.some(room => 
-        room.roomId === roomNumber &&
-        dayStr >= room.startDate.split("T")[0] &&
-        dayStr < room.endDate.split("T")[0]
-      )
-    );
-
-    if (isReserved) {
-      return false;
-    }
-
-    return true;
-  }, [previewDate, bookings]);
-
-  const getRoomStatus = useCallback((roomNumber, date) => {
-    const dayStr = date.toISOString().split("T")[0];
-    const reservation = bookings.find(res =>
-      res.rooms.some(room =>
-        room.roomId === roomNumber &&
-        dayStr >= room.startDate.split("T")[0] &&
-        dayStr < room.endDate.split("T")[0]
-      )
-    );
-
-    if (reservation) {
-      const room = reservation.rooms.find(r => r.roomId === roomNumber);
-      return room.status || ROOM_STATUS.OCCUPIED;
-    }
-    return ROOM_STATUS.AVAILABLE;
-  }, [bookings]);
-
-  if (error) {
+  // Show loading state if timeline data is loading
+  if (timelineSync.loading) {
     return (
-      <div className={styles.calendarContainer}>
-        <div className={styles.errorState}>
-          <h3>Eroare la încărcarea calendarului</h3>
-          <p>{error.message || error}</p>
-          <button onClick={refresh}>Încearcă din nou</button>
+      <div className={styles.container}>
+        <div className={styles.loadingState}>
+          <div className={styles.loadingStateContent}>
+            <div className={styles.spinner}></div>
+            <p>Se încarcă calendarul...</p>
+          </div>
         </div>
       </div>
     );
   }
 
-  if (loading) {
+  // Show error state if timeline data has error
+  if (timelineSync.error) {
     return (
-      <div className={styles.calendarContainer}>
-        <div className={styles.loadingState}>
-          <p>Se încarcă calendarul...</p>
+      <div className={styles.container}>
+        <div className={styles.errorState}>
+          <h3>Eroare la încărcarea calendarului</h3>
+          <p>{timelineSync.error.message || timelineSync.error}</p>
+          <button onClick={timelineSync.refresh}>Încearcă din nou</button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={styles.calendarContainer}>
-      <DateSelector 
-        startDate={startDate} 
-        endDate={endDate} 
-        setDateRange={setDateRange} 
+    <div className={styles.container}>
+      <DateSelector
+        startDate={startDate}
+        endDate={endDate}
+        onDateRangeChange={handleDateRangeChange}
       />
-      <CalendarTable
-        rooms={rooms}
-        days={days}
-        highlightedRoom={highlightedRoom}
-        isInSelectedPeriod={isInSelectedPeriod}
-        getRoomStatus={getRoomStatus}
-        handleCellClick={handleCellClick}
-        handleCellHover={handleCellHover}
-        handleCellLeave={handleCellLeave}
-        previewDate={previewDate}
-        isDragging={isDragging}
-        tableWrapperRef={tableWrapperRef}
-        handleMouseDown={handleMouseDown}
-        handleMouseMove={handleMouseMove}
-        tooltipData={tooltipData}
-        statusColors={STATUS_COLORS}
-        statusLabels={STATUS_LABELS}
-      />
+
+      <div
+        className={styles.tableWrapper}
+        ref={tableWrapperRef}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={() => setTooltipData(null)}
+        onMouseLeave={() => setTooltipData(null)}
+      >
+        <CalendarTable
+          days={days}
+          rooms={rooms}
+          bookings={bookings}
+          isRoomAvailable={isRoomAvailable}
+          onCellClick={handleCellClick}
+          highlightedRoom={highlightedRoom}
+          setHighlightedRoom={setHighlightedRoom}
+          tooltipData={tooltipData}
+          isDragging={isDragging}
+        />
+      </div>
     </div>
   );
 };

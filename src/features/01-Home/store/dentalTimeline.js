@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { useDataSync } from '../../../design-patterns/hooks';
 import { useMemo, useCallback } from 'react';
 
 // Helper functions for date calculations
@@ -119,9 +118,10 @@ const useAppointmentsStore = create((set, get) => ({
 
 /**
  * Hook pentru dental timeline cu integrare API
- * @param {Object} options - Opțiuni pentru useDataSync
+ * @param {Object} timelineData - Timeline data from shared context
+ * @param {Object} options - Opțiuni pentru timeline
  */
-export const useDentalTimelineWithAPI = (options = {}) => {
+export const useDentalTimelineWithAPI = (timelineData = null, options = {}) => {
   const {
     startDate = null,
     endDate = null,
@@ -129,20 +129,11 @@ export const useDentalTimelineWithAPI = (options = {}) => {
     enableBusinessLogic = true
   } = options;
 
-  // Folosește useDataSync pentru integrarea cu API
-  const timelineSync = useDataSync('timeline', {
-    businessType: 'dental',
-    startDate,
-    endDate,
-    enableValidation,
-    enableBusinessLogic
-  });
-
   // Folosește store-ul local pentru state management
   const appointmentsStore = useAppointmentsStore();
 
   // Memoizează datele derivate pentru a evita infinite re-renders
-  const appointments = useMemo(() => timelineSync.data?.reservations || [], [timelineSync.data?.reservations]);
+  const appointments = useMemo(() => timelineData?.reservations || [], [timelineData?.reservations]);
   
   const displayedAppointments = useMemo(() => 
     appointmentsStore.getDisplayedAppointments(appointments),
@@ -155,9 +146,6 @@ export const useDentalTimelineWithAPI = (options = {}) => {
   );
 
   return {
-    // API integration
-    ...timelineSync,
-    
     // Local state management
     ...appointmentsStore,
     
@@ -168,11 +156,12 @@ export const useDentalTimelineWithAPI = (options = {}) => {
       getAppointmentsCountForDate
     }),
     
-    // Business-specific actions
+    // Business-specific actions (these would need to be implemented with actual API calls)
     createAppointment: async (appointment) => {
       try {
-        const newAppointment = await timelineSync.create(appointment);
-        return newAppointment;
+        // This would need to be implemented with actual API integration
+        console.log('Creating appointment:', appointment);
+        throw new Error('Appointment creation not implemented yet');
       } catch (error) {
         console.error('Error creating appointment:', error);
         throw error;
@@ -181,8 +170,9 @@ export const useDentalTimelineWithAPI = (options = {}) => {
 
     updateAppointment: async (id, updates) => {
       try {
-        const updatedAppointment = await timelineSync.update({ id, ...updates });
-        return updatedAppointment;
+        // This would need to be implemented with actual API integration
+        console.log('Updating appointment:', { id, updates });
+        throw new Error('Appointment update not implemented yet');
       } catch (error) {
         console.error('Error updating appointment:', error);
         throw error;
@@ -191,7 +181,9 @@ export const useDentalTimelineWithAPI = (options = {}) => {
 
     deleteAppointment: async (id) => {
       try {
-        await timelineSync.remove({ id });
+        // This would need to be implemented with actual API integration
+        console.log('Deleting appointment:', id);
+        throw new Error('Appointment deletion not implemented yet');
       } catch (error) {
         console.error('Error deleting appointment:', error);
         throw error;

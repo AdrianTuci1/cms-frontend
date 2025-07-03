@@ -1,0 +1,210 @@
+{
+  "metadata": {
+    "description": "Test data for sales functionality across different business types",
+    "businessTypes": ["dental", "gym", "hotel"],
+    "dateRange": {
+      "startDate": "2024-01-15",
+      "endDate": "2024-01-21"
+    }
+  },
+  "request": {
+    "method": "GET",
+    "endpoint": "/api/sales/stocks",
+    "params": {
+      "businessType": "dental",
+      "category": "all",
+      "lowStock": false
+    }
+  },
+  "response": {
+    "success": true,
+    "data": {
+      "stocks": [
+        {
+          "id": "stock-001",
+          "productId": "prod-001",
+          "productName": "Pastă de dinți Colgate",
+          "category": "dental_supplies",
+          "quantity": 50,
+          "minQuantity": 10,
+          "price": 15.50,
+          "currentPrice": 15.50,
+          "unit": "buc",
+          "supplier": "Dental Supplies Ltd",
+          "description": "Pastă de dinți cu fluor pentru protecție împotriva cariilor",
+          "status": "in-stock",
+          "expiryDate": "2025-12-31",
+          "createdAt": "2024-01-01T10:00:00Z",
+          "updatedAt": "2024-01-15T14:30:00Z"
+        },
+        {
+          "id": "stock-002",
+          "productId": "prod-002",
+          "productName": "Periuță de dinți Oral-B",
+          "category": "dental_supplies",
+          "quantity": 25,
+          "minQuantity": 15,
+          "price": 12.75,
+          "currentPrice": 12.75,
+          "unit": "buc",
+          "supplier": "Dental Supplies Ltd",
+          "description": "Periuță de dinți electrică cu tehnologie sonic",
+          "status": "in-stock",
+          "expiryDate": "2026-06-30",
+          "createdAt": "2024-01-02T11:00:00Z",
+          "updatedAt": "2024-01-15T14:30:00Z"
+        },
+        {
+          "id": "stock-003",
+          "productId": "prod-003",
+          "productName": "Aparat de irigare",
+          "category": "dental_equipment",
+          "quantity": 8,
+          "minQuantity": 5,
+          "price": 89.99,
+          "currentPrice": 89.99,
+          "unit": "buc",
+          "supplier": "Medical Equipment Co",
+          "description": "Aparat profesional pentru irigare orală",
+          "status": "low-stock",
+          "expiryDate": "2027-01-15",
+          "createdAt": "2024-01-03T12:00:00Z",
+          "updatedAt": "2024-01-15T14:30:00Z"
+        },
+        {
+          "id": "stock-004",
+          "productId": "prod-004",
+          "productName": "Fir dentar",
+          "category": "dental_supplies",
+          "quantity": 100,
+          "minQuantity": 20,
+          "price": 8.25,
+          "currentPrice": 8.25,
+          "unit": "buc",
+          "supplier": "Dental Supplies Ltd",
+          "description": "Fir dentar cu aromă de mentă",
+          "status": "in-stock",
+          "expiryDate": "2025-08-20",
+          "createdAt": "2024-01-04T13:00:00Z",
+          "updatedAt": "2024-01-15T14:30:00Z"
+        },
+        {
+          "id": "stock-005",
+          "productId": "prod-005",
+          "productName": "Gel anestezic",
+          "category": "dental_medication",
+          "quantity": 3,
+          "minQuantity": 10,
+          "price": 45.00,
+          "currentPrice": 45.00,
+          "unit": "buc",
+          "supplier": "Pharma Supplies",
+          "description": "Gel anestezic pentru proceduri dentare",
+          "status": "low-stock",
+          "expiryDate": "2024-06-15",
+          "createdAt": "2024-01-05T14:00:00Z",
+          "updatedAt": "2024-01-15T14:30:00Z"
+        },
+        {
+          "id": "stock-006",
+          "productId": "prod-006",
+          "productName": "Protein Shake",
+          "category": "supplements",
+          "quantity": 75,
+          "minQuantity": 20,
+          "price": 35.50,
+          "currentPrice": 35.50,
+          "unit": "buc",
+          "supplier": "Fitness Nutrition",
+          "description": "Shake proteic cu 25g proteină per porție",
+          "status": "in-stock",
+          "expiryDate": "2025-03-10",
+          "createdAt": "2024-01-06T15:00:00Z",
+          "updatedAt": "2024-01-15T14:30:00Z"
+        },
+        {
+          "id": "stock-007",
+          "productId": "prod-007",
+          "productName": "Creatină Monohidrat",
+          "category": "supplements",
+          "quantity": 45,
+          "minQuantity": 15,
+          "price": 28.99,
+          "currentPrice": 28.99,
+          "unit": "buc",
+          "supplier": "Fitness Nutrition",
+          "description": "Creatină monohidrat pentru creșterea forței",
+          "status": "in-stock",
+          "expiryDate": "2025-07-22",
+          "createdAt": "2024-01-07T16:00:00Z",
+          "updatedAt": "2024-01-15T14:30:00Z"
+        },
+        {
+          "id": "stock-008",
+          "productId": "prod-008",
+          "productName": "Mănuși de fitness",
+          "category": "equipment",
+          "quantity": 12,
+          "minQuantity": 8,
+          "price": 22.50,
+          "currentPrice": 22.50,
+          "unit": "pereche",
+          "supplier": "Fitness Equipment",
+          "description": "Mănuși antiderapante pentru ridicări",
+          "status": "low-stock",
+          "expiryDate": "2026-12-01",
+          "createdAt": "2024-01-08T17:00:00Z",
+          "updatedAt": "2024-01-15T14:30:00Z"
+        },
+        {
+          "id": "stock-009",
+          "productId": "prod-009",
+          "productName": "Băutură energizantă",
+          "category": "drinks",
+          "quantity": 200,
+          "minQuantity": 50,
+          "price": 6.50,
+          "currentPrice": 6.50,
+          "unit": "buc",
+          "supplier": "Beverage Co",
+          "description": "Băutură energizantă fără zahăr",
+          "status": "in-stock",
+          "expiryDate": "2024-09-30",
+          "createdAt": "2024-01-09T18:00:00Z",
+          "updatedAt": "2024-01-15T14:30:00Z"
+        },
+        {
+          "id": "stock-010",
+          "productId": "prod-010",
+          "productName": "Apa minerală",
+          "category": "drinks",
+          "quantity": 150,
+          "minQuantity": 30,
+          "price": 3.25,
+          "currentPrice": 3.25,
+          "unit": "buc",
+          "supplier": "Beverage Co",
+          "description": "Apă minerală naturală 500ml",
+          "status": "in-stock",
+          "expiryDate": "2024-11-15",
+          "createdAt": "2024-01-10T19:00:00Z",
+          "updatedAt": "2024-01-15T14:30:00Z"
+        }
+      ],
+      "statistics": {
+        "totalProducts": 10,
+        "totalValue": 2848.24,
+        "lowStockItems": 3,
+        "outOfStockItems": 0,
+        "categories": {
+          "dental_supplies": 4,
+          "dental_equipment": 1,
+          "dental_medication": 1,
+          "supplements": 2,
+          "equipment": 1,
+          "drinks": 2
+        }
+      }
+    }
+  }
+} 

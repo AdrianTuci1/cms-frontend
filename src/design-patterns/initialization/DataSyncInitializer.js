@@ -4,7 +4,7 @@
  * Updated pentru noua structură API din requests.md
  */
 
-import dataSyncManager from '../data-sync/DataSyncManager';
+import dataSyncManager from '../data-sync/index.js';
 import { StrategyRegistry } from '../strategy/base/StrategyRegistry';
 import eventBus from '../observer/base/EventBus';
 

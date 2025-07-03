@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { useDataSync } from '../../../design-patterns/hooks';
 import { useMemo, useCallback } from 'react';
 // import roomsData from '../data/rooms.json';
 // import reservationsData from '../data/reservations.json';
@@ -129,9 +128,10 @@ const useCalendarStore = create((set, get) => ({
 
 /**
  * Hook pentru hotel timeline cu integrare API
- * @param {Object} options - Opțiuni pentru useDataSync
+ * @param {Object} timelineData - Timeline data from shared context
+ * @param {Object} options - Opțiuni pentru timeline
  */
-export const useHotelTimelineWithAPI = (options = {}) => {
+export const useHotelTimelineWithAPI = (timelineData = null, options = {}) => {
   const {
     startDate = null,
     endDate = null,
@@ -139,21 +139,12 @@ export const useHotelTimelineWithAPI = (options = {}) => {
     enableBusinessLogic = true
   } = options;
 
-  // Folosește useDataSync pentru integrarea cu API
-  const timelineSync = useDataSync('timeline', {
-    businessType: 'hotel',
-    startDate,
-    endDate,
-    enableValidation,
-    enableBusinessLogic
-  });
-
   // Folosește store-ul local pentru state management
   const calendarStore = useCalendarStore();
 
   // Memoizează datele derivate pentru a evita infinite re-renders
-  const bookings = useMemo(() => timelineSync.data?.bookings || [], [timelineSync.data?.bookings]);
-  const rooms = useMemo(() => timelineSync.data?.packages?.rooms || [], [timelineSync.data?.packages?.rooms]);
+  const bookings = useMemo(() => timelineData?.bookings || [], [timelineData?.bookings]);
+  const rooms = useMemo(() => timelineData?.packages?.rooms || [], [timelineData?.packages?.rooms]);
 
   const isRoomAvailable = useCallback((roomNumber, startDate, endDate) =>
     calendarStore.isRoomAvailable(roomNumber, startDate, endDate, bookings),
@@ -161,9 +152,6 @@ export const useHotelTimelineWithAPI = (options = {}) => {
   );
 
   return {
-    // API integration
-    ...timelineSync,
-    
     // Local state management
     ...calendarStore,
     
@@ -174,11 +162,12 @@ export const useHotelTimelineWithAPI = (options = {}) => {
       isRoomAvailable
     }),
     
-    // Business-specific actions
+    // Business-specific actions (these would need to be implemented with actual API calls)
     createBooking: async (booking) => {
       try {
-        const newBooking = await timelineSync.create(booking);
-        return newBooking;
+        // This would need to be implemented with actual API integration
+        console.log('Creating booking:', booking);
+        throw new Error('Booking creation not implemented yet');
       } catch (error) {
         console.error('Error creating booking:', error);
         throw error;
@@ -187,8 +176,9 @@ export const useHotelTimelineWithAPI = (options = {}) => {
 
     updateBooking: async (id, updates) => {
       try {
-        const updatedBooking = await timelineSync.update({ id, ...updates });
-        return updatedBooking;
+        // This would need to be implemented with actual API integration
+        console.log('Updating booking:', { id, updates });
+        throw new Error('Booking update not implemented yet');
       } catch (error) {
         console.error('Error updating booking:', error);
         throw error;
@@ -197,7 +187,9 @@ export const useHotelTimelineWithAPI = (options = {}) => {
 
     deleteBooking: async (id) => {
       try {
-        await timelineSync.remove({ id });
+        // This would need to be implemented with actual API integration
+        console.log('Deleting booking:', id);
+        throw new Error('Booking deletion not implemented yet');
       } catch (error) {
         console.error('Error deleting booking:', error);
         throw error;

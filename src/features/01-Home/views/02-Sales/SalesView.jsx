@@ -3,18 +3,28 @@ import ResizablePanels from '../../components/gym/timeline/ResizablePanels.jsx';
 import ProductsPanel from '../../components/sales/ProductsPanel.jsx';
 import ReceiptPanel from '../../components/sales/ReceiptPanel.jsx';
 import { useSalesStore } from '../../store';
+import { useDataSync } from '../../../../design-patterns/hooks';
 import styles from './SalesView.module.css';
 
 const SalesView = ({ businessType = 'dental' }) => {
   const [paymentMethod, setPaymentMethod] = useState('cash');
 
-  // Folosește sales store cu integrare API
+  // Use useDataSync hook directly for stocks data
+  const stocksSync = useDataSync('stocks', {
+    businessType,
+    enableValidation: true,
+    enableBusinessLogic: true
+  });
+
+  const { data: stocksData, loading: stocksLoading, error: stocksError } = stocksSync;
+
+  // Extract the actual stock items from the stocks data
+  const stockItems = stocksData?.items || stocksData || [];
+
+  // Folosește sales store cu integrare API și shared stocks data
   const {
     cart,
     total,
-    stocksData,
-    stocksLoading,
-    stocksError,
     addToCart,
     removeFromCart,
     updateQuantity,
@@ -22,7 +32,7 @@ const SalesView = ({ businessType = 'dental' }) => {
     finalizeSale,
     cancelSale,
     canCreateSale
-  } = useSalesStore(businessType);
+  } = useSalesStore(businessType, stockItems);
 
   const handleAddToCart = (product) => {
     try {
@@ -44,35 +54,17 @@ const SalesView = ({ businessType = 'dental' }) => {
     }
   };
 
-  const handleValidate = async () => {
+  const handleValidate = () => {
     try {
       const validation = validateCart();
-      
-      if (!validation.isValid) {
+      if (validation.isValid) {
+        console.log('Cart is valid:', validation);
+        // Proceed with sale
+      } else {
         console.error('Cart validation failed:', validation.errors);
-        return false;
       }
-
-      if (!canCreateSale) {
-        console.error('Insufficient permissions to create sale');
-        return false;
-      }
-
-      // Finalizează vânzarea direct
-      await handleFinalizeSale();
-      return true;
     } catch (error) {
-      console.error('Validation error:', error);
-      return false;
-    }
-  };
-
-  const handleFinalizeSale = async () => {
-    try {
-      const sale = await finalizeSale(paymentMethod, {});
-      console.log('Sale completed successfully:', sale);
-    } catch (error) {
-      console.error('Error finalizing sale:', error);
+      console.error('Error validating cart:', error.message);
     }
   };
 
@@ -100,7 +92,7 @@ const SalesView = ({ businessType = 'dental' }) => {
         leftContent={
           <ProductsPanel 
             onAddToCart={handleAddToCart}
-            products={stocksData}
+            products={stockItems}
             loading={stocksLoading}
             error={stocksError}
             businessType={businessType}

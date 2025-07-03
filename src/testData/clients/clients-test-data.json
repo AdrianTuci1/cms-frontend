@@ -1,0 +1,224 @@
+{
+  "metadata": {
+    "description": "Test data for clients functionality across different business types",
+    "businessTypes": ["dental", "gym", "hotel"],
+    "dateRange": {
+      "startDate": "2024-01-01",
+      "endDate": "2024-01-31"
+    }
+  },
+  "request": {
+    "method": "GET",
+    "endpoint": "/api/clients",
+    "params": {
+      "businessType": "dental",
+      "status": "all",
+      "search": ""
+    }
+  },
+  "response": {
+    "success": true,
+    "data": {
+      "clients": [
+        {
+          "id": "client-001",
+          "name": "Maria Popescu",
+          "email": "maria.popescu@email.com",
+          "phone": "0722123456",
+          "doctor": "Dr. Ion Ionescu",
+          "previousTreatment": {
+            "id": "treatment-001",
+            "name": "Canal Treatment",
+            "date": "2024-01-10",
+            "status": "completed"
+          },
+          "nextTreatment": {
+            "id": "treatment-002",
+            "name": "Cleaning",
+            "date": "2024-01-25",
+            "status": "scheduled"
+          },
+          "status": "active",
+          "lastVisit": "2024-01-15",
+          "totalVisits": 5,
+          "createdAt": "2023-06-15T10:00:00Z",
+          "updatedAt": "2024-01-15T14:30:00Z"
+        },
+        {
+          "id": "client-002",
+          "name": "Ion Vasilescu",
+          "email": "ion.vasilescu@email.com",
+          "phone": "0733123456",
+          "doctor": "Dr. Ana Dumitrescu",
+          "previousTreatment": {
+            "id": "treatment-003",
+            "name": "Filling",
+            "date": "2024-01-08",
+            "status": "completed"
+          },
+          "nextTreatment": {
+            "id": "treatment-004",
+            "name": "Check-up",
+            "date": "2024-02-05",
+            "status": "scheduled"
+          },
+          "status": "active",
+          "lastVisit": "2024-01-10",
+          "totalVisits": 3,
+          "createdAt": "2023-09-20T11:00:00Z",
+          "updatedAt": "2024-01-10T16:45:00Z"
+        },
+        {
+          "id": "client-003",
+          "name": "Elena Marin",
+          "email": "elena.marin@email.com",
+          "phone": "0744123456",
+          "doctor": "Dr. Ion Ionescu",
+          "previousTreatment": {
+            "id": "treatment-005",
+            "name": "Extraction",
+            "date": "2024-01-05",
+            "status": "completed"
+          },
+          "nextTreatment": {
+            "id": "treatment-006",
+            "name": "Implant",
+            "date": "2024-02-15",
+            "status": "pending"
+          },
+          "status": "pending",
+          "lastVisit": "2024-01-05",
+          "totalVisits": 2,
+          "createdAt": "2023-12-10T09:30:00Z",
+          "updatedAt": "2024-01-05T13:20:00Z"
+        },
+        {
+          "id": "client-004",
+          "name": "Alexandru Popa",
+          "email": "alexandru.popa@email.com",
+          "phone": "0755123456",
+          "trainer": "Mihai Dumitrescu",
+          "membership": {
+            "type": "Premium",
+            "startDate": "2024-01-01",
+            "endDate": "2024-12-31",
+            "status": "active"
+          },
+          "lastWorkout": "2024-01-20",
+          "totalWorkouts": 15,
+          "status": "active",
+          "createdAt": "2024-01-01T08:00:00Z",
+          "updatedAt": "2024-01-20T19:15:00Z"
+        },
+        {
+          "id": "client-005",
+          "name": "Ana Ionescu",
+          "email": "ana.ionescu@email.com",
+          "phone": "0766123456",
+          "trainer": "Elena Popescu",
+          "membership": {
+            "type": "Basic",
+            "startDate": "2024-01-15",
+            "endDate": "2024-04-15",
+            "status": "active"
+          },
+          "lastWorkout": "2024-01-18",
+          "totalWorkouts": 8,
+          "status": "active",
+          "createdAt": "2024-01-15T10:30:00Z",
+          "updatedAt": "2024-01-18T18:45:00Z"
+        },
+        {
+          "id": "client-006",
+          "name": "Vasile Munteanu",
+          "email": "vasile.munteanu@email.com",
+          "phone": "0777123456",
+          "trainer": "Mihai Dumitrescu",
+          "membership": {
+            "type": "Premium",
+            "startDate": "2023-12-01",
+            "endDate": "2024-11-30",
+            "status": "expired"
+          },
+          "lastWorkout": "2024-01-10",
+          "totalWorkouts": 45,
+          "status": "inactive",
+          "createdAt": "2023-12-01T07:15:00Z",
+          "updatedAt": "2024-01-10T20:30:00Z"
+        },
+        {
+          "id": "client-007",
+          "name": "Carmen Dumitrescu",
+          "email": "carmen.dumitrescu@email.com",
+          "phone": "0788123456",
+          "roomNumber": "201",
+          "checkIn": "2024-01-20",
+          "checkOut": "2024-01-25",
+          "roomType": "Deluxe",
+          "status": "checked-in",
+          "totalStays": 3,
+          "createdAt": "2024-01-20T14:00:00Z",
+          "updatedAt": "2024-01-20T14:00:00Z"
+        },
+        {
+          "id": "client-008",
+          "name": "George Popescu",
+          "email": "george.popescu@email.com",
+          "phone": "0799123456",
+          "roomNumber": "305",
+          "checkIn": "2024-01-22",
+          "checkOut": "2024-01-24",
+          "roomType": "Standard",
+          "status": "checked-in",
+          "totalStays": 1,
+          "createdAt": "2024-01-22T12:30:00Z",
+          "updatedAt": "2024-01-22T12:30:00Z"
+        },
+        {
+          "id": "client-009",
+          "name": "Laura Marin",
+          "email": "laura.marin@email.com",
+          "phone": "0700123456",
+          "roomNumber": "102",
+          "checkIn": "2024-01-18",
+          "checkOut": "2024-01-21",
+          "roomType": "Suite",
+          "status": "checked-out",
+          "totalStays": 5,
+          "createdAt": "2024-01-18T16:45:00Z",
+          "updatedAt": "2024-01-21T11:00:00Z"
+        },
+        {
+          "id": "client-010",
+          "name": "Mihai Vasilescu",
+          "email": "mihai.vasilescu@email.com",
+          "phone": "0711123456",
+          "roomNumber": "401",
+          "checkIn": "2024-01-25",
+          "checkOut": "2024-01-28",
+          "roomType": "Deluxe",
+          "status": "reserved",
+          "totalStays": 2,
+          "createdAt": "2024-01-25T09:15:00Z",
+          "updatedAt": "2024-01-25T09:15:00Z"
+        }
+      ],
+      "statistics": {
+        "totalClients": 10,
+        "activeClients": 7,
+        "inactiveClients": 2,
+        "pendingClients": 1,
+        "businessTypes": {
+          "dental": 3,
+          "gym": 3,
+          "hotel": 4
+        },
+        "statusDistribution": {
+          "active": 7,
+          "inactive": 2,
+          "pending": 1
+        }
+      }
+    }
+  }
+} 

@@ -6,8 +6,21 @@ import InventoryCard from '../components/InventoryCard.jsx';
 import LowStockCard from '../components/LowStockCard.jsx';
 import AddStockForm from '../components/AddStockForm.jsx';
 import useStocksStore from '../store/stocksStore';
+import { useDataSync } from '../../../design-patterns/hooks';
 
 const StocksView = ({ businessType = 'gym' }) => {
+  // Use useDataSync hook directly for stocks data - same as SalesView
+  const stocksSync = useDataSync('stocks', {
+    businessType,
+    enableValidation: true,
+    enableBusinessLogic: true
+  });
+
+  const { data: stocksData, loading: stocksLoading, error: stocksError, isOnline, lastUpdated } = stocksSync;
+
+  // Extract the actual stock items from the stocks data - same as SalesView
+  const stockItems = stocksData?.items || stocksData || [];
+
   // Folosește store-ul pentru toată logica de business
   const {
     // State
@@ -24,13 +37,6 @@ const StocksView = ({ businessType = 'gym' }) => {
     sortOrder,
     setSortOrder,
     
-    // Data
-    stocksData,
-    stocksLoading,
-    stocksError,
-    lastUpdated,
-    isOnline,
-    
     // Functions
     formatCurrency,
     handleAddItem,
@@ -46,7 +52,7 @@ const StocksView = ({ businessType = 'gym' }) => {
     canCreateStock,
     canUpdateStock,
     canDeleteStock
-  } = useStocksStore(businessType);
+  } = useStocksStore(businessType, stockItems); // Pass stockItems to store
 
   // Render loading state
   if (stocksLoading) {
@@ -75,11 +81,17 @@ const StocksView = ({ businessType = 'gym' }) => {
     );
   }
 
+  // Process stocks data to match expected structure
+  const processedStocksData = {
+    inventory: stockItems.filter(item => item.quantity > 0),
+    lowStock: stockItems.filter(item => item.quantity <= (item.minQuantity || 5))
+  };
+
   const leftContent = (
     <div className={styles.inventorySection}>
       <div className={styles.sectionHeader}>
         <h3>Current Inventory</h3>
-        <span className={styles.itemCount}>{stocksData.inventory.length} items</span>
+        <span className={styles.itemCount}>{processedStocksData.inventory.length} items</span>
         <div className={styles.statusInfo}>
           <span className={isOnline ? styles.online : styles.offline}>
             {isOnline ? '🟢 Online' : '🔴 Offline'}
@@ -93,7 +105,7 @@ const StocksView = ({ businessType = 'gym' }) => {
       </div>
       
       <div className={styles.inventoryList}>
-        {stocksData.inventory.map((item) => (
+        {processedStocksData.inventory.map((item) => (
           <InventoryCard 
             key={item.id} 
             item={item} 
@@ -112,10 +124,10 @@ const StocksView = ({ businessType = 'gym' }) => {
     <div className={styles.lowStockSection}>
       <div className={styles.sectionHeader}>
         <h3>Low Stock Alert</h3>
-        <span className={styles.itemCount}>{stocksData.lowStock.length} items</span>
+        <span className={styles.itemCount}>{processedStocksData.lowStock.length} items</span>
       </div>
       <div className={styles.lowStockList}>
-        {stocksData.lowStock.map((item) => (
+        {processedStocksData.lowStock.map((item) => (
           <LowStockCard 
             key={item.id} 
             item={item} 

@@ -6,6 +6,8 @@ class EventBus {
   constructor() {
     this.events = new Map();
     this.middleware = [];
+    this.recentEvents = new Map(); // Track recent events for deduplication
+    this.deduplicationWindow = 100; // 100ms window for deduplication
   }
 
   /**
@@ -63,6 +65,34 @@ class EventBus {
   }
 
   /**
+   * Check if an event was recently emitted to prevent duplicates
+   * @param {string} eventName - Event name
+   * @param {*} data - Event data
+   * @returns {boolean} True if event was recently emitted
+   */
+  wasRecentlyEmitted(eventName, data) {
+    const now = Date.now();
+    const eventKey = `${eventName}:${JSON.stringify(data)}`;
+    const recentEvent = this.recentEvents.get(eventKey);
+    
+    if (recentEvent && (now - recentEvent.timestamp) < this.deduplicationWindow) {
+      return true;
+    }
+    
+    // Store this event
+    this.recentEvents.set(eventKey, { timestamp: now });
+    
+    // Clean up old events
+    for (const [key, event] of this.recentEvents.entries()) {
+      if (now - event.timestamp > this.deduplicationWindow) {
+        this.recentEvents.delete(key);
+      }
+    }
+    
+    return false;
+  }
+
+  /**
    * Emit an event
    * @param {string} eventName - Event name
    * @param {*} data - Event data
@@ -70,6 +100,12 @@ class EventBus {
    */
   emit(eventName, data = null, context = {}) {
     if (!this.events.has(eventName)) return;
+
+    // Check for duplicate events
+    if (this.wasRecentlyEmitted(eventName, data)) {
+      console.log(`[EventBus] Skipping duplicate event: ${eventName}`);
+      return;
+    }
 
     const event = {
       name: eventName,
@@ -176,6 +212,21 @@ class EventBus {
   }
 
   /**
+   * Clear deduplication cache
+   */
+  clearDeduplicationCache() {
+    this.recentEvents.clear();
+  }
+
+  /**
+   * Set deduplication window
+   * @param {number} windowMs - Deduplication window in milliseconds
+   */
+  setDeduplicationWindow(windowMs) {
+    this.deduplicationWindow = windowMs;
+  }
+
+  /**
    * Generate unique subscription ID
    * @returns {string} Unique ID
    */
@@ -191,7 +242,11 @@ class EventBus {
     const stats = {
       totalEvents: this.events.size,
       totalSubscriptions: 0,
-      events: {}
+      events: {},
+      deduplication: {
+        cacheSize: this.recentEvents.size,
+        windowMs: this.deduplicationWindow
+      }
     };
 
     for (const [eventName, subscriptions] of this.events) {
@@ -209,7 +264,6 @@ const eventBus = new EventBus();
 // Add default middleware for logging in development
 if (import.meta.env.DEV) {
   eventBus.use((event) => {
-    console.log(`[EventBus] ${event.name}:`, event.data);
     return event;
   });
 }

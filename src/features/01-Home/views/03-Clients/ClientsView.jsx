@@ -11,16 +11,38 @@ const ClientsView = () => {
   const businessType = getBusinessType();
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Data sync hook pentru clients
-  const {
-    data: clients,
-    loading,
-    error
-  } = useDataSync('clients', {
+  // Use useDataSync hook directly for clients data
+  const clientsSync = useDataSync('clients', {
     businessType: businessType.name,
+    page: 1,
+    limit: 100,
     enableValidation: true,
     enableBusinessLogic: true
   });
+
+  const { data: clientsData, loading, error } = clientsSync;
+
+  // Extract clients array from the nested structure
+  const clients = useMemo(() => {
+    if (!clientsData) return [];
+    
+    // Handle different data structures
+    if (Array.isArray(clientsData)) {
+      return clientsData;
+    }
+    
+    // Handle nested structure from mock data
+    if (clientsData.clients && Array.isArray(clientsData.clients)) {
+      return clientsData.clients;
+    }
+    
+    // Handle response structure
+    if (clientsData.response?.data?.clients && Array.isArray(clientsData.response.data.clients)) {
+      return clientsData.response.data.clients;
+    }
+    
+    return [];
+  }, [clientsData]);
 
   // Filter clients based on search term
   const filteredClients = useMemo(() => {
@@ -38,6 +60,7 @@ const ClientsView = () => {
       client.email?.toLowerCase().includes(searchLower) ||
       client.phone?.includes(searchTerm) ||
       client.doctor?.toLowerCase().includes(searchLower) ||
+      client.trainer?.toLowerCase().includes(searchLower) ||
       client.previousTreatment?.name?.toLowerCase().includes(searchLower) ||
       client.nextTreatment?.name?.toLowerCase().includes(searchLower)
     );
@@ -85,6 +108,10 @@ const ClientsView = () => {
             <div className={styles.loading}>
               <p>Loading clients...</p>
             </div>
+          ) : error ? (
+            <div className={styles.error}>
+              <p>Error loading clients: {error.message}</p>
+            </div>
           ) : filteredClients.length > 0 ? (
             filteredClients.map(client => renderClientCard(client))
           ) : searchTerm.trim() ? (
@@ -94,6 +121,11 @@ const ClientsView = () => {
           ) : (
             <div className={styles.emptyState}>
               <p>No clients found. Add a client using the button above.</p>
+              {import.meta.env.DEV && (
+                <div style={{ marginTop: '10px', fontSize: '12px', color: '#666' }}>
+                  Debug: Raw data length: {clientsData ? (Array.isArray(clientsData) ? clientsData.length : 'not array') : 'no data'}
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './InvoiceCard.module.css';
-import { FaLightbulb } from 'react-icons/fa';
+import { FaLightbulb, FaFileInvoice } from 'react-icons/fa';
 
 const InvoiceCard = ({ data, type = 'invoice' }) => {
   const getStatusClass = (status) => {
@@ -14,34 +14,63 @@ const InvoiceCard = ({ data, type = 'invoice' }) => {
     }
   };
 
+  // Helper functions to extract data from different formats
+  const getInvoiceNumber = () => {
+    return data.number || data.invoiceNumber || `INV-${data.id}`;
+  };
+
+  const getCustomerName = () => {
+    return data.customer || data.clientName || data.customerName || 'Unknown Customer';
+  };
+
+  const getAmount = () => {
+    const amount = data.amount || data.totalAmount || data.suggestedAmount;
+    if (typeof amount === 'number') {
+      return `€${amount.toFixed(2)}`;
+    }
+    return amount || '€0.00';
+  };
+
+  const getDate = () => {
+    return data.date || data.createdAt || data.invoiceDate || 'No date';
+  };
+
+  const getStatus = () => {
+    return data.status || 'Unknown';
+  };
+
+  const getLastVisit = () => {
+    return data.lastVisit || data.lastVisitDate || 'No visit data';
+  };
+
   return (
     <div className={styles.card}>
       <div className={styles.invoiceInfo}>
         <div className={styles.iconContainer}>
-          {data.icon}
+          {data.icon || <FaFileInvoice />}
         </div>
         <div className={styles.details}>
           <h3 className={styles.invoiceNumber}>
-            {type === 'invoice' ? data.number : data.customer}
+            {type === 'invoice' ? getInvoiceNumber() : getCustomerName()}
           </h3>
           <div className={styles.customerInfo}>
             {type === 'invoice' ? (
               <>
-                <span>{data.customer}</span>
-                <span className={styles.date}>{data.date}</span>
+                <span>{getCustomerName()}</span>
+                <span className={styles.date}>{getDate()}</span>
               </>
             ) : (
-              <span>Last visit: {data.lastVisit}</span>
+              <span>Last visit: {getLastVisit()}</span>
             )}
           </div>
           <span className={styles.amount}>
-            {type === 'invoice' ? data.amount : data.suggestedAmount}
+            {getAmount()}
           </span>
         </div>
         <div className={styles.statusInfo}>
           {type === 'invoice' ? (
-            <span className={`${styles.status} ${getStatusClass(data.status)}`}>
-              {data.status}
+            <span className={`${styles.status} ${getStatusClass(getStatus())}`}>
+              {getStatus()}
             </span>
           ) : (
             <span className={styles.suggestionBadge}>

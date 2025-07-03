@@ -13,86 +13,39 @@ const ServicesView = () => {
   const { openDrawer } = useDrawerStore();
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Data sync hook pentru packages
-  const {
-    data: packages,
-    loading,
-    error
-  } = useDataSync('packages', {
+  // Use useDataSync hook directly for packages data
+  const packagesSync = useDataSync('packages', {
     businessType: businessType.name,
     enableValidation: true,
     enableBusinessLogic: true
   });
 
-  // Fallback data pentru când nu sunt date de la API
-  const fallbackServices = useMemo(() => {
-    switch (businessType.name) {
-      case BUSINESS_TYPES.DENTAL_CLINIC.name:
-        return [
-          {
-            id: 1,
-            name: 'Dental Cleaning',
-            price: 100,
-            description: 'Professional teeth cleaning and examination',
-            duration: 60,
-            category: 'Preventive'
-          },
-          {
-            id: 2,
-            name: 'Root Canal',
-            price: 800,
-            description: 'Treatment for infected tooth pulp',
-            duration: 90,
-            category: 'Restorative'
-          }
-        ];
-      case BUSINESS_TYPES.GYM.name:
-        return [
-          {
-            id: 1,
-            name: 'Basic Fitness',
-            price: 49,
-            description: 'Access to gym equipment and basic facilities',
-            duration: 1,
-            type: 'Standard',
-            features: ['Gym Access', 'Locker Room', 'Basic Equipment']
-          },
-          {
-            id: 2,
-            name: 'Premium Wellness',
-            price: 89,
-            description: 'Full access to all facilities including pool and spa',
-            duration: 3,
-            type: 'Premium',
-            features: ['Gym Access', 'Pool', 'Spa', 'Personal Trainer', 'Group Classes']
-          }
-        ];
-      case BUSINESS_TYPES.HOTEL.name:
-        return [
-          {
-            id: 1,
-            name: 'Deluxe Suite',
-            price: 299,
-            description: 'Spacious suite with ocean view and private balcony',
-            capacity: 2,
-            type: 'Suite'
-          },
-          {
-            id: 2,
-            name: 'Family Room',
-            price: 399,
-            description: 'Large room perfect for families with two bedrooms',
-            capacity: 4,
-            type: 'Family'
-          }
-        ];
-      default:
-        return [];
-    }
-  }, [businessType.name]);
+  const { data: packagesData, loading, error } = packagesSync;
 
-  // Folosește datele de la API sau fallback data
-  const services = packages || fallbackServices;
+  // Extract packages array from the nested structure
+  const packages = useMemo(() => {
+    if (!packagesData) return [];
+    
+    // Handle different data structures
+    if (Array.isArray(packagesData)) {
+      return packagesData;
+    }
+    
+    // Handle nested structure from mock data
+    if (packagesData.packages && Array.isArray(packagesData.packages)) {
+      return packagesData.packages;
+    }
+    
+    // Handle response structure
+    if (packagesData.response?.data?.packages && Array.isArray(packagesData.response.data.packages)) {
+      return packagesData.response.data.packages;
+    }
+    
+    return [];
+  }, [packagesData]);
+
+  // Folosește doar datele de la API
+  const services = packages || [];
 
   const handleAddService = () => {
     // openDrawer(<AddService />, 'add service');
@@ -143,6 +96,9 @@ const ServicesView = () => {
       (service.type && service.type.toLowerCase().includes(searchLower)) ||
       (service.features && service.features.some(feature => 
         feature.toLowerCase().includes(searchLower)
+      )) ||
+      (service.amenities && service.amenities.some(amenity => 
+        amenity.toLowerCase().includes(searchLower)
       ))
     );
   }, [searchQuery, services]);
@@ -208,6 +164,11 @@ const ServicesView = () => {
         ) : (
           <div className={styles.emptyState}>
             <p>No services found. Add a service using the button above.</p>
+            {import.meta.env.DEV && (
+              <div style={{ marginTop: '10px', fontSize: '12px', color: '#666' }}>
+                Debug: Raw data length: {packagesData ? (Array.isArray(packagesData) ? packagesData.length : 'not array') : 'no data'}
+              </div>
+            )}
           </div>
         )}
       </div>

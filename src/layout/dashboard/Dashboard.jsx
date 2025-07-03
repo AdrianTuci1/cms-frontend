@@ -9,8 +9,9 @@ import ClientsView from '../../features/01-Home/views/03-Clients/ClientsView';
 import ServicesView from '../../features/01-Home/views/04-Services/ServicesView';
 import InvoicesSection from '../../features/03-Invoices/views/InvoicesSection';
 
-const Dashboard = () => {
-  const { currentSection, currentView } = useOutletContext();
+// Component for dashboard views
+const DashboardViews = () => {
+  const { currentView } = useOutletContext();
 
   const renderDashboardViews = () => {
     switch (currentView) {
@@ -27,10 +28,19 @@ const Dashboard = () => {
     }
   };
 
+  return (
+    <div>
+      {renderDashboardViews()}
+    </div>
+  );
+};
+
+// Component for other sections that don't need the data context
+const OtherSections = () => {
+  const { currentSection, currentView } = useOutletContext();
+
   const renderSection = () => {
     switch (currentSection) {
-      case 'dashboard':
-        return renderDashboardViews();
       case 'stocks':
         return <StocksView view={currentView} />;
       case 'automations':
@@ -46,10 +56,20 @@ const Dashboard = () => {
     }
   };
 
+  return renderSection();
+};
+
+const Dashboard = () => {
+  const { currentSection } = useOutletContext();
+
   return (
     <div className="dashboard-page">
       <div className="dashboard-content">
-        {renderSection()}
+        {currentSection === 'dashboard' ? (
+          <DashboardViews />
+        ) : (
+          <OtherSections />
+        )}
       </div>
     </div>
   );

@@ -4,7 +4,7 @@
  */
 import { useState, useEffect, useCallback } from 'react';
 import offlineManager from '../offline/OfflineManager';
-import dataSyncManager from '../data-sync/DataSyncManager';
+import dataSyncManager from '../data-sync/index.js';
 import eventBus from '../observer/base/EventBus';
 
 export const useOfflineData = (feature, options = {}) => {

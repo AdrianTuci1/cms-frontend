@@ -142,13 +142,18 @@ class DataProcessor {
 
   /**
    * Process timeline data
+   * Timeline data should already be standardized as an array from DataSyncManager
    */
   processTimelineData(data) {
-    return Array.isArray(data) ? data.map(item => ({
+    // Ensure data is an array and add timeline-specific metadata
+    const timelineArray = Array.isArray(data) ? data : [data];
+    
+    return timelineArray.map(item => ({
       ...item,
       type: 'timeline',
-      businessType: this.businessType
-    })) : data;
+      businessType: this.businessType,
+      processedAt: new Date().toISOString()
+    }));
   }
 
   /**
@@ -314,13 +319,37 @@ class DataProcessor {
 
   /**
    * Add metadata to data
-   * @param {Object} data - Data to process
+   * @param {Object|Array} data - Data to process
    * @param {string} resource - Resource name
+   * @param {string} source - Data source (api, mock, indexeddb, etc.)
    */
-  addMetadata(data, resource) {
+  addMetadata(data, resource, source = 'api') {
     const timestamp = new Date().toISOString();
     
-    // Ensure data has a valid id
+    // Handle arrays by adding metadata to each item
+    if (Array.isArray(data)) {
+      return data.map(item => {
+        // Ensure each item has a valid id
+        let itemWithId = item;
+        if (!item.id) {
+          itemWithId = {
+            ...item,
+            id: `${resource}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+          };
+        }
+        
+        return {
+          ...itemWithId,
+          _syncTimestamp: timestamp,
+          _lastModified: timestamp,
+          _version: (item._version || 0) + 1,
+          _resource: resource,
+          _source: source
+        };
+      });
+    }
+    
+    // Handle single objects
     let dataWithId = data;
     if (!data.id) {
       // Generate a unique id if none exists
@@ -335,7 +364,8 @@ class DataProcessor {
       _syncTimestamp: timestamp,
       _lastModified: timestamp,
       _version: (data._version || 0) + 1,
-      _resource: resource
+      _resource: resource,
+      _source: source
     };
   }
 }

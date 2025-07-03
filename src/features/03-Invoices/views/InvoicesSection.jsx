@@ -2,19 +2,77 @@ import React from 'react';
 import styles from './InvoicesSection.module.css';
 import InvoiceCard from '../components/invoices/InvoiceCard';
 import useInvoicesStore from '../store';
+import { useDataSync } from '../../../design-patterns/hooks/useDataSync';
 
 const InvoicesSection = () => {
   const {
     searchQuery,
-    setSearchQuery,
-    getFilteredInvoices,
-    getFilteredSuggestions,
-    getTotalItemsCount
+    setSearchQuery
   } = useInvoicesStore();
 
-  const filteredInvoices = getFilteredInvoices();
-  const filteredSuggestions = getFilteredSuggestions();
-  const totalItemsCount = getTotalItemsCount();
+  // Use useDataSync for invoices data
+  const {
+    data: invoicesData,
+    loading: invoicesLoading,
+    error: invoicesError,
+    isOnline
+  } = useDataSync('invoices');
+
+  // Extract invoices and suggestions from the data
+  const recentInvoices = invoicesData?.invoices || invoicesData || [];
+  const billingSuggestions = invoicesData?.suggestions || [];
+
+  // Filter invoices based on search query
+  const filteredInvoices = recentInvoices.filter(invoice => {
+    if (!searchQuery) return true;
+    const searchLower = searchQuery.toLowerCase();
+    return (
+      (invoice.number && invoice.number.toLowerCase().includes(searchLower)) ||
+      (invoice.customer && invoice.customer.toLowerCase().includes(searchLower)) ||
+      (invoice.clientName && invoice.clientName.toLowerCase().includes(searchLower)) ||
+      (invoice.amount && invoice.amount.toString().toLowerCase().includes(searchLower))
+    );
+  });
+
+  // Filter suggestions based on search query
+  const filteredSuggestions = billingSuggestions.filter(suggestion => {
+    if (!searchQuery) return true;
+    const searchLower = searchQuery.toLowerCase();
+    return (
+      (suggestion.customer && suggestion.customer.toLowerCase().includes(searchLower)) ||
+      (suggestion.suggestedAmount && suggestion.suggestedAmount.toString().toLowerCase().includes(searchLower))
+    );
+  });
+
+  const totalItemsCount = filteredInvoices.length + filteredSuggestions.length;
+
+  // Show loading state
+  if (invoicesLoading) {
+    return (
+      <div className={styles.invoicesContainer}>
+        <div className={styles.wrapper}>
+          <div className={styles.loadingState}>
+            <div className={styles.loadingSpinner}></div>
+            <p>Loading invoices...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (invoicesError) {
+    return (
+      <div className={styles.invoicesContainer}>
+        <div className={styles.wrapper}>
+          <div className={styles.errorState}>
+            <p>Error loading invoices: {invoicesError.message}</p>
+            {!isOnline && <p>You are currently offline. Some features may be limited.</p>}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.invoicesContainer}>
@@ -44,9 +102,16 @@ const InvoicesSection = () => {
                 </svg>
               </button>
             </div>
-            <span className={styles.invoiceCount}>
-              {totalItemsCount} items
-            </span>
+            <div className={styles.headerInfo}>
+              <span className={styles.invoiceCount}>
+                {totalItemsCount} items
+              </span>
+              {!isOnline && (
+                <span className={styles.offlineIndicator}>
+                  Offline
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -54,18 +119,30 @@ const InvoicesSection = () => {
           <div className={styles.column}>
             <h2 className={styles.columnTitle}>Recent Invoices</h2>
             <div className={styles.cardsContainer}>
-              {filteredInvoices.map(invoice => (
-                <InvoiceCard key={invoice.id} data={invoice} type="invoice" />
-              ))}
+              {filteredInvoices.length > 0 ? (
+                filteredInvoices.map(invoice => (
+                  <InvoiceCard key={invoice.id} data={invoice} type="invoice" />
+                ))
+              ) : (
+                <div className={styles.emptyState}>
+                  <p>No invoices found</p>
+                </div>
+              )}
             </div>
           </div>
 
           <div className={styles.column}>
             <h2 className={styles.columnTitle}>Billing Suggestions</h2>
             <div className={styles.cardsContainer}>
-              {filteredSuggestions.map(suggestion => (
-                <InvoiceCard key={suggestion.id} data={suggestion} type="suggestion" />
-              ))}
+              {filteredSuggestions.length > 0 ? (
+                filteredSuggestions.map(suggestion => (
+                  <InvoiceCard key={suggestion.id} data={suggestion} type="suggestion" />
+                ))
+              ) : (
+                <div className={styles.emptyState}>
+                  <p>No billing suggestions</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

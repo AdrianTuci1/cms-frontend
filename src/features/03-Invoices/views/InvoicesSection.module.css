@@ -85,9 +85,24 @@
   height: 20px;
 }
 
+.headerInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .invoiceCount {
   color: #6b7280;
   font-size: 14px;
+}
+
+.offlineIndicator {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
 }
 
 .columnsContainer {
@@ -118,6 +133,68 @@
   border-radius: 8px;
   overflow: hidden;
   flex: 1;
+}
+
+/* Loading State */
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 16px;
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e5e7eb;
+  border-top: 4px solid #2563eb;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loadingState p {
+  color: #6b7280;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Error State */
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 12px;
+  text-align: center;
+  padding: 24px;
+}
+
+.errorState p {
+  color: #dc2626;
+  font-size: 14px;
+  margin: 0;
+}
+
+.errorState p:last-child {
+  color: #6b7280;
+}
+
+/* Empty State */
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: #6b7280;
+  font-size: 14px;
 }
 
 .content {

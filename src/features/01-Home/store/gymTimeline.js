@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { useDataSync } from '../../../design-patterns/hooks';
 import { useMemo, useCallback } from 'react';
 
 const useTimelineStore = create((set) => ({
@@ -29,9 +28,10 @@ const useTimelineStore = create((set) => ({
 
 /**
  * Hook pentru gym timeline cu integrare API
- * @param {Object} options - Opțiuni pentru useDataSync
+ * @param {Object} timelineData - Timeline data from shared context
+ * @param {Object} options - Opțiuni pentru timeline
  */
-export const useGymTimelineWithAPI = (options = {}) => {
+export const useGymTimelineWithAPI = (timelineData = null, options = {}) => {
   const {
     startDate = null,
     endDate = null,
@@ -39,22 +39,13 @@ export const useGymTimelineWithAPI = (options = {}) => {
     enableBusinessLogic = true
   } = options;
 
-  // Folosește useDataSync pentru integrarea cu API
-  const timelineSync = useDataSync('timeline', {
-    businessType: 'gym',
-    startDate,
-    endDate,
-    enableValidation,
-    enableBusinessLogic
-  });
-
   // Folosește store-ul local pentru state management
   const timelineStore = useTimelineStore();
 
   // Memoizează datele derivate pentru a evita infinite re-renders
-  const checkedIn = useMemo(() => timelineSync.data?.checkedIn || [], [timelineSync.data?.checkedIn]);
-  const classes = useMemo(() => timelineSync.data?.classes || [], [timelineSync.data?.classes]);
-  const occupancy = useMemo(() => timelineSync.data?.occupancy || [], [timelineSync.data?.occupancy]);
+  const checkedIn = useMemo(() => timelineData?.checkedIn || [], [timelineData?.checkedIn]);
+  const classes = useMemo(() => timelineData?.classes || [], [timelineData?.classes]);
+  const occupancy = useMemo(() => timelineData?.occupancy || [], [timelineData?.occupancy]);
 
   const activeMembers = useMemo(() => 
     checkedIn.filter(member => !member.checkOutTime),
@@ -78,9 +69,6 @@ export const useGymTimelineWithAPI = (options = {}) => {
   );
 
   return {
-    // API integration
-    ...timelineSync,
-    
     // Local state management
     ...timelineStore,
     
@@ -91,15 +79,12 @@ export const useGymTimelineWithAPI = (options = {}) => {
       occupancy
     }),
     
-    // Business-specific actions
+    // Business-specific actions (these would need to be implemented with actual API calls)
     checkInMember: async (memberData) => {
       try {
-        const checkIn = await timelineSync.create({
-          ...memberData,
-          checkInTime: new Date().toISOString(),
-          type: 'checkIn'
-        });
-        return checkIn;
+        // This would need to be implemented with actual API integration
+        console.log('Checking in member:', memberData);
+        throw new Error('Member check-in not implemented yet');
       } catch (error) {
         console.error('Error checking in member:', error);
         throw error;
@@ -108,12 +93,9 @@ export const useGymTimelineWithAPI = (options = {}) => {
 
     checkOutMember: async (memberId) => {
       try {
-        const checkOut = await timelineSync.update({
-          id: memberId,
-          checkOutTime: new Date().toISOString(),
-          type: 'checkOut'
-        });
-        return checkOut;
+        // This would need to be implemented with actual API integration
+        console.log('Checking out member:', memberId);
+        throw new Error('Member check-out not implemented yet');
       } catch (error) {
         console.error('Error checking out member:', error);
         throw error;

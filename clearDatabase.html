@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Clear Utility</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .button {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: background-color 0.3s;
+        }
+        .button:hover {
+            background: #c82333;
+        }
+        .button.secondary {
+            background: #6c757d;
+        }
+        .button.secondary:hover {
+            background: #5a6268;
+        }
+        .button.info {
+            background: #17a2b8;
+        }
+        .button.info:hover {
+            background: #138496;
+        }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗑️ Database Clear Utility</h1>
+        
+        <div class="warning">
+            <strong>⚠️ Warning:</strong> This will permanently delete all data from the IndexedDB database. 
+            This action cannot be undone!
+        </div>
+        
+        <div style="text-align: center;">
+            <button class="button" onclick="clearDatabase()">
+                🗑️ Clear All Database
+            </button>
+            
+            <button class="button secondary" onclick="clearSpecificStores()">
+                🧹 Clear All Stores
+            </button>
+            
+            <button class="button info" onclick="inspectDatabase()">
+                🔍 Inspect Database
+            </button>
+        </div>
+        
+        <div id="log" class="log">Ready to clear database...</div>
+    </div>
+
+    <script>
+        // Override console.log to show in the UI
+        const logElement = document.getElementById('log');
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        function addToLog(message, type = 'log') {
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : type === 'warn' ? '⚠️' : 'ℹ️';
+            logElement.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToLog(args.join(' '));
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToLog(args.join(' '), 'error');
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addToLog(args.join(' '), 'warn');
+        };
+
+        // Database clear functions
+        async function clearDatabase() {
+            console.log('🗑️ Starting database clear...');
+            
+            try {
+                const dbName = 'cms-frontend';
+                const request = indexedDB.deleteDatabase(dbName);
+                
+                request.onsuccess = function() {
+                    console.log('✅ Database deleted successfully!');
+                    console.log('🔄 Please refresh the page to reinitialize the database');
+                };
+                
+                request.onerror = function() {
+                    console.error('❌ Error deleting database:', request.error);
+                };
+                
+                request.onblocked = function() {
+                    console.warn('⚠️ Database deletion was blocked. Please close other tabs using this database.');
+                };
+                
+            } catch (error) {
+                console.error('❌ Error clearing database:', error);
+            }
+        }
+
+        async function clearSpecificStores() {
+            console.log('🗑️ Clearing specific stores...');
+            
+            try {
+                const dbName = 'cms-frontend';
+                const request = indexedDB.open(dbName, 2);
+                
+                request.onsuccess = function(event) {
+                    const db = event.target.result;
+                    const stores = ['timeline', 'clients', 'packages', 'members', 'invoices', 'stocks', 'sales'];
+                    
+                    let clearedCount = 0;
+                    
+                    stores.forEach(storeName => {
+                        if (db.objectStoreNames.contains(storeName)) {
+                            const transaction = db.transaction(storeName, 'readwrite');
+                            const store = transaction.objectStore(storeName);
+                            store.clear();
+                            
+                            transaction.oncomplete = function() {
+                                clearedCount++;
+                                console.log(`✅ Cleared store: ${storeName}`);
+                                
+                                if (clearedCount === stores.length) {
+                                    console.log('🎉 All stores cleared!');
+                                    db.close();
+                                }
+                            };
+                        }
+                    });
+                };
+                
+                request.onerror = function() {
+                    console.error('❌ Error opening database:', request.error);
+                };
+                
+            } catch (error) {
+                console.error('❌ Error clearing stores:', error);
+            }
+        }
+
+        async function inspectDatabase() {
+            console.log('🔍 Inspecting database...');
+            
+            try {
+                const dbName = 'cms-frontend';
+                const request = indexedDB.open(dbName, 2);
+                
+                request.onsuccess = function(event) {
+                    const db = event.target.result;
+                    console.log('📊 Database stores:', Array.from(db.objectStoreNames));
+                    
+                    // Check timeline store specifically
+                    if (db.objectStoreNames.contains('timeline')) {
+                        const transaction = db.transaction('timeline', 'readonly');
+                        const store = transaction.objectStore('timeline');
+                        const getAllRequest = store.getAll();
+                        
+                        getAllRequest.onsuccess = function() {
+                            const timelineData = getAllRequest.result;
+                            console.log(`📅 Timeline records: ${timelineData.length}`);
+                            if (timelineData.length > 0) {
+                                console.log('📋 Sample timeline data:', JSON.stringify(timelineData[0], null, 2));
+                            }
+                        };
+                    }
+                    
+                    db.close();
+                };
+                
+                request.onerror = function() {
+                    console.error('❌ Error opening database:', request.error);
+                };
+                
+            } catch (error) {
+                console.error('❌ Error inspecting database:', error);
+            }
+        }
+
+        console.log('🛠️ Database clear utility loaded!');
+        console.log('💡 Click a button above to clear or inspect the database');
+    </script>
+</body>
+</html> 

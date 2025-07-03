@@ -11,8 +11,11 @@ const ProductsPanel = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
+  // Ensure products is always an array
+  const safeProducts = Array.isArray(products) ? products : [];
+
   // Filtrează produsele după căutare și categorie
-  const filteredProducts = products.filter(product => {
+  const filteredProducts = safeProducts.filter(product => {
     const matchesSearch = product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.id?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
@@ -20,7 +23,7 @@ const ProductsPanel = ({
   });
 
   // Obține categoriile unice
-  const categories = ['all', ...new Set(products.map(p => p.category).filter(Boolean))];
+  const categories = ['all', ...new Set(safeProducts.map(p => p.category).filter(Boolean))];
 
   if (loading) {
     return (

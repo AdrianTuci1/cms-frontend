@@ -363,6 +363,102 @@ export const timelineTestUtils = {
   }
 };
 
+import { useDataSync } from '../../../design-patterns/hooks';
+import { getBusinessType } from '../../../config/businessTypes';
+
+/**
+ * Shared data provider hook for dashboard views
+ * Preloads all necessary data and provides it to child components
+ */
+export const useDashboardData = () => {
+  const businessType = getBusinessType();
+
+  // Map business type name to the format expected by the data sync system
+  const getBusinessTypeKey = (businessTypeName) => {
+    switch (businessTypeName) {
+      case 'Dental Clinic':
+        return 'dental';
+      case 'Gym':
+        return 'gym';
+      case 'Hotel':
+        return 'hotel';
+      default:
+        return 'dental';
+    }
+  };
+
+  const businessTypeKey = getBusinessTypeKey(businessType.name);
+
+  // Preload all necessary data for dashboard views
+  const clientsSync = useDataSync('clients', {
+    businessType: businessTypeKey,
+    enableValidation: true,
+    enableBusinessLogic: true
+  });
+
+  const packagesSync = useDataSync('packages', {
+    businessType: businessTypeKey,
+    enableValidation: true,
+    enableBusinessLogic: true
+  });
+
+  const stocksSync = useDataSync('stocks', {
+    businessType: businessTypeKey,
+    enableValidation: true,
+    enableBusinessLogic: true
+  });
+
+  const timelineSync = useDataSync('timeline', {
+    businessType: businessTypeKey,
+    enableValidation: true,
+    enableBusinessLogic: true
+  });
+
+  // Debug logging for timeline data
+  console.log('Timeline sync state:', {
+    loading: timelineSync.loading,
+    error: timelineSync.error,
+    dataLength: timelineSync.data?.length || 0,
+    data: timelineSync.data
+  });
+
+  // Combine all sync states
+  const isLoading = clientsSync.loading || packagesSync.loading || stocksSync.loading || timelineSync.loading;
+  const hasError = clientsSync.error || packagesSync.error || stocksSync.error || timelineSync.error;
+  const error = clientsSync.error || packagesSync.error || stocksSync.error || timelineSync.error;
+
+  // Refresh all data
+  const refreshAll = () => {
+    clientsSync.refresh();
+    packagesSync.refresh();
+    stocksSync.refresh();
+    timelineSync.refresh();
+  };
+
+  return {
+    // Individual sync objects for specific access
+    clientsSync,
+    packagesSync,
+    stocksSync,
+    timelineSync,
+    
+    // Combined state
+    isLoading,
+    hasError,
+    error,
+    refreshAll,
+    
+    // Business type
+    businessType: businessType.name,
+    
+    // Convenience getters
+    get clients() { return clientsSync.data || []; },
+    get packages() { return packagesSync.data || []; },
+    get stocks() { return stocksSync.data || []; },
+    get timeline() { return timelineSync.data || []; }
+  };
+};
+
 // Export Sales Store
 export { default as useSalesStore } from './salesStore';
 

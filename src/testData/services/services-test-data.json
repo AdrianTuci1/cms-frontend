@@ -1,0 +1,119 @@
+{
+  "metadata": {
+    "description": "Test data for services functionality across different business types",
+    "businessTypes": ["dental", "gym", "hotel"],
+    "dateRange": {
+      "startDate": "2024-01-01",
+      "endDate": "2024-01-31"
+    }
+  },
+  "request": {
+    "method": "GET",
+    "endpoint": "/api/packages",
+    "params": {
+      "businessType": "dental",
+      "status": "all",
+      "search": ""
+    }
+  },
+  "response": {
+    "success": true,
+    "data": {
+      "packages": [
+        {
+          "id": "service-001",
+          "name": "Dental Cleaning",
+          "price": 100,
+          "description": "Professional teeth cleaning and examination",
+          "duration": 60,
+          "category": "Preventive",
+          "businessType": "dental",
+          "status": "active",
+          "createdAt": "2023-06-15T10:00:00Z",
+          "updatedAt": "2024-01-15T14:30:00Z"
+        },
+        {
+          "id": "service-002",
+          "name": "Root Canal",
+          "price": 800,
+          "description": "Treatment for infected tooth pulp",
+          "duration": 90,
+          "category": "Restorative",
+          "businessType": "dental",
+          "status": "active",
+          "createdAt": "2023-06-15T10:00:00Z",
+          "updatedAt": "2024-01-15T14:30:00Z"
+        },
+        {
+          "id": "service-005",
+          "name": "Basic Fitness",
+          "price": 49,
+          "description": "Access to gym equipment and basic facilities",
+          "duration": 1,
+          "type": "Standard",
+          "features": ["Gym Access", "Locker Room", "Basic Equipment"],
+          "businessType": "gym",
+          "status": "active",
+          "createdAt": "2024-01-01T08:00:00Z",
+          "updatedAt": "2024-01-20T19:15:00Z"
+        },
+        {
+          "id": "service-006",
+          "name": "Premium Wellness",
+          "price": 89,
+          "description": "Full access to all facilities including pool and spa",
+          "duration": 3,
+          "type": "Premium",
+          "features": ["Gym Access", "Pool", "Spa", "Personal Trainer", "Group Classes"],
+          "businessType": "gym",
+          "status": "active",
+          "createdAt": "2024-01-01T08:00:00Z",
+          "updatedAt": "2024-01-20T19:15:00Z"
+        },
+        {
+          "id": "service-009",
+          "name": "Deluxe Suite",
+          "price": 299,
+          "description": "Spacious suite with ocean view and private balcony",
+          "capacity": 2,
+          "type": "Suite",
+          "amenities": ["Ocean View", "Private Balcony", "King Bed", "Jacuzzi", "Room Service"],
+          "businessType": "hotel",
+          "status": "active",
+          "createdAt": "2024-01-01T08:00:00Z",
+          "updatedAt": "2024-01-20T19:15:00Z"
+        },
+        {
+          "id": "service-010",
+          "name": "Family Room",
+          "price": 399,
+          "description": "Large room perfect for families with two bedrooms",
+          "capacity": 4,
+          "type": "Family",
+          "amenities": ["Two Bedrooms", "Kitchenette", "Living Area", "Balcony", "Free WiFi"],
+          "businessType": "hotel",
+          "status": "active",
+          "createdAt": "2024-01-01T08:00:00Z",
+          "updatedAt": "2024-01-20T19:15:00Z"
+        }
+      ],
+      "statistics": {
+        "total": 6,
+        "byBusinessType": {
+          "dental": 2,
+          "gym": 2,
+          "hotel": 2
+        },
+        "byStatus": {
+          "active": 6,
+          "inactive": 0
+        },
+        "priceRange": {
+          "min": 49,
+          "max": 800,
+          "average": 289.33
+        }
+      }
+    }
+  }
+} 

@@ -12,9 +12,10 @@ import { useBusinessLogic } from '../../../design-patterns/hooks/useBusinessLogi
 /**
  * Hook principal pentru Sales Store
  * @param {string} businessType - Tipul de business (dental, gym, hotel)
+ * @param {Object} externalStocksData - Optional external stocks data from shared context
  * @returns {Object} State-ul și funcțiile pentru gestionarea vânzărilor
  */
-const useSalesStore = (businessType = 'dental') => {
+const useSalesStore = (businessType = 'dental', externalStocksData = null) => {
   // State pentru cart și vânzări
   const [cart, setCart] = useState([]);
   const [total, setTotal] = useState(0);
@@ -46,18 +47,15 @@ const useSalesStore = (businessType = 'dental') => {
     enableBusinessLogic: true
   });
 
-  // Extrag datele și funcțiile din sync hooks
-  const {
-    data: stocksData,
-    loading: stocksLoading,
-    error: stocksError,
-    refresh: refreshStocks,
-    create: createStock,
-    update: updateStock,
-    remove: removeStock,
-    validateData: validateStockData,
-    isOperationAllowed: isStockOperationAllowed
-  } = stocksSync;
+  // Use external stocks data if provided, otherwise use sync data
+  const stocksData = externalStocksData || stocksSync.data;
+  const stocksLoading = externalStocksData ? false : stocksSync.loading;
+  const stocksError = externalStocksData ? null : stocksSync.error;
+
+  // Debug logging
+  console.log('Raw stocksData from useDataSync:', stocksData);
+  console.log('stocksLoading:', stocksLoading);
+  console.log('stocksError:', stocksError);
 
   const {
     data: salesData,
@@ -100,7 +98,8 @@ const useSalesStore = (businessType = 'dental') => {
    */
   const addToCart = useCallback((product) => {
     // Verifică dacă produsul este disponibil în stocks
-    const stockItem = stocksData?.find(stock => stock.productId === product.id);
+    const stockItems = stocksData?.items || stocksData || [];
+    const stockItem = stockItems.find(stock => stock.id === product.id || stock.productId === product.id);
     
     if (!stockItem || stockItem.quantity <= 0) {
       throw new Error(`Product ${product.name} is out of stock`);
@@ -149,7 +148,8 @@ const useSalesStore = (businessType = 'dental') => {
 
     // Verifică stocul disponibil
     const item = cart.find(item => item.id === productId);
-    const stockItem = stocksData?.find(stock => stock.productId === productId);
+    const stockItems = stocksData?.items || stocksData || [];
+    const stockItem = stockItems.find(stock => stock.id === productId || stock.productId === productId);
     
     if (stockItem && newQuantity > stockItem.quantity) {
       throw new Error(`Cannot add ${newQuantity} items. Only ${stockItem.quantity} available`);
@@ -177,7 +177,8 @@ const useSalesStore = (businessType = 'dental') => {
 
     // Verifică stocul pentru fiecare produs
     for (const item of cart) {
-      const stockItem = stocksData?.find(stock => stock.productId === item.id);
+      const stockItems = stocksData?.items || stocksData || [];
+      const stockItem = stockItems.find(stock => stock.id === item.id || stock.productId === item.id);
       
       if (!stockItem) {
         errors.push(`Product ${item.name} is not available in stock`);
@@ -241,10 +242,11 @@ const useSalesStore = (businessType = 'dental') => {
       
       // Actualizează stocul pentru fiecare produs
       for (const item of cart) {
-        const stockItem = stocksData?.find(stock => stock.productId === item.id);
+        const stockItems = stocksData?.items || stocksData || [];
+        const stockItem = stockItems.find(stock => stock.id === item.id || stock.productId === item.id);
         if (stockItem) {
           const newQuantity = stockItem.quantity - item.quantity;
-          await updateStock({
+          await updateSale({
             id: stockItem.id,
             quantity: newQuantity
           });
@@ -278,7 +280,6 @@ const useSalesStore = (businessType = 'dental') => {
 
       // Refresh datele
       await Promise.all([
-        refreshStocks(),
         refreshSales(),
         refreshInvoices()
       ]);
@@ -292,8 +293,7 @@ const useSalesStore = (businessType = 'dental') => {
     }
   }, [
     cart, total, stocksData, validateCart, isSaleOperationAllowed, 
-    createSale, updateStock, createInvoice, refreshStocks, refreshSales, 
-    refreshInvoices, emit, businessType
+    createSale, updateSale, createInvoice, refreshSales, refreshInvoices, emit, businessType
   ]);
 
   /**
@@ -310,11 +310,12 @@ const useSalesStore = (businessType = 'dental') => {
    * Caută produse în stocks
    */
   const searchProducts = useCallback((searchTerm) => {
-    if (!stocksData) return [];
+    const stockItems = stocksData?.items || stocksData || [];
+    if (!stockItems || stockItems.length === 0) return [];
     
-    return stocksData.filter(stock => 
-      stock.productName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      stock.productId?.toLowerCase().includes(searchTerm.toLowerCase())
+    return stockItems.filter(stock => 
+      (stock.name || stock.productName)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (stock.id || stock.productId)?.toLowerCase().includes(searchTerm.toLowerCase())
     ).filter(stock => stock.quantity > 0);
   }, [stocksData]);
 
@@ -322,19 +323,28 @@ const useSalesStore = (businessType = 'dental') => {
    * Obține produsele disponibile pentru vânzare
    */
   const getAvailableProducts = useCallback(() => {
-    if (!stocksData) return [];
+    const stockItems = stocksData?.items || stocksData || [];
+    console.log('stockItems in getAvailableProducts:', stockItems);
     
-    return stocksData
+    if (!stockItems || stockItems.length === 0) {
+      console.log('No stock items found');
+      return [];
+    }
+    
+    const availableProducts = stockItems
       .filter(stock => stock.quantity > 0)
       .map(stock => ({
-        id: stock.productId,
-        name: stock.productName,
+        id: stock.id || stock.productId,
+        name: stock.name || stock.productName,
         price: stock.price,
         currentPrice: stock.currentPrice || stock.price,
         quantity: stock.quantity,
         category: stock.category,
         description: stock.description
       }));
+    
+    console.log('Available products:', availableProducts);
+    return availableProducts;
   }, [stocksData]);
 
   /**
@@ -410,7 +420,6 @@ const useSalesStore = (businessType = 'dental') => {
     getAvailableProducts,
     
     // Refresh operations
-    refreshStocks,
     refreshSales,
     refreshInvoices,
     
@@ -419,7 +428,6 @@ const useSalesStore = (businessType = 'dental') => {
     
     // Permissions
     canCreateSale: isSaleOperationAllowed('createSale', { items: cart, total }),
-    canUpdateStock: isStockOperationAllowed('updateStock', {}),
     canCreateInvoice: isInvoiceOperationAllowed('createInvoice', {})
   };
 };

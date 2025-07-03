@@ -4,7 +4,8 @@ import WeekNavigator from './timeline/WeekNavigator';
 import styles from './timeline/Appointments.module.css';
 // import AddAppointment from '../../components/drawer/AddAppointment/AddAppointment';
 // import useDrawerStore from '../../store/drawerStore';
-import { useDentalTimelineWithAPI } from '../../store';
+import { useDentalTimelineWithAPI } from '../../store/dentalTimeline';
+import { useDataSync } from '../../../../design-patterns/hooks';
 
 // Lazy load WeekView component
 const WeekView = lazy(() => import('./timeline/WeekView'));
@@ -16,8 +17,19 @@ const Appointments = () => {
   const [startDate, setStartDate] = useState('2024-01-15');
   const [endDate, setEndDate] = useState('2024-01-21');
 
-  // Use the new timeline integration hook
-  const timeline = useDentalTimelineWithAPI({
+  // Use useDataSync hook directly for timeline data
+  const timelineSync = useDataSync('timeline', {
+    businessType: 'dental',
+    startDate,
+    endDate,
+    enableValidation: true,
+    enableBusinessLogic: true
+  });
+
+  const timelineData = timelineSync.data;
+
+  // Use the updated timeline integration hook with shared data
+  const timeline = useDentalTimelineWithAPI(timelineData, {
     startDate,
     endDate,
     enableValidation: true,
@@ -25,13 +37,6 @@ const Appointments = () => {
   });
 
   const {
-    data,
-    loading,
-    error,
-    refresh,
-    createAppointment,
-    updateAppointment,
-    deleteAppointment,
     getAppointments,
     selectedDate,
     currentWeek,
@@ -78,13 +83,28 @@ const Appointments = () => {
     setAllAppointments(!isAllAppointments);
   };
 
-  if (error) {
+  // Show loading state if timeline data is loading
+  if (timelineSync.loading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loadingState}>
+          <div className={styles.loadingStateContent}>
+            <div className={styles.spinner}></div>
+            <p>Se încarcă programările...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if timeline data has error
+  if (timelineSync.error) {
     return (
       <div className={styles.container}>
         <div className={styles.errorState}>
           <h3>Eroare la încărcarea programărilor</h3>
-          <p>{error.message || error}</p>
-          <button onClick={refresh}>Încearcă din nou</button>
+          <p>{timelineSync.error.message || timelineSync.error}</p>
+          <button onClick={timelineSync.refresh}>Încearcă din nou</button>
         </div>
       </div>
     );
@@ -121,7 +141,7 @@ const Appointments = () => {
           appointments={memoizedDisplayedAppointments}
           onAppointmentClick={handleAppointmentClick}
           onPatientClick={handlePatientClick}
-          isLoading={loading}
+          isLoading={false} // We handle loading state above
         />
       </Suspense>
     </div>

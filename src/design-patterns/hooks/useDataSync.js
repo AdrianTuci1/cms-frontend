@@ -141,24 +141,52 @@ export const useDataSync = (resource, options = {}) => {
       setLoading(true);
       setError(null);
 
+      // Wait for DataSyncManager to be initialized
+      await dataSyncManager.waitForInitialization();
+
       const requestParams = buildRequestParams();
 
       const fetchOptions = {
-        forceRefresh: true, // Always fetch from server
-        useCache: false, // Never use cache in server-first approach
+        forceRefresh: false, // Try cache first for faster load
+        useCache: true, // Use cache/IDB if available
         params: requestParams
       };
 
       const result = await dataSyncManager.getDataWithFallback(resourceRef.current, fetchOptions);
       
+      // For timeline, preserve the structure (reservations array) for dental timeline hook
+      let timelineResult = result;
+      if (resourceRef.current === 'timeline') {
+        // If result is already an array (from standardizeTimelineData), wrap it in reservations
+        if (Array.isArray(result)) {
+          timelineResult = { reservations: result };
+        } else if (result && result.reservations) {
+          // If result already has reservations, keep it as is
+          timelineResult = result;
+        } else {
+          // Fallback: wrap single item in reservations array
+          timelineResult = { reservations: [result] };
+        }
+      }
+      
       // Process data using strategy
-      const processedResult = processData(result, 'read');
+      const processedResult = processData(timelineResult, 'read');
       
       setData(processedResult);
       setLastUpdated(new Date().toISOString());
       
       if (onDataUpdateRef.current) {
         onDataUpdateRef.current(processedResult);
+      }
+
+      // After initial data load, trigger background refresh from server to keep data up to date
+      // But only if online and not currently loading fresh data
+      if (navigator.onLine) {
+        dataSyncManager.getDataWithFallback(resourceRef.current, {
+          forceRefresh: true,
+          useCache: false,
+          params: requestParams
+        }).catch(() => {/* background refresh failure ignored */});
       }
 
     } catch (err) {
@@ -179,32 +207,43 @@ export const useDataSync = (resource, options = {}) => {
           const fallbackData = await dataSyncManager.getDataWithFallback(resourceRef.current, {
             forceRefresh: false,
             useCache: true,
-            params: buildRequestParams()
+            params: requestParams
           });
           
-          const processedResult = processData(fallbackData, 'read');
-          setData(processedResult);
+          // For timeline, preserve the structure (reservations array) for dental timeline hook
+          let processedFallbackData = fallbackData;
+          if (resourceRef.current === 'timeline') {
+            // If fallbackData is already an array (from standardizeTimelineData), wrap it in reservations
+            if (Array.isArray(fallbackData)) {
+              processedFallbackData = { reservations: fallbackData };
+            } else if (fallbackData && fallbackData.reservations) {
+              // If fallbackData already has reservations, keep it as is
+              processedFallbackData = fallbackData;
+            } else {
+              // Fallback: wrap single item in reservations array
+              processedFallbackData = { reservations: [fallbackData] };
+            }
+          }
+          
+          processedFallbackData = processData(processedFallbackData, 'read');
+          
+          setData(processedFallbackData);
           setLastUpdated(new Date().toISOString());
           
           if (onDataUpdateRef.current) {
-            onDataUpdateRef.current(processedResult);
+            onDataUpdateRef.current(processedFallbackData);
           }
-          
-          return; // Nu setează eroarea
         } catch (fallbackError) {
           console.error(`Fallback data also failed for ${resourceRef.current}:`, fallbackError);
+          setError(fallbackError);
         }
-      }
-      
-      // Pentru alte erori, setează eroarea în state
-      setError(err);
-      if (onErrorRef.current) {
-        onErrorRef.current(err);
+      } else {
+        setError(err);
       }
     } finally {
       setLoading(false);
     }
-  }, [buildRequestParams, processData]);
+  }, [processData, buildRequestParams]);
 
   /**
    * Funcție pentru refresh manual
@@ -219,13 +258,6 @@ export const useDataSync = (resource, options = {}) => {
   const optimisticUpdate = useCallback((updater) => {
     setData(prevData => {
       const newData = typeof updater === 'function' ? updater(prevData) : updater;
-      
-      // Emite eveniment pentru DataSyncManager
-      eventBus.emit(`${resourceRef.current}:updated`, {
-        data: newData,
-        source: 'optimistic',
-        timestamp: new Date().toISOString()
-      });
       
       return newData;
     });
@@ -305,7 +337,7 @@ export const useDataSync = (resource, options = {}) => {
     } finally {
       setLoading(false);
     }
-  }, [enableValidation, validateData, isOperationAllowed, processData, optimisticUpdate, fetchData]);
+  }, [enableValidation, validateData, isOperationAllowed, processData, optimisticUpdate]);
 
   /**
    * Funcții CRUD convenabile cu validare și business logic
@@ -373,6 +405,7 @@ export const useDataSync = (resource, options = {}) => {
 
     return () => {
       listeners.forEach(unsubscribe => unsubscribe());
+      eventListenersRef.current = [];
     };
   }, [processData]); // Doar processData ca dependență
 
@@ -380,8 +413,55 @@ export const useDataSync = (resource, options = {}) => {
    * Initial data fetch - only run once on mount
    */
   useEffect(() => {
-    fetchData();
+    let isMounted = true;
+    
+    const loadData = async () => {
+      if (!isMounted) return;
+      await fetchData();
+    };
+    
+    loadData();
+    
+    return () => {
+      isMounted = false;
+    };
   }, []); // Empty dependency array to run only once
+
+  /**
+   * Clear duplicates from the current resource
+   */
+  const clearDuplicates = useCallback(async () => {
+    try {
+      const count = await dataSyncManager.clearDuplicates(resourceRef.current);
+      console.log(`Cleared ${count} duplicates from ${resourceRef.current}`);
+      
+      // Refresh data after clearing duplicates
+      await fetchData();
+      
+      return count;
+    } catch (error) {
+      console.error(`Error clearing duplicates for ${resourceRef.current}:`, error);
+      throw error;
+    }
+  }, [fetchData]);
+
+  /**
+   * Clear all data from the current resource
+   */
+  const clearResourceData = useCallback(async () => {
+    try {
+      const count = await dataSyncManager.clearResourceData(resourceRef.current);
+      console.log(`Cleared ${count} records from ${resourceRef.current}`);
+      
+      // Refresh data after clearing
+      await fetchData();
+      
+      return count;
+    } catch (error) {
+      console.error(`Error clearing data for ${resourceRef.current}:`, error);
+      throw error;
+    }
+  }, [fetchData]);
 
   return {
     // Data state
@@ -405,7 +485,11 @@ export const useDataSync = (resource, options = {}) => {
     
     // Strategy info
     strategy: strategy.current?.getName() || 'No Strategy',
-    businessType: businessType || dataSyncManager.businessType
+    businessType: businessType || dataSyncManager.businessType,
+    
+    // Utility operations
+    clearDuplicates,
+    clearResourceData
   };
 };
 

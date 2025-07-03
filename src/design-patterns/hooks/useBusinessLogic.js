@@ -5,7 +5,7 @@
  */
 
 import { useCallback, useMemo } from 'react';
-import strategyRegistry from '../strategy/base/StrategyRegistry';
+import { crudStrategyFactory } from '../strategy/CRUDStrategy.js';
 
 /**
  * Hook pentru business logic
@@ -14,7 +14,12 @@ import strategyRegistry from '../strategy/base/StrategyRegistry';
  */
 export const useBusinessLogic = (businessType) => {
   const strategy = useMemo(() => {
-    return strategyRegistry.get(businessType);
+    try {
+      return crudStrategyFactory.create(businessType);
+    } catch (error) {
+      console.warn(`No strategy found for business type: ${businessType}`, error);
+      return null;
+    }
   }, [businessType]);
 
   /**
