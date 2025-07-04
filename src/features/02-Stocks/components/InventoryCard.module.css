@@ -1,9 +1,17 @@
 .inventoryCard {
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 1rem;
-  overflow: hidden;
+  border-bottom: 1px solid #eee;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.inventoryCard:hover {
+  background: #f8f9fa;
+}
+
+.inventoryCard:last-child {
+  border-bottom: none;
 }
 
 .cardHeader {

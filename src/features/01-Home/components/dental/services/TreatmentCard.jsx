@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './TreatmentCard.module.css';
 
-const TreatmentCard = ({ treatment }) => {
+const TreatmentCard = ({ treatment, onClick }) => {
   const getInitials = (name) => {
     return name
       .split(' ')
@@ -29,7 +29,7 @@ const TreatmentCard = ({ treatment }) => {
   };
 
   return (
-    <div className={styles.card}>
+    <div className={styles.card} onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
       <div className={styles.initialsBox} style={{ backgroundColor: getColorForTreatment(treatment.name) }}>
         {getInitials(treatment.name)}
       </div>

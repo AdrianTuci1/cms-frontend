@@ -1,10 +1,11 @@
 import React from 'react';
 import useDrawerStore, { DRAWER_TYPES, DRAWER_MODES } from './store/drawerStore';
 import DrawerLayout from './layout/DrawerLayout';
-import AppointmentForm from './forms/AppointmentForm';
+import TimelineForm from './forms/TimelineForm';
 import ServiceForm from './forms/ServiceForm';
 import StockForm from './forms/StockForm';
 import MemberForm from './forms/MemberForm';
+import PermissionsForm from './forms/PermissionsForm';
 
 const DrawerManager = () => {
   const {
@@ -21,10 +22,10 @@ const DrawerManager = () => {
     return null;
   }
 
-  const handleSubmit = async (formData, mode) => {
+  const handleSubmit = async (formData) => {
     try {
       if (activeDrawer.onSave) {
-        await activeDrawer.onSave(formData, mode);
+        await activeDrawer.onSave(formData, activeDrawer.mode);
       }
       closeDrawer(activeDrawer.id);
     } catch (error) {
@@ -63,8 +64,8 @@ const DrawerManager = () => {
     };
 
     switch (activeDrawer.type) {
-      case DRAWER_TYPES.APPOINTMENT:
-        return <AppointmentForm {...formProps} />;
+      case DRAWER_TYPES.TIMELINE:
+        return <TimelineForm {...formProps} />;
         
       case DRAWER_TYPES.SERVICE:
         return <ServiceForm {...formProps} />;
@@ -74,6 +75,9 @@ const DrawerManager = () => {
         
       case DRAWER_TYPES.MEMBER:
         return <MemberForm {...formProps} />;
+        
+      case DRAWER_TYPES.PERMISSIONS:
+        return <PermissionsForm {...formProps} />;
         
       case DRAWER_TYPES.AI_ASSISTANT:
         // AI Assistant drawer - don't touch as requested

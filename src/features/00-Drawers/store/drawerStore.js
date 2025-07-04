@@ -3,32 +3,52 @@ import { getBusinessType } from '../../../../src/config/businessTypes';
 
 const businessType = getBusinessType();
 
-// Drawer types
+// Drawer types - to be defined based on forms
 export const DRAWER_TYPES = {
-  APPOINTMENT: 'appointment',
+  TIMELINE: 'timeline',
   STOCK: 'stock',
   MEMBER: 'member',
   SERVICE: 'service',
-  AI_ASSISTANT: 'ai-assistant'
+  AI_ASSISTANT: 'ai-assistant',
+  PERMISSIONS: 'permissions'
 };
 
-// Drawer modes
+// Drawer modes - only edit and create
 export const DRAWER_MODES = {
   CREATE: 'create',
-  VIEW: 'view',
-  EDIT: 'edit',
-  DELETE: 'delete'
+  EDIT: 'edit'
 };
 
 // Business type specific configurations
 const BUSINESS_TYPE_CONFIGS = {
   'Dental Clinic': {
-    appointment: {
+    timeline: {
       title: 'Appointment',
-      fields: ['patientName', 'phoneNumber', 'date', 'time', 'treatmentType', 'medicId', 'notes'],
-      required: ['patientName', 'phoneNumber', 'date', 'time', 'treatmentType'],
-      queryFields: ['phoneNumber', 'email'], // Fields that can query database
-      searchFields: ['treatmentType', 'medicId'] // Fields with search options
+      fields: [
+        { name: 'clientId', type: 'number', label: 'Client ID', required: true },
+        { name: 'clientName', type: 'text', label: 'Client Name', required: true },
+        { name: 'phoneNumber', type: 'tel', label: 'Phone Number', required: true },
+        { name: 'email', type: 'email', label: 'Email' },
+        { name: 'treatmentId', type: 'number', label: 'Treatment ID', required: true },
+        { name: 'displayTreatment', type: 'text', label: 'Treatment Name', required: true },
+        { name: 'medicId', type: 'number', label: 'Medic ID', required: true },
+        { name: 'medicName', type: 'text', label: 'Medic Name', required: true },
+        { name: 'date', type: 'datetime-local', label: 'Appointment Date & Time', required: true },
+        { name: 'duration', type: 'number', label: 'Duration (minutes)', min: 15, max: 180, required: true },
+        { name: 'status', type: 'select', label: 'Status', required: true, options: [
+          { value: 'scheduled', label: 'Scheduled' },
+          { value: 'confirmed', label: 'Confirmed' },
+          { value: 'in_progress', label: 'In Progress' },
+          { value: 'completed', label: 'Completed' },
+          { value: 'cancelled', label: 'Cancelled' },
+          { value: 'no_show', label: 'No Show' }
+        ]},
+        { name: 'color', type: 'color', label: 'Color', required: true },
+        { name: 'notes', type: 'textarea', label: 'Notes', placeholder: 'Additional notes about the appointment...' }
+      ],
+      required: ['clientId', 'clientName', 'treatmentId', 'displayTreatment', 'medicId', 'medicName', 'date', 'duration', 'status'],
+      queryFields: ['phoneNumber', 'email'],
+      searchFields: ['treatmentId', 'medicId']
     },
     service: {
       title: 'Treatment',
@@ -37,9 +57,41 @@ const BUSINESS_TYPE_CONFIGS = {
     }
   },
   'Gym': {
-    appointment: {
+    timeline: {
       title: 'Session',
-      fields: ['clientName', 'phoneNumber', 'date', 'time', 'sessionType', 'trainerId', 'notes'],
+      fields: [
+        { name: 'clientName', type: 'text', label: 'Client Name', required: true },
+        { name: 'phoneNumber', type: 'tel', label: 'Phone Number', required: true },
+        { name: 'email', type: 'email', label: 'Email' },
+        { name: 'date', type: 'date', label: 'Session Date', required: true },
+        { name: 'time', type: 'time', label: 'Session Time', required: true },
+        { 
+          name: 'sessionType', 
+          type: 'select', 
+          label: 'Session Type', 
+          required: true,
+          options: [
+            { value: 'personal_training', label: 'Personal Training' },
+            { value: 'group_class', label: 'Group Class' },
+            { value: 'consultation', label: 'Consultation' },
+            { value: 'assessment', label: 'Fitness Assessment' },
+            { value: 'other', label: 'Other' }
+          ]
+        },
+        { 
+          name: 'trainerId', 
+          type: 'select', 
+          label: 'Trainer', 
+          required: true,
+          options: [
+            { value: '1', label: 'Mike Johnson' },
+            { value: '2', label: 'Lisa Chen' },
+            { value: '3', label: 'David Wilson' }
+          ]
+        },
+        { name: 'duration', type: 'number', label: 'Duration (minutes)', min: 30, max: 120 },
+        { name: 'notes', type: 'textarea', label: 'Notes', placeholder: 'Session goals or special requirements...' }
+      ],
       required: ['clientName', 'phoneNumber', 'date', 'time', 'sessionType'],
       queryFields: ['phoneNumber', 'email'],
       searchFields: ['sessionType', 'trainerId']
@@ -51,9 +103,30 @@ const BUSINESS_TYPE_CONFIGS = {
     }
   },
   'Hotel': {
-    appointment: {
+    timeline: {
       title: 'Booking',
-      fields: ['guestName', 'phoneNumber', 'checkIn', 'checkOut', 'roomType', 'guests', 'notes'],
+      fields: [
+        { name: 'guestName', type: 'text', label: 'Guest Name', required: true },
+        { name: 'phoneNumber', type: 'tel', label: 'Phone Number', required: true },
+        { name: 'email', type: 'email', label: 'Email' },
+        { name: 'checkIn', type: 'date', label: 'Check-in Date', required: true },
+        { name: 'checkOut', type: 'date', label: 'Check-out Date', required: true },
+        { 
+          name: 'roomType', 
+          type: 'select', 
+          label: 'Room Type', 
+          required: true,
+          options: [
+            { value: 'standard', label: 'Standard Room' },
+            { value: 'deluxe', label: 'Deluxe Room' },
+            { value: 'suite', label: 'Suite' },
+            { value: 'family', label: 'Family Room' },
+            { value: 'presidential', label: 'Presidential Suite' }
+          ]
+        },
+        { name: 'guests', type: 'number', label: 'Number of Guests', min: 1, max: 6 },
+        { name: 'specialRequests', type: 'textarea', label: 'Special Requests', placeholder: 'Any special requests or preferences...' }
+      ],
       required: ['guestName', 'phoneNumber', 'checkIn', 'checkOut', 'roomType'],
       queryFields: ['phoneNumber', 'email'],
       searchFields: ['roomType']
@@ -69,51 +142,47 @@ const BUSINESS_TYPE_CONFIGS = {
 const useDrawerStore = create((set, get) => ({
   // Main drawer state
   isOpen: false,
-  content: null,
-  title: '',
-  type: 'drawer',
-  businessType: businessType,
-  
-  // Multiple drawer support
-  drawers: [],
   activeDrawerId: null,
+  drawers: [],
   
   // Current drawer data
   currentData: null,
-  currentMode: DRAWER_MODES.EDIT, // Default to edit mode
+  currentMode: null,
   currentDrawerType: null,
   
   // Loading states
   isLoading: false,
   
-  // Auto-save functionality
-  autoSaveEnabled: true,
-  pendingChanges: new Map(), // Track changes for auto-save
+  // Query and search results
+  queryResults: {},
+  searchResults: {},
   
-  // Database querying support
-  queryResults: new Map(), // Store query results for fields
-  searchResults: new Map(), // Store search results for options
-  
-  // Open a new drawer
-  openDrawer: (config) => {
+  // Open drawer with simplified API: openDrawer('mode', 'type', 'data')
+  openDrawer: (mode, type, data = null, options = {}) => {
     const {
-      type = DRAWER_TYPES.APPOINTMENT,
-      mode = DRAWER_MODES.EDIT, // Default to edit mode
-      data = null,
       title = null,
       size = 'medium',
       onSave = null,
       onDelete = null,
-      onCancel = null,
-      allowMultiple = false // Only AI assistant can open multiple drawers
-    } = config;
+      onCancel = null
+    } = options;
     
     const state = get();
     
-    // Check if we can open multiple drawers
-    if (!allowMultiple && state.drawers.length > 0 && type !== DRAWER_TYPES.AI_ASSISTANT) {
-      console.warn('Only AI assistant can open multiple drawers. Closing existing drawer.');
-      // Close existing drawer and open new one
+    // Validate mode
+    if (!Object.values(DRAWER_MODES).includes(mode)) {
+      console.error(`Invalid drawer mode: ${mode}. Must be 'create' or 'edit'`);
+      return null;
+    }
+    
+    // Validate type
+    if (!Object.values(DRAWER_TYPES).includes(type)) {
+      console.error(`Invalid drawer type: ${type}`);
+      return null;
+    }
+    
+    // Close existing drawer if not AI assistant
+    if (type !== DRAWER_TYPES.AI_ASSISTANT && state.drawers.length > 0) {
       set(state => ({
         drawers: [],
         activeDrawerId: null,
@@ -123,16 +192,11 @@ const useDrawerStore = create((set, get) => ({
     
     const drawerId = `drawer_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     
-    // Get business-specific configuration
-    const businessConfig = BUSINESS_TYPE_CONFIGS[businessType.name] || {};
-    const typeConfig = businessConfig[type] || {};
-    
     // Generate title if not provided
     const drawerTitle = title || (() => {
-      const modeText = mode === DRAWER_MODES.CREATE ? 'New' : 
-                      mode === DRAWER_MODES.EDIT ? 'Edit' : 
-                      mode === DRAWER_MODES.VIEW ? 'View' : 'Delete';
-      return `${modeText} ${typeConfig.title || type}`;
+      const modeText = mode === DRAWER_MODES.CREATE ? 'New' : 'Edit';
+      const typeText = type.charAt(0).toUpperCase() + type.slice(1);
+      return `${modeText} ${typeText}`;
     })();
     
     const newDrawer = {
@@ -145,8 +209,7 @@ const useDrawerStore = create((set, get) => ({
       onSave,
       onDelete,
       onCancel,
-      isOpen: true,
-      allowMultiple
+      isOpen: true
     };
     
     set(state => ({
@@ -161,32 +224,10 @@ const useDrawerStore = create((set, get) => ({
     return drawerId;
   },
   
-  // Close specific drawer with auto-save (only for edit mode)
-  closeDrawer: async (drawerId = null) => {
+  // Close specific drawer
+  closeDrawer: (drawerId = null) => {
     const state = get();
     const targetId = drawerId || state.activeDrawerId;
-    const targetDrawer = state.drawers.find(d => d.id === targetId);
-    
-    // Auto-save only for edit mode, not create mode
-    if (state.autoSaveEnabled && targetDrawer && targetDrawer.onSave && targetDrawer.mode === DRAWER_MODES.EDIT) {
-      const pendingData = state.pendingChanges.get(targetId);
-      if (pendingData) {
-        try {
-          set({ isLoading: true });
-          await targetDrawer.onSave(pendingData, targetDrawer.mode);
-          console.log('Auto-saved changes for drawer:', targetId);
-        } catch (error) {
-          console.error('Auto-save failed:', error);
-          // You could show a toast notification here
-        } finally {
-          set({ isLoading: false });
-        }
-      }
-    }
-    
-    // Remove pending changes for this drawer
-    const newPendingChanges = new Map(state.pendingChanges);
-    newPendingChanges.delete(targetId);
     
     set(state => {
       const updatedDrawers = state.drawers.filter(d => d.id !== targetId);
@@ -198,159 +239,20 @@ const useDrawerStore = create((set, get) => ({
         isOpen: updatedDrawers.length > 0,
         currentData: newActiveId ? updatedDrawers.find(d => d.id === newActiveId)?.data : null,
         currentMode: newActiveId ? updatedDrawers.find(d => d.id === newActiveId)?.mode : null,
-        currentDrawerType: newActiveId ? updatedDrawers.find(d => d.id === newActiveId)?.type : null,
-        pendingChanges: newPendingChanges
+        currentDrawerType: newActiveId ? updatedDrawers.find(d => d.id === newActiveId)?.type : null
       };
     });
   },
   
-  // Close all drawers (with auto-save only for edit mode)
-  closeAllDrawers: async () => {
-    const state = get();
-    
-    // Auto-save only for edit mode drawers
-    if (state.autoSaveEnabled) {
-      const savePromises = Array.from(state.pendingChanges.entries()).map(async ([drawerId, data]) => {
-        const drawer = state.drawers.find(d => d.id === drawerId);
-        if (drawer && drawer.onSave && drawer.mode === DRAWER_MODES.EDIT) {
-          try {
-            await drawer.onSave(data, drawer.mode);
-            console.log('Auto-saved changes for drawer:', drawerId);
-          } catch (error) {
-            console.error('Auto-save failed for drawer:', drawerId, error);
-          }
-        }
-      });
-      
-      if (savePromises.length > 0) {
-        set({ isLoading: true });
-        await Promise.all(savePromises);
-        set({ isLoading: false });
-      }
-    }
-    
+  // Close all drawers
+  closeAllDrawers: () => {
     set({
       drawers: [],
       activeDrawerId: null,
       isOpen: false,
       currentData: null,
       currentMode: null,
-      currentDrawerType: null,
-      pendingChanges: new Map()
-    });
-  },
-  
-  // Update current drawer data (for auto-save)
-  updateCurrentData: (newData) => {
-    set(state => {
-      const updatedData = { ...state.currentData, ...newData };
-      const newPendingChanges = new Map(state.pendingChanges);
-      newPendingChanges.set(state.activeDrawerId, updatedData);
-      
-      return {
-        currentData: updatedData,
-        pendingChanges: newPendingChanges
-      };
-    });
-  },
-  
-  // Manual save for create mode
-  saveDrawer: async (drawerId = null) => {
-    const state = get();
-    const targetId = drawerId || state.activeDrawerId;
-    const targetDrawer = state.drawers.find(d => d.id === targetId);
-    
-    if (targetDrawer && targetDrawer.onSave) {
-      const dataToSave = state.pendingChanges.get(targetId) || state.currentData;
-      
-      try {
-        set({ isLoading: true });
-        await targetDrawer.onSave(dataToSave, targetDrawer.mode);
-        console.log('Manually saved drawer:', targetId);
-        
-        // Clear pending changes after successful save
-        const newPendingChanges = new Map(state.pendingChanges);
-        newPendingChanges.delete(targetId);
-        
-        set({ pendingChanges: newPendingChanges });
-      } catch (error) {
-        console.error('Manual save failed:', error);
-        throw error;
-      } finally {
-        set({ isLoading: false });
-      }
-    }
-  },
-  
-  // Database querying for fields
-  queryField: async (fieldName, value, drawerId = null) => {
-    const targetId = drawerId || get().activeDrawerId;
-    
-    try {
-      // This would be replaced with actual API call
-      const results = await mockQueryDatabase(fieldName, value);
-      
-      set(state => {
-        const newQueryResults = new Map(state.queryResults);
-        newQueryResults.set(`${targetId}_${fieldName}`, results);
-        return { queryResults: newQueryResults };
-      });
-      
-      return results;
-    } catch (error) {
-      console.error('Query failed:', error);
-      return [];
-    }
-  },
-  
-  // Search options for select fields
-  searchOptions: async (fieldName, searchTerm, drawerId = null) => {
-    const targetId = drawerId || get().activeDrawerId;
-    
-    try {
-      // This would be replaced with actual API call
-      const results = await mockSearchOptions(fieldName, searchTerm);
-      
-      set(state => {
-        const newSearchResults = new Map(state.searchResults);
-        newSearchResults.set(`${targetId}_${fieldName}`, results);
-        return { searchResults: newSearchResults };
-      });
-      
-      return results;
-    } catch (error) {
-      console.error('Search failed:', error);
-      return [];
-    }
-  },
-  
-  // Get query results for a field
-  getQueryResults: (fieldName, drawerId = null) => {
-    const targetId = drawerId || get().activeDrawerId;
-    return get().queryResults.get(`${targetId}_${fieldName}`) || [];
-  },
-  
-  // Get search results for a field
-  getSearchResults: (fieldName, drawerId = null) => {
-    const targetId = drawerId || get().activeDrawerId;
-    return get().searchResults.get(`${targetId}_${fieldName}`) || [];
-  },
-  
-  // Clear query/search results
-  clearFieldResults: (fieldName, drawerId = null) => {
-    const targetId = drawerId || get().activeDrawerId;
-    
-    set(state => {
-      const newQueryResults = new Map(state.queryResults);
-      const newSearchResults = new Map(state.searchResults);
-      
-      newQueryResults.delete(`${targetId}_${fieldName}`);
-      newSearchResults.delete(`${targetId}_${fieldName}`);
-      
-      return {
-        queryResults: newQueryResults,
-        searchResults: newSearchResults
-      };
+      currentDrawerType: null
     });
   },
   
@@ -359,54 +261,103 @@ const useDrawerStore = create((set, get) => ({
     set({ isLoading: loading });
   },
   
-  // Toggle auto-save
-  toggleAutoSave: () => {
-    set(state => ({ autoSaveEnabled: !state.autoSaveEnabled }));
-  },
-  
-  // Get current drawer configuration
-  getCurrentDrawerConfig: () => {
-    const state = get();
-    const businessConfig = BUSINESS_TYPE_CONFIGS[state.businessType.name] || {};
-    return businessConfig[state.currentDrawerType] || {};
-  },
-  
   // Get active drawer
   getActiveDrawer: () => {
     const state = get();
     return state.drawers.find(d => d.id === state.activeDrawerId);
   },
   
-  // Check if specific drawer type is open
-  isDrawerTypeOpen: (type) => {
+  // Check if drawer is open
+  isDrawerOpen: (type = null) => {
     const state = get();
-    return state.drawers.some(d => d.type === type && d.isOpen);
+    if (!type) return state.isOpen;
+    return state.drawers.some(d => d.type === type);
   },
   
-  // Check if there are pending changes
-  hasPendingChanges: (drawerId = null) => {
-    const state = get();
-    const targetId = drawerId || state.activeDrawerId;
-    return state.pendingChanges.has(targetId);
+  // Get drawer configuration for a specific type and business type
+  getDrawerConfig: (drawerType, businessTypeName = null) => {
+    const targetBusinessType = businessTypeName || 'Dental Clinic'; // Default fallback
+    const businessConfig = BUSINESS_TYPE_CONFIGS[targetBusinessType] || {};
+    return businessConfig[drawerType] || null;
   },
   
-  // Check if current drawer is in create mode
-  isCreateMode: (drawerId = null) => {
-    const state = get();
-    const targetId = drawerId || state.activeDrawerId;
-    const drawer = state.drawers.find(d => d.id === targetId);
-    return drawer?.mode === DRAWER_MODES.CREATE;
+  // Get fields for a specific drawer type and business type
+  getDrawerFields: (drawerType, businessTypeName = null) => {
+    const config = get().getDrawerConfig(drawerType, businessTypeName);
+    return config?.fields || [];
   },
   
-  // Legacy support
-  openLegacyDrawer: (content, title, type = 'drawer', businessType) => {
-    return get().openDrawer({
-      type: DRAWER_TYPES.APPOINTMENT,
-      mode: DRAWER_MODES.EDIT,
-      data: { content },
-      title,
-      size: 'medium'
-    });
+  // Get required fields for a specific drawer type and business type
+  getRequiredFields: (drawerType, businessTypeName = null) => {
+    const config = get().getDrawerConfig(drawerType, businessTypeName);
+    return config?.required || [];
+  },
+  
+  // Get title for a specific drawer type and business type
+  getDrawerTitle: (drawerType, businessTypeName = null) => {
+    const config = get().getDrawerConfig(drawerType, businessTypeName);
+    return config?.title || drawerType;
+  },
+  
+  // Form-related functions for BaseForm
+  updateCurrentData: (newData) => {
+    set(state => ({
+      currentData: { ...state.currentData, ...newData }
+    }));
+  },
+  
+  hasPendingChanges: () => {
+    const state = get();
+    // For now, always return false - this can be enhanced later
+    return false;
+  },
+  
+  isCreateMode: () => {
+    const state = get();
+    return state.currentMode === DRAWER_MODES.CREATE;
+  },
+  
+  saveDrawer: async (data) => {
+    const state = get();
+    const activeDrawer = state.drawers.find(d => d.id === state.activeDrawerId);
+    if (activeDrawer && activeDrawer.onSave) {
+      return await activeDrawer.onSave(data, state.currentMode);
+    }
+  },
+  
+  queryField: async (fieldName, value) => {
+    // Mock query function - replace with actual API call
+    await new Promise(resolve => setTimeout(resolve, 300));
+    const results = await mockQueryDatabase(fieldName, value);
+    set(state => ({
+      queryResults: { ...state.queryResults, [fieldName]: results }
+    }));
+  },
+  
+  searchOptions: async (fieldName, searchTerm) => {
+    // Mock search function - replace with actual API call
+    await new Promise(resolve => setTimeout(resolve, 200));
+    const results = await mockSearchOptions(fieldName, searchTerm);
+    set(state => ({
+      searchResults: { ...state.searchResults, [fieldName]: results }
+    }));
+  },
+  
+  getQueryResults: (fieldName) => {
+    const state = get();
+    return state.queryResults?.[fieldName] || [];
+  },
+  
+  getSearchResults: (fieldName) => {
+    const state = get();
+    return state.searchResults?.[fieldName] || [];
+  },
+  
+  clearFieldResults: (fieldName) => {
+    set(state => ({
+      queryResults: { ...state.queryResults, [fieldName]: [] },
+      searchResults: { ...state.searchResults, [fieldName]: [] }
+    }));
   }
 }));
 

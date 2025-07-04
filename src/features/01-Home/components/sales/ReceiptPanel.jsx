@@ -4,6 +4,8 @@ import styles from './ReceiptPanel.module.css';
 const ReceiptPanel = ({ 
   cart, 
   total, 
+  paymentMethod = 'cash',
+  onPaymentMethodChange,
   onUpdateQuantity, 
   onRemoveFromCart, 
   onValidate, 
@@ -93,6 +95,28 @@ const ReceiptPanel = ({
           </div>
         )}
 
+        {/* Payment Method Selection */}
+        <div className={styles.paymentMethods}>
+          <button 
+            className={`${styles.paymentButton} ${paymentMethod === 'cash' ? styles.active : ''}`}
+            onClick={() => onPaymentMethodChange('cash')}
+          >
+            Cash
+          </button>
+          <button 
+            className={`${styles.paymentButton} ${paymentMethod === 'card' ? styles.active : ''}`}
+            onClick={() => onPaymentMethodChange('card')}
+          >
+            Card
+          </button>
+          <button 
+            className={`${styles.paymentButton} ${paymentMethod === 'voucher' ? styles.active : ''}`}
+            onClick={() => onPaymentMethodChange('voucher')}
+          >
+            Voucher
+          </button>
+        </div>
+
         {/* Actions */}
         <div className={styles.receiptActions}>
           <button 
@@ -104,11 +128,12 @@ const ReceiptPanel = ({
             {canCreateSale ? 'Validate & Complete Sale' : 'Cannot Create Sale'}
           </button>
           <button 
-            className={styles.cancelButton}
+            className={styles.clearButton}
             onClick={onCancel}
             disabled={cart.length === 0}
+            title="Clear cart"
           >
-            Cancel
+            🗑️
           </button>
         </div>
 

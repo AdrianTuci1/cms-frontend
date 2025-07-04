@@ -14,6 +14,32 @@
   margin-bottom: 1rem;
 }
 
+.categoryFilter {
+  flex: 1;
+  max-width: 200px;
+}
+
+.categoryFilter select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.categoryFilter select:hover {
+  border-color: var(--color-primary);
+}
+
+.categoryFilter select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
 .productCount {
   color: var(--text-secondary);
   font-size: 0.9rem;

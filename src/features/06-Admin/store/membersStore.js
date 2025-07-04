@@ -1,94 +1,125 @@
 /**
  * Members Store - Store pentru gestionarea membrilor staff
- * Gestionează informațiile despre membrii staff și operațiunile asociate
+ * Gestionează logica de business pentru membrii staff și operațiunile asociate
  */
 
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
+import { useBusinessLogic } from '../../../design-patterns/hooks';
+import { eventBus } from '../../../design-patterns/observer/base/EventBus';
 
 /**
  * Hook principal pentru Members Store
+ * @param {string} businessType - Tipul de business
+ * @param {Array} memberItems - Lista de membri din useDataSync
  * @returns {Object} State-ul și funcțiile pentru gestionarea membrilor
  */
-const useMembersStore = () => {
-  // State pentru membri
-  const [members, setMembers] = useState([
-    { 
-      id: 1, 
-      name: 'John Doe', 
-      email: 'john@example.com', 
-      phone: '0712 345 678',
-      role: 'Manager', 
-      workDays: [0, 1, 2, 3, 4], // Monday to Friday
-      photoUrl: 'https://randomuser.me/api/portraits/men/32.jpg',
-    },
-    { 
-      id: 2, 
-      name: 'Jane Smith', 
-      email: 'jane@example.com', 
-      phone: '0723 456 789',
-      role: 'Receptioner', 
-      workDays: [1, 3, 5, 6], // Tuesday, Thursday, Saturday, Sunday
-      photoUrl: 'https://randomuser.me/api/portraits/women/44.jpg',
-    },
-    { 
-      id: 3, 
-      name: 'Robert Johnson', 
-      email: 'robert@example.com', 
-      phone: '0734 567 890',
-      role: 'Camerista', 
-      workDays: [0, 2, 4, 6], // Monday, Wednesday, Friday, Sunday
-      photoUrl: 'https://randomuser.me/api/portraits/men/55.jpg',
-    },
-  ]);
+const useMembersStore = (businessType = 'hotel', memberItems = []) => {
+  // Folosește business logic pentru validare și procesare
+  const businessLogic = useBusinessLogic(businessType);
 
   /**
    * Adaugă un nou membru
    */
-  const addMember = useCallback((member) => {
-    const newMember = {
-      ...member,
-      id: Date.now(), // Simple ID generation
-      photoUrl: member.photoUrl || 'https://randomuser.me/api/portraits/lego/1.jpg'
-    };
-    setMembers(prev => [...prev, newMember]);
-  }, []);
+  const addMember = useCallback(async (member) => {
+    try {
+      // Validează datele folosind business logic
+      const validation = businessLogic.validateData(member, 'members');
+      if (!validation.isValid) {
+        console.error('Validation errors:', validation.errors);
+        return;
+      }
+
+      // Verifică permisiunile
+      if (!businessLogic.isOperationAllowed('createMember', member)) {
+        console.error('Operation not allowed');
+        return;
+      }
+
+      // Procesează datele folosind business logic
+      const processedData = businessLogic.processData(member, 'members');
+      
+      // Emite eveniment pentru crearea membru
+      eventBus.emit('members:create', processedData);
+      
+      console.log('✅ Member created successfully');
+      
+    } catch (error) {
+      console.error('❌ Failed to create member:', error.message);
+    }
+  }, [businessLogic]);
 
   /**
    * Actualizează un membru existent
    */
-  const updateMember = useCallback((id, updates) => {
-    setMembers(prev => prev.map(member =>
-      member.id === id ? { ...member, ...updates } : member
-    ));
-  }, []);
+  const updateMember = useCallback(async (id, updates) => {
+    try {
+      // Validează datele folosind business logic
+      const validation = businessLogic.validateData(updates, 'members');
+      if (!validation.isValid) {
+        console.error('Validation errors:', validation.errors);
+        return;
+      }
+
+      // Verifică permisiunile
+      if (!businessLogic.isOperationAllowed('updateMember', updates)) {
+        console.error('Operation not allowed');
+        return;
+      }
+
+      // Procesează datele folosind business logic
+      const processedData = businessLogic.processData({ id, ...updates }, 'members');
+      
+      // Emite eveniment pentru actualizarea membru
+      eventBus.emit('members:update', processedData);
+      
+      console.log('✅ Member updated successfully');
+
+    } catch (error) {
+      console.error('❌ Failed to update member:', error.message);
+    }
+  }, [businessLogic]);
 
   /**
    * Elimină un membru
    */
-  const removeMember = useCallback((id) => {
-    setMembers(prev => prev.filter(member => member.id !== id));
-  }, []);
+  const removeMember = useCallback(async (id) => {
+    try {
+      // Verifică permisiunile
+      if (!businessLogic.isOperationAllowed('deleteMember', { id })) {
+        console.error('Operation not allowed');
+        return;
+      }
+
+      // Emite eveniment pentru ștergerea membru
+      eventBus.emit('members:delete', { id });
+      
+      console.log('✅ Member deleted successfully');
+
+    } catch (error) {
+      console.error('❌ Failed to delete member:', error.message);
+    }
+  }, [businessLogic]);
 
   /**
    * Obține un membru după ID
    */
   const getMemberById = useCallback((id) => {
-    return members.find(member => member.id === id);
-  }, [members]);
+    return memberItems.find(member => member.id === id);
+  }, [memberItems]);
 
   /**
    * Obține toți membrii
    */
   const getAllMembers = useCallback(() => {
-    return members;
-  }, [members]);
+    return memberItems;
+  }, [memberItems]);
 
   /**
    * Obține membrii după rol
    */
   const getMembersByRole = useCallback((role) => {
-    return members.filter(member => member.role === role);
-  }, [members]);
+    return memberItems.filter(member => member.role === role);
+  }, [memberItems]);
 
   /**
    * Obține zilele de lucru ca string
@@ -102,37 +133,12 @@ const useMembersStore = () => {
    * Validează datele unui membru
    */
   const validateMember = useCallback((member) => {
-    const errors = [];
-    
-    if (!member.name || member.name.trim().length < 2) {
-      errors.push('Name must be at least 2 characters long');
-    }
-    
-    if (!member.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(member.email)) {
-      errors.push('Valid email is required');
-    }
-    
-    if (!member.phone || member.phone.trim().length < 10) {
-      errors.push('Valid phone number is required');
-    }
-    
-    if (!member.role) {
-      errors.push('Role is required');
-    }
-    
-    if (!member.workDays || member.workDays.length === 0) {
-      errors.push('At least one work day must be selected');
-    }
-    
-    return {
-      isValid: errors.length === 0,
-      errors
-    };
-  }, []);
+    return businessLogic.validateData(member, 'members');
+  }, [businessLogic]);
 
   return {
-    // State
-    members,
+    // Data (from useDataSync)
+    members: memberItems,
     
     // Actions
     addMember,
@@ -142,7 +148,10 @@ const useMembersStore = () => {
     getAllMembers,
     getMembersByRole,
     getDayPill,
-    validateMember
+    validateMember,
+    
+    // Business logic
+    businessLogic
   };
 };
 

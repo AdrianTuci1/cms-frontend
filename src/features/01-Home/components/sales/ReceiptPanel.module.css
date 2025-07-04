@@ -124,13 +124,40 @@
   color: var(--text-primary);
 }
 
+.paymentMethods {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.paymentButton {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--text-primary);
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.paymentButton:hover {
+  background: var(--bg-hover);
+}
+
+.paymentButton.active {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
 .receiptActions {
   display: flex;
   gap: 1rem;
 }
 
 .receiptActions button {
-  flex: 1;
   padding: 0.75rem;
   border: none;
   border-radius: 4px;
@@ -139,6 +166,7 @@
 }
 
 .validateButton {
+  flex: 1;
   background: var(--color-success);
   color: white;
 }
@@ -147,16 +175,22 @@
   opacity: 0.9;
 }
 
-.cancelButton {
+.clearButton {
+  width: 48px;
+  height: 48px;
   background: var(--color-danger);
   color: white;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.cancelButton:hover:not(:disabled) {
+.clearButton:hover:not(:disabled) {
   opacity: 0.9;
 }
 
-.validateButton:disabled, .cancelButton:disabled {
+.validateButton:disabled, .clearButton:disabled {
   background: var(--color-gray);
   cursor: not-allowed;
   opacity: 0.65;

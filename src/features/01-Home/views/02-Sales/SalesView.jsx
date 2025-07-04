@@ -74,20 +74,6 @@ const SalesView = ({ businessType = 'dental' }) => {
 
   return (
     <div className={styles.salesContainer}>
-      {/* Payment Method Selection */}
-      <div className={styles.paymentMethod}>
-        <label>Payment Method:</label>
-        <select 
-          value={paymentMethod} 
-          onChange={(e) => setPaymentMethod(e.target.value)}
-        >
-          <option value="cash">Cash</option>
-          <option value="card">Card</option>
-          <option value="transfer">Bank Transfer</option>
-          <option value="voucher">Voucher</option>
-        </select>
-      </div>
-
       <ResizablePanels
         leftContent={
           <ProductsPanel 
@@ -102,6 +88,8 @@ const SalesView = ({ businessType = 'dental' }) => {
           <ReceiptPanel
             cart={cart}
             total={total}
+            paymentMethod={paymentMethod}
+            onPaymentMethodChange={setPaymentMethod}
             onUpdateQuantity={handleUpdateQuantity}
             onRemoveFromCart={handleRemoveFromCart}
             onValidate={handleValidate}

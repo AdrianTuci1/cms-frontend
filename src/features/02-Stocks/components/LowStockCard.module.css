@@ -1,10 +1,18 @@
 .lowStockCard {
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 1rem;
-  overflow: hidden;
+  border-bottom: 1px solid #eee;
   border-left: 4px solid #dc3545;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lowStockCard:hover {
+  background: #f8f9fa;
+}
+
+.lowStockCard:last-child {
+  border-bottom: none;
 }
 
 .cardHeader {

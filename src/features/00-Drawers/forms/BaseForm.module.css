@@ -291,6 +291,17 @@
   background-color: var(--bg-secondary, #f9fafb);
 }
 
+.selectedValue {
+  padding: 8px 12px;
+  background-color: var(--bg-secondary, #f9fafb);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: var(--text-primary, #111827);
+  margin-top: 8px;
+  font-weight: 500;
+}
+
 /* Loading indicators */
 .loadingIndicator {
   display: flex;

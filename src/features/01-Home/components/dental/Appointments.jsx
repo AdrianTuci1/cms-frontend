@@ -2,8 +2,7 @@ import { useEffect, lazy, Suspense, useState, useMemo } from 'react';
 import AppointmentHeader from './timeline/AppointmentHeader';
 import WeekNavigator from './timeline/WeekNavigator';
 import styles from './timeline/Appointments.module.css';
-// import AddAppointment from '../../components/drawer/AddAppointment/AddAppointment';
-// import useDrawerStore from '../../store/drawerStore';
+import { openDrawer, useDrawer, useDrawerStore, DRAWER_TYPES } from '../../../00-Drawers';
 import { useDentalTimelineWithAPI } from '../../store/dentalTimeline';
 import { useDataSync } from '../../../../design-patterns/hooks';
 
@@ -11,7 +10,7 @@ import { useDataSync } from '../../../../design-patterns/hooks';
 const WeekView = lazy(() => import('./timeline/WeekView'));
 
 const Appointments = () => {
-  // const { openDrawer } = useDrawerStore();
+  const { isOpen, currentMode, currentDrawerType } = useDrawer();
   
   // Date range for timeline - Updated to match test data
   const [startDate, setStartDate] = useState('2024-01-15');
@@ -66,17 +65,132 @@ const Appointments = () => {
   }, []); // Empty dependency array to run only once
 
   const handleAddAppointment = () => {
-    // openDrawer(<AddAppointment />, 'addAppointment');
+    // Create new appointment with default values
+    const newAppointment = {
+      clientId: null,
+      clientName: '',
+      phoneNumber: '',
+      email: '',
+      treatmentId: null,
+      displayTreatment: '',
+      medicId: null,
+      medicName: '',
+      date: new Date().toISOString().slice(0, 16), // Current date and time
+      duration: 60,
+      status: 'scheduled',
+      color: '#1976d2',
+      notes: ''
+    };
+
+    openDrawer('create', DRAWER_TYPES.TIMELINE, newAppointment, {
+      title: 'New Dental Appointment',
+      onSave: async (data, mode) => {
+        console.log('Saving appointment:', data);
+        
+        try {
+          // Use optimistic update from useDataSync
+          await timelineSync.create(data);
+          console.log('Appointment saved successfully with optimistic update!');
+        } catch (error) {
+          console.error('Failed to save appointment:', error);
+          // Error handling is automatic - optimistic update will be reverted
+        }
+      },
+      onCancel: () => {
+        console.log('Appointment creation cancelled');
+      }
+    });
   };
 
   const handleAppointmentClick = (appointment) => {
-    // To be implemented with drawer
-    console.log('Appointment clicked:', appointment);
+    // Edit existing appointment
+    const appointmentData = {
+      id: appointment.id,
+      clientId: appointment.clientId,
+      clientName: appointment.clientName,
+      phoneNumber: appointment.phoneNumber || '',
+      email: appointment.email || '',
+      treatmentId: appointment.treatmentId,
+      displayTreatment: appointment.displayTreatment,
+      medicId: appointment.medicId,
+      medicName: appointment.medicName,
+      date: appointment.date ? new Date(appointment.date).toISOString().slice(0, 16) : '',
+      duration: appointment.duration,
+      status: appointment.status,
+      color: appointment.color,
+      notes: appointment.notes || ''
+    };
+
+    openDrawer('edit', DRAWER_TYPES.TIMELINE, appointmentData, {
+      title: 'Edit Dental Appointment',
+      onSave: async (data, mode) => {
+        console.log('Updating appointment:', data);
+        
+        try {
+          // Use optimistic update from useDataSync
+          await timelineSync.update(data);
+          console.log('Appointment updated successfully with optimistic update!');
+        } catch (error) {
+          console.error('Failed to update appointment:', error);
+          // Error handling is automatic - optimistic update will be reverted
+        }
+      },
+      onDelete: async (data) => {
+        console.log('Deleting appointment:', data);
+        
+        try {
+          // Use optimistic update from useDataSync
+          await timelineSync.remove(data);
+          console.log('Appointment deleted successfully with optimistic update!');
+        } catch (error) {
+          console.error('Failed to delete appointment:', error);
+          // Error handling is automatic - optimistic update will be reverted
+        }
+      },
+      onCancel: () => {
+        console.log('Appointment edit cancelled');
+      }
+    });
   };
 
   const handlePatientClick = (appointment) => {
-    // To be implemented with drawer
-    console.log('Patient clicked:', appointment);
+    // Open patient/member drawer for editing
+    const patientData = {
+      id: appointment.clientId,
+      name: appointment.clientName,
+      phoneNumber: appointment.phoneNumber || '',
+      email: appointment.email || '',
+      role: 'patient'
+    };
+
+    openDrawer('edit', DRAWER_TYPES.MEMBER, patientData, {
+      title: 'Edit Patient Information',
+      onSave: async (data, mode) => {
+        console.log('Updating patient:', data);
+        // Here you would typically update your API/database
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+        console.log('Patient updated successfully!');
+        
+        // Refresh timeline data
+        if (timelineSync.refresh) {
+          timelineSync.refresh();
+        }
+      },
+      onDelete: async (data) => {
+        console.log('Deleting patient:', data);
+        // Here you would typically delete from your API/database
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+        console.log('Patient deleted successfully!');
+        
+        // Refresh timeline data
+        if (timelineSync.refresh) {
+          timelineSync.refresh();
+        }
+      },
+      onCancel: () => {
+        console.log('Patient edit cancelled');
+      }
+    });
   };
 
   const handleToggleAppointments = () => {
@@ -112,6 +226,24 @@ const Appointments = () => {
 
   return (
     <div className={styles.container}>
+      {/* Drawer status indicator */}
+      {isOpen && (
+        <div style={{
+          position: 'fixed',
+          top: '10px',
+          right: '10px',
+          background: 'rgba(59, 130, 246, 0.9)',
+          color: 'white',
+          padding: '8px 12px',
+          borderRadius: '6px',
+          fontSize: '0.875rem',
+          zIndex: 1000,
+          backdropFilter: 'blur(10px)'
+        }}>
+          {currentMode} {currentDrawerType}
+        </div>
+      )}
+
       <AppointmentHeader
         onAddAppointment={handleAddAppointment}
         onTodayClick={goToToday}

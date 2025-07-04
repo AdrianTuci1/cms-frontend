@@ -282,7 +282,7 @@ const BaseForm = ({
 
   const renderField = (field) => {
     const fieldConfig = fields.find(f => f.name === field) || { name: field, type: 'text' };
-    const { name, type, label, placeholder, options = [], ...props } = fieldConfig;
+    const { name, type, label, placeholder, options = [], searchTerm, onSearchChange, showInitialResults, ...props } = fieldConfig;
     
     const isRequired = required.includes(name);
     const error = getFieldError(name);
@@ -294,6 +294,54 @@ const BaseForm = ({
     const searchResults = getSearchResults(name);
 
     switch (type) {
+      case 'searchable-select':
+        return (
+          <div className={styles.formGroup} key={name}>
+            <label className={`${styles.formLabel} ${isRequired ? styles.requiredLabel : ''}`}>
+              {label || name.charAt(0).toUpperCase() + name.slice(1)}
+            </label>
+            
+            {/* Search input */}
+            <input
+              type="text"
+              className={getInputClassName(name)}
+              placeholder={placeholder || `Search ${label || name}...`}
+              value={searchTerm || ''}
+              onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
+              disabled={mode === 'view' || isLoading}
+              style={{ marginBottom: '8px' }}
+            />
+            
+            {/* Options dropdown */}
+            {(showInitialResults || searchTerm) && options.length > 0 && (
+              <div className={styles.searchResults}>
+                {options.map((option, index) => (
+                  <div
+                    key={index}
+                    className={styles.searchResultItem}
+                    onClick={() => handleSelectChange(name, option.value)}
+                  >
+                    {option.label}
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            {/* Selected value display */}
+            {formData[name] && (
+              <div className={styles.selectedValue}>
+                Selected: {options.find(opt => opt.value === formData[name])?.label || formData[name]}
+              </div>
+            )}
+            
+            {error && (
+              <div className={styles.errorMessage}>
+                {error}
+              </div>
+            )}
+          </div>
+        );
+        
       case 'select':
         return (
           <div className={styles.formGroup} key={name}>
@@ -412,6 +460,51 @@ const BaseForm = ({
               value={formData[name] || ''}
               onChange={(e) => handleInputChange(name, e.target.value)}
               disabled={mode === 'view' || isLoading}
+              {...props}
+            />
+            {error && (
+              <div className={styles.errorMessage}>
+                {error}
+              </div>
+            )}
+          </div>
+        );
+        
+      case 'datetime-local':
+        return (
+          <div className={styles.formGroup} key={name}>
+            <label className={`${styles.formLabel} ${isRequired ? styles.requiredLabel : ''}`}>
+              {label || name.charAt(0).toUpperCase() + name.slice(1)}
+            </label>
+            <input
+              type="datetime-local"
+              className={getInputClassName(name)}
+              value={formData[name] || ''}
+              onChange={(e) => handleInputChange(name, e.target.value)}
+              disabled={mode === 'view' || isLoading}
+              {...props}
+            />
+            {error && (
+              <div className={styles.errorMessage}>
+                {error}
+              </div>
+            )}
+          </div>
+        );
+        
+      case 'color':
+        return (
+          <div className={styles.formGroup} key={name}>
+            <label className={`${styles.formLabel} ${isRequired ? styles.requiredLabel : ''}`}>
+              {label || name.charAt(0).toUpperCase() + name.slice(1)}
+            </label>
+            <input
+              type="color"
+              className={getInputClassName(name)}
+              value={formData[name] || '#1976d2'}
+              onChange={(e) => handleInputChange(name, e.target.value)}
+              disabled={mode === 'view' || isLoading}
+              style={{ height: '44px', padding: '4px' }}
               {...props}
             />
             {error && (

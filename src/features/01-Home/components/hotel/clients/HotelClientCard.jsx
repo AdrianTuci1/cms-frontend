@@ -5,9 +5,9 @@ import styles from './HotelClientCard.module.css';
 // Simple placeholder image as data URI
 const PLACEHOLDER_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiBmaWxsPSIjRjVGNUY1Ii8+CjxjaXJjbGUgY3g9IjMyIiBjeT0iMjQiIHI9IjgiIGZpbGw9IiNEN0Q3RDciLz4KPHBhdGggZD0iTTggNTJDMCA0OCA0IDQwIDEyIDQwSDUyQzYwIDQwIDY0IDQ4IDU2IDUySDhaIiBmaWxsPSIjRDdEN0Q3Ii8+Cjx0ZXh0IHg9IjMyIiB5PSI1OCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjgiIGZpbGw9IiM5OTk5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiPk5vIFBob3RvPC90ZXh0Pgo8L3N2Zz4K';
 
-const HotelClientCard = ({ client }) => {
+const HotelClientCard = ({ client, onClick }) => {
   return (
-    <div className={styles.card}>
+    <div className={styles.card} onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
       <div className={styles.memberInfo}>
         <div className={styles.photoContainer}>
           <img 

@@ -43,6 +43,9 @@ class DataProcessor {
       case 'stocks':
         processedData = this.processStocksData(response);
         break;
+      case 'members':
+        processedData = this.processMembersData(response);
+        break;
       case 'sales':
         processedData = this.processSalesData(response);
         break;

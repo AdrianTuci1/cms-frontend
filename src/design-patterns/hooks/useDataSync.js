@@ -9,7 +9,6 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import dataSyncManager from '../data-sync/index.js';
 import eventBus from '../observer/base/EventBus';
 import { crudStrategyFactory } from '../strategy/CRUDStrategy.js';
-import { getMockData } from '../../api/mockData/index.js';
 
 /**
  * Hook principal pentru sincronizarea datelor

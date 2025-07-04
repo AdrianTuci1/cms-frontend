@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './RoomCard.module.css';
 
-const RoomCard = ({ room }) => {
+const RoomCard = ({ room, onClick }) => {
   const getInitials = (name) => {
     return name
       .split(' ')
@@ -29,7 +29,7 @@ const RoomCard = ({ room }) => {
   };
 
   return (
-    <div className={styles.card}>
+    <div className={styles.card} onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
       <div className={styles.initialsBox} style={{ backgroundColor: getColorForRoom(room.name) }}>
         {getInitials(room.name)}
       </div>

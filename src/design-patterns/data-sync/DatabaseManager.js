@@ -15,7 +15,7 @@ class DatabaseManager {
    */
   async initializeDatabase() {
     try {
-      this.db = await openDB('cms-frontend', 2, {
+      this.db = await openDB('cms-frontend', 3, {
         upgrade: (db, oldVersion, newVersion) => {
           this.createStores(db);
         }
@@ -41,7 +41,7 @@ class DatabaseManager {
     ];
 
     // Business-specific resources
-    const businessResources = ['timeline', 'clients', 'packages', 'members'];
+    const businessResources = ['timeline', 'clients', 'packages', 'members', 'services'];
 
     // Create stores for all resources
     [...generalResources, ...businessResources].forEach(resource => {
@@ -144,6 +144,9 @@ class DatabaseManager {
           records = data.stocks;
         } else if (resource === 'stocks' && data.items && Array.isArray(data.items)) {
           // Handle { items: [...] } structure for stocks resource
+          records = data.items;
+        } else if (resource === 'members' && data.items && Array.isArray(data.items)) {
+          // Handle { items: [...] } structure for members resource
           records = data.items;
         } else if (data.clients && Array.isArray(data.clients)) {
           // Handle { clients: [...] } structure
@@ -261,6 +264,15 @@ class DatabaseManager {
         // Return stocks data with items array structure
         return {
           id: 'stocks-001',
+          items: filteredData
+        };
+      }
+      
+      // Special handling for members resource to preserve structure
+      if (resource === 'members' && filteredData.length > 0) {
+        // Return members data with items array structure
+        return {
+          id: 'members-001',
           items: filteredData
         };
       }

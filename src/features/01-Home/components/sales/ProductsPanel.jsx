@@ -8,18 +8,15 @@ const ProductsPanel = ({
   error = null,
   businessType = 'dental'
 }) => {
-  const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
   // Ensure products is always an array
   const safeProducts = Array.isArray(products) ? products : [];
 
-  // Filtrează produsele după căutare și categorie
+  // Filtrează produsele după categorie
   const filteredProducts = safeProducts.filter(product => {
-    const matchesSearch = product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.id?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    return matchesCategory;
   });
 
   // Obține categoriile unice
@@ -49,23 +46,6 @@ const ProductsPanel = ({
     <div className={styles.productsPanel}>
       <div className={styles.productsPanelContent}>
         <div className={styles.productsHeader}>
-          <h2>Products ({businessType})</h2>
-          <span className={styles.productCount}>
-            {filteredProducts.length} products available
-          </span>
-        </div>
-
-        {/* Search and Filter Controls */}
-        <div className={styles.controls}>
-          <div className={styles.searchBox}>
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          
           <div className={styles.categoryFilter}>
             <select 
               value={selectedCategory} 
@@ -78,6 +58,9 @@ const ProductsPanel = ({
               ))}
             </select>
           </div>
+          <span className={styles.productCount}>
+            {filteredProducts.length} products available
+          </span>
         </div>
 
         {/* Products Grid */}
@@ -85,7 +68,7 @@ const ProductsPanel = ({
           {filteredProducts.length === 0 ? (
             <div className={styles.noProducts}>
               <p>No products found</p>
-              {searchTerm && <p>Try adjusting your search terms</p>}
+              {selectedCategory !== 'all' && <p>Try selecting a different category</p>}
             </div>
           ) : (
             filteredProducts.map(product => (

@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './PackageCard.module.css';
 
-const PackageCard = ({ packageData }) => {
+const PackageCard = ({ packageData, onClick }) => {
   const getInitials = (name) => {
     return name
       .split(' ')
@@ -29,7 +29,7 @@ const PackageCard = ({ packageData }) => {
   };
 
   return (
-    <div className={styles.card}>
+    <div className={styles.card} onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
       <div className={styles.initialsBox} style={{ backgroundColor: getColorForPackage(packageData.name) }}>
         {getInitials(packageData.name)}
       </div>

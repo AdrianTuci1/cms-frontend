@@ -16,6 +16,7 @@ import { getServicesMock, servicesMock } from './servicesMock.js';
 import { getSalesMock, salesMock } from './salesMock.js';
 import { getInvoicesMock, invoicesMock } from './invoicesMock.js';
 import { getStocksMock, stocksMock } from './stocksMock.js';
+import { getMembersMock, membersMock } from './membersMock.js';
 import { getAgentMock, agentMock } from './agentMock.js';
 import { getHistoryMock, historyMock } from './historyMock.js';
 import { getWorkflowsMock, workflowsMock } from './workflowsMock.js';
@@ -75,6 +76,9 @@ export function getMockData(resource, businessType = null) {
     
     case 'stocks':
       return getStocksMock(businessType);
+    
+    case 'members':
+      return getMembersMock(businessType);
     
     case 'sales':
       return getSalesMock(businessType);
@@ -136,6 +140,7 @@ export default {
   servicesMock,
   invoicesMock,
   stocksMock,
+  membersMock,
   salesMock,
   agentMock,
   historyMock,

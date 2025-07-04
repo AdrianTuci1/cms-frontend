@@ -2,55 +2,127 @@ import React, { useState, useMemo } from 'react';
 import styles from './ServicesView.module.css';
 import { getBusinessType, BUSINESS_TYPES } from '../../../../config/businessTypes';
 import { useDataSync } from '../../../../design-patterns/hooks';
+import { openDrawer, DRAWER_TYPES } from '../../../00-Drawers';
 import TreatmentCard from '../../components/dental/services/TreatmentCard.jsx';
 import PackageCard from '../../components/gym/services/PackageCard.jsx';
 import RoomCard from '../../components/hotel/services/RoomCard.jsx';
-import useDrawerStore from '../../../00-Drawers/store/drawerStore';
 // import AddService from '../components/drawer/AddService/AddService';
 
 const ServicesView = () => {
   const businessType = getBusinessType();
-  const { openDrawer } = useDrawerStore();
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Use useDataSync hook directly for packages data
-  const packagesSync = useDataSync('packages', {
+  // Use useDataSync hook directly for services data
+  const servicesSync = useDataSync('services', {
     businessType: businessType.name,
     enableValidation: true,
     enableBusinessLogic: true
   });
 
-  const { data: packagesData, loading, error } = packagesSync;
+  const { data: servicesData, loading, error } = servicesSync;
 
-  // Extract packages array from the nested structure
-  const packages = useMemo(() => {
-    if (!packagesData) return [];
+  // Extract services array from the nested structure
+  const services = useMemo(() => {
+    if (!servicesData) return [];
     
     // Handle different data structures
-    if (Array.isArray(packagesData)) {
-      return packagesData;
+    if (Array.isArray(servicesData)) {
+      return servicesData;
     }
     
     // Handle nested structure from mock data
-    if (packagesData.packages && Array.isArray(packagesData.packages)) {
-      return packagesData.packages;
+    if (servicesData.services && Array.isArray(servicesData.services)) {
+      return servicesData.services;
     }
     
     // Handle response structure
-    if (packagesData.response?.data?.packages && Array.isArray(packagesData.response.data.packages)) {
-      return packagesData.response.data.packages;
+    if (servicesData.response?.data?.services && Array.isArray(servicesData.response.data.services)) {
+      return servicesData.response.data.services;
     }
     
     return [];
-  }, [packagesData]);
+  }, [servicesData]);
 
-  // Folosește doar datele de la API
-  const services = packages || [];
+  const handleServiceClick = (service) => {
+    // Edit existing service
+    const serviceData = {
+      id: service.id,
+      name: service.name || '',
+      description: service.description || '',
+      price: service.price || 0,
+      duration: service.duration || 0,
+      category: service.category || '',
+      type: service.type || '',
+      features: service.features || [],
+      amenities: service.amenities || [],
+      capacity: service.capacity || 1
+    };
+
+    openDrawer('edit', DRAWER_TYPES.SERVICE, serviceData, {
+      title: `Edit ${businessType.name === 'Dental Clinic' ? 'Treatment' : businessType.name === 'Gym' ? 'Package' : 'Room'}`,
+      onSave: async (data, mode) => {
+        console.log('Updating service:', data);
+        
+        try {
+          // Use optimistic update from useDataSync
+          await servicesSync.update(data);
+          console.log('Service updated successfully with optimistic update!');
+        } catch (error) {
+          console.error('Failed to update service:', error);
+          // Error handling is automatic - optimistic update will be reverted
+        }
+      },
+      onDelete: async (data) => {
+        console.log('Deleting service:', data);
+        
+        try {
+          // Use optimistic update from useDataSync
+          await servicesSync.remove(data);
+          console.log('Service deleted successfully with optimistic update!');
+        } catch (error) {
+          console.error('Failed to delete service:', error);
+          // Error handling is automatic - optimistic update will be reverted
+        }
+      },
+      onCancel: () => {
+        console.log('Service edit cancelled');
+      }
+    });
+  };
 
   const handleAddService = () => {
-    // openDrawer(<AddService />, 'add service');
-    console.log('Add service functionality not implemented yet');
-  }
+    // Create new service with default values
+    const newService = {
+      name: '',
+      description: '',
+      price: 0,
+      duration: 0,
+      category: '',
+      type: '',
+      features: [],
+      amenities: [],
+      capacity: 1
+    };
+
+    openDrawer('create', DRAWER_TYPES.SERVICE, newService, {
+      title: `New ${businessType.name === 'Dental Clinic' ? 'Treatment' : businessType.name === 'Gym' ? 'Package' : 'Room'}`,
+      onSave: async (data, mode) => {
+        console.log('Creating service:', data);
+        
+        try {
+          // Use optimistic update from useDataSync
+          await servicesSync.create(data);
+          console.log('Service created successfully with optimistic update!');
+        } catch (error) {
+          console.error('Failed to create service:', error);
+          // Error handling is automatic - optimistic update will be reverted
+        }
+      },
+      onCancel: () => {
+        console.log('Service creation cancelled');
+      }
+    });
+  };
 
   const getSearchPlaceholder = () => {
     switch (businessType.name) {
@@ -104,13 +176,17 @@ const ServicesView = () => {
   }, [searchQuery, services]);
 
   const renderServiceCard = (service) => {
+    const cardProps = {
+      onClick: () => handleServiceClick(service)
+    };
+
     switch (businessType.name) {
       case BUSINESS_TYPES.DENTAL_CLINIC.name:
-        return <TreatmentCard key={service.id} treatment={service} />;
+        return <TreatmentCard key={service.id} treatment={service} {...cardProps} />;
       case BUSINESS_TYPES.GYM.name:
-        return <PackageCard key={service.id} packageData={service} />;
+        return <PackageCard key={service.id} packageData={service} {...cardProps} />;
       case BUSINESS_TYPES.HOTEL.name:
-        return <RoomCard key={service.id} room={service} />;
+        return <RoomCard key={service.id} room={service} {...cardProps} />;
       default:
         return null;
     }
@@ -166,7 +242,7 @@ const ServicesView = () => {
             <p>No services found. Add a service using the button above.</p>
             {import.meta.env.DEV && (
               <div style={{ marginTop: '10px', fontSize: '12px', color: '#666' }}>
-                Debug: Raw data length: {packagesData ? (Array.isArray(packagesData) ? packagesData.length : 'not array') : 'no data'}
+                Debug: Raw data length: {servicesData ? (Array.isArray(servicesData) ? servicesData.length : 'not array') : 'no data'}
               </div>
             )}
           </div>

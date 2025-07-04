@@ -1,6 +1,8 @@
 .stocksView {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 70px);
   background-color: #f8f9fa;
-  min-height: 100vh;
 }
 
 .header {
@@ -127,7 +129,11 @@
 
 .inventorySection,
 .lowStockSection {
-  transition: width 0.1s ease;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 1rem;
 }
 
 .resizeHandle {
@@ -331,7 +337,13 @@
 .lowStockList {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 /* Integration Example Styles */
@@ -482,67 +494,7 @@
   }
 }
 
-/* Inventory List Styles */
-.inventorySection {
-  background: white;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
 
-.inventoryCard {
-  background: white;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
-  border: 1px solid #e0e0e0;
-  position: relative;
-  overflow: hidden;
-}
-
-.inventoryCard::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 4px;
-  height: 100%;
-  background-color: #1a237e;
-}
-
-.inventoryCard:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Low Stock Styles */
-.lowStockSection {
-  background: white;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.lowStockCard {
-  background: #fff3f3;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border: 1px solid #ffcdd2;
-  position: relative;
-  overflow: hidden;
-}
-
-.lowStockCard::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 4px;
-  height: 100%;
-  background-color: #e74c3c;
-}
 
 /* Card Components */
 .cardHeader {
@@ -779,4 +731,14 @@
 
 .negative {
   color: #e74c3c;
+}
+
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: #666;
+  font-size: 0.95rem;
+  text-align: center;
 } 

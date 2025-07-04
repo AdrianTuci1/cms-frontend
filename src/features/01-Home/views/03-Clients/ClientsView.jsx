@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { getBusinessType } from '../../../../config/businessTypes';
 import { FaSearch, FaPlus } from 'react-icons/fa';
 import { useDataSync } from '../../../../design-patterns/hooks';
+import { openDrawer, DRAWER_TYPES } from '../../../00-Drawers';
 import GymClientCard from '../../components/gym/clients/GymClientCard';
 import DentalClientCard from '../../components/dental/clients/DentalClientCard';
 import HotelClientCard from '../../components/hotel/clients/HotelClientCard';
@@ -70,14 +71,90 @@ const ClientsView = () => {
     setSearchTerm(e.target.value);
   };
 
+  const handleClientClick = (client) => {
+    // Edit existing client
+    const clientData = {
+      id: client.id,
+      name: client.name || client.clientName || client.patientName || client.guestName || '',
+      phoneNumber: client.phoneNumber || client.phone || '',
+      email: client.email || '',
+      role: client.role || 'client'
+    };
+
+    openDrawer('edit', DRAWER_TYPES.MEMBER, clientData, {
+      title: `Edit ${businessType.name === 'Dental Clinic' ? 'Patient' : businessType.name === 'Gym' ? 'Member' : 'Guest'}`,
+      onSave: async (data, mode) => {
+        console.log('Updating client:', data);
+        
+        try {
+          // Use optimistic update from useDataSync
+          await clientsSync.update(data);
+          console.log('Client updated successfully with optimistic update!');
+        } catch (error) {
+          console.error('Failed to update client:', error);
+          // Error handling is automatic - optimistic update will be reverted
+        }
+      },
+      onDelete: async (data) => {
+        console.log('Deleting client:', data);
+        
+        try {
+          // Use optimistic update from useDataSync
+          await clientsSync.remove(data);
+          console.log('Client deleted successfully with optimistic update!');
+        } catch (error) {
+          console.error('Failed to delete client:', error);
+          // Error handling is automatic - optimistic update will be reverted
+        }
+      },
+      onCancel: () => {
+        console.log('Client edit cancelled');
+      }
+    });
+  };
+
+  const handleAddClient = () => {
+    // Create new client with default values
+    const newClient = {
+      name: '',
+      phoneNumber: '',
+      email: '',
+      role: 'client'
+    };
+
+    openDrawer('create', DRAWER_TYPES.MEMBER, newClient, {
+      title: `New ${businessType.name === 'Dental Clinic' ? 'Patient' : businessType.name === 'Gym' ? 'Member' : 'Guest'}`,
+      onSave: async (data, mode) => {
+        console.log('Creating client:', data);
+        
+        try {
+          // Use optimistic update from useDataSync
+          await clientsSync.create(data);
+          console.log('Client created successfully with optimistic update!');
+        } catch (error) {
+          console.error('Failed to create client:', error);
+          // Error handling is automatic - optimistic update will be reverted
+        }
+      },
+      onCancel: () => {
+        console.log('Client creation cancelled');
+      }
+    });
+  };
+
   const renderClientCard = (client) => {
+    const cardProps = {
+      client: client,
+      onClick: () => handleClientClick(client)
+    };
+
     switch (businessType.name) {
       case 'Gym':
-        return <GymClientCard key={client.id} client={client} />;
+        return <GymClientCard key={client.id} {...cardProps} />;
       case 'Dental Clinic':
-        return <DentalClientCard key={client.id} client={client} />;
+        return <DentalClientCard key={client.id} {...cardProps} />;
       case 'Hotel':
-        return <HotelClientCard key={client.id} client={client} />;
+        return <HotelClientCard key={client.id} {...cardProps} />;
       default:
         return null;
     }
@@ -96,7 +173,7 @@ const ClientsView = () => {
             className={styles.searchInput}
           />
         </div>
-        <button className={styles.addButton}>
+        <button className={styles.addButton} onClick={handleAddClient}>
           <FaPlus className={styles.icon}/>
           Adaugă Client
         </button>

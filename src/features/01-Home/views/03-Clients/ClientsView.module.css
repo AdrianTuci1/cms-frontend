@@ -1,7 +1,7 @@
 .adminView {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: calc(100vh - 70px);
   background-color: var(--bg-secondary, #f8f9fa);
   border-radius: 8px;
   overflow: hidden;
@@ -13,6 +13,11 @@
   align-items: center;
   padding: 1rem;
   border-bottom: 1px solid var(--border-color, #e0e0e0);
+  background-color: var(--bg-secondary, #f8f9fa);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  flex-shrink: 0;
 }
 
 .header h2 {
@@ -79,17 +84,21 @@
 
 .content {
   flex: 1;
-  overflow: auto;
-  padding: 1rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .membersContainer {
+  flex: 1;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   border: 1px solid #eee;
   border-radius: 8px;
-  overflow: hidden;
+  margin: 1rem;
   background: #fff;
+  padding: 0.5rem;
 }
 
 .card {
