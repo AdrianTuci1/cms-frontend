@@ -18,6 +18,7 @@
 .headerLeft {
   display: flex;
   align-items: center;
+  gap: 0.5rem;
 }
 
 .headerRight {
@@ -171,6 +172,17 @@
 
 .purchaseButton:hover {
   background-color: #e0a800;
+}
+
+.settingsButton {
+  background-color: #6c757d;
+  color: white;
+  padding: 0.75rem;
+  min-width: 44px;
+}
+
+.settingsButton:hover {
+  background-color: #5a6268;
 }
 
 .controlButton svg {

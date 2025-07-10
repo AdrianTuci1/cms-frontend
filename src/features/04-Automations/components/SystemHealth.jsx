@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { FaPlay, FaStop, FaCoins, FaUser, FaRobot } from 'react-icons/fa';
+import { FaPlay, FaStop, FaCoins, FaUser, FaRobot, FaCog } from 'react-icons/fa';
 import styles from '../styles/SystemHealth.module.css';
 
-const SystemHealth = ({ systemHealth, isLoading }) => {
+const SystemHealth = ({ systemHealth, isLoading, onSettingsClick }) => {
   const [isRunning, setIsRunning] = useState(false);
   const [tokenUsage, setTokenUsage] = useState(0);
   const [delay, setDelay] = useState(0);
@@ -45,6 +45,12 @@ const SystemHealth = ({ systemHealth, isLoading }) => {
     console.log('Purchase tokens clicked');
   };
 
+  const handleSettingsClick = () => {
+    if (onSettingsClick) {
+      onSettingsClick();
+    }
+  };
+
   if (isLoading) {
     return (
       <div className={styles.systemHealthBox}>
@@ -65,6 +71,13 @@ const SystemHealth = ({ systemHealth, isLoading }) => {
           >
             {isRunning ? <FaStop /> : <FaPlay />}
             {isRunning ? 'Oprește' : 'Pornește'}
+          </button>
+          <button 
+            className={`${styles.controlButton} ${styles.settingsButton}`}
+            onClick={handleSettingsClick}
+            title="Configurare Automatizări"
+          >
+            <FaCog />
           </button>
         </div>
         <h2>Starea Sistemului</h2>

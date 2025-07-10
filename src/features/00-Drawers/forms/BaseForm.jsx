@@ -538,6 +538,30 @@ const BaseForm = ({
           </div>
         );
         
+      case 'checkbox':
+        return (
+          <div className={styles.formGroup} key={name}>
+            <label className={`${styles.formLabel} ${styles.checkboxLabel}`}>
+              <input
+                type="checkbox"
+                className={styles.formCheckbox}
+                checked={formData[name] || false}
+                onChange={(e) => handleInputChange(name, e.target.checked)}
+                disabled={mode === 'view' || isLoading}
+                {...props}
+              />
+              <span className={styles.checkboxText}>
+                {label || name.charAt(0).toUpperCase() + name.slice(1)}
+              </span>
+            </label>
+            {error && (
+              <div className={styles.errorMessage}>
+                {error}
+              </div>
+            )}
+          </div>
+        );
+        
       default:
         return (
           <div className={styles.formGroup} key={name}>

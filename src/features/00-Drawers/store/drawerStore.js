@@ -25,30 +25,20 @@ const BUSINESS_TYPE_CONFIGS = {
     timeline: {
       title: 'Appointment',
       fields: [
-        { name: 'clientId', type: 'number', label: 'Client ID', required: true },
         { name: 'clientName', type: 'text', label: 'Client Name', required: true },
         { name: 'phoneNumber', type: 'tel', label: 'Phone Number', required: true },
         { name: 'email', type: 'email', label: 'Email' },
-        { name: 'treatmentId', type: 'number', label: 'Treatment ID', required: true },
         { name: 'displayTreatment', type: 'text', label: 'Treatment Name', required: true },
-        { name: 'medicId', type: 'number', label: 'Medic ID', required: true },
         { name: 'medicName', type: 'text', label: 'Medic Name', required: true },
         { name: 'date', type: 'datetime-local', label: 'Appointment Date & Time', required: true },
         { name: 'duration', type: 'number', label: 'Duration (minutes)', min: 15, max: 180, required: true },
-        { name: 'status', type: 'select', label: 'Status', required: true, options: [
-          { value: 'scheduled', label: 'Scheduled' },
-          { value: 'confirmed', label: 'Confirmed' },
-          { value: 'in_progress', label: 'In Progress' },
-          { value: 'completed', label: 'Completed' },
-          { value: 'cancelled', label: 'Cancelled' },
-          { value: 'no_show', label: 'No Show' }
-        ]},
-        { name: 'color', type: 'color', label: 'Color', required: true },
+        { name: 'done', type: 'checkbox', label: 'Done' },
+        { name: 'paid', type: 'checkbox', label: 'Paid' },
         { name: 'notes', type: 'textarea', label: 'Notes', placeholder: 'Additional notes about the appointment...' }
       ],
-      required: ['clientId', 'clientName', 'treatmentId', 'displayTreatment', 'medicId', 'medicName', 'date', 'duration', 'status'],
+      required: ['clientName', 'displayTreatment', 'medicName', 'date', 'duration'],
       queryFields: ['phoneNumber', 'email'],
-      searchFields: ['treatmentId', 'medicId']
+      searchFields: ['displayTreatment', 'medicName']
     },
     service: {
       title: 'Treatment',

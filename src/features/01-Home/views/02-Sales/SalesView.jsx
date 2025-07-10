@@ -95,7 +95,6 @@ const SalesView = ({ businessType = 'dental' }) => {
             onValidate={handleValidate}
             onCancel={handleCancel}
             canCreateSale={canCreateSale}
-            businessType={businessType}
           />
         }
       />

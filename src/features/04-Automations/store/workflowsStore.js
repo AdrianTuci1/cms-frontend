@@ -2,44 +2,47 @@ import { create } from 'zustand';
 
 // Mock data for assistants - in a real app this would come from an API
 const mockAssistants = {
-  'ai-assistant': {
-    id: 'ai-assistant',
-    name: 'AI Assistant',
-    description: 'Intelligent automation assistant for business processes',
+  'reservation': {
+    id: 'reservation',
+    name: 'Booking.com',
+    description: 'Automated booking management and reservations',
     isActive: true,
     config: {
+      apiKey: '',
       responseTime: 'immediate',
       language: 'ro',
-      capabilities: ['chat', 'automation', 'analysis']
+      capabilities: ['booking', 'reservations', 'notifications']
     },
     stats: {
-      messagesProcessed: 1247,
+      bookingsProcessed: 1247,
       automationsTriggered: 89,
       accuracy: 94.2
     }
   },
-  'email-automation': {
-    id: 'email-automation',
-    name: 'Email Automation',
-    description: 'Automated email responses and notifications',
+  'whatsapp': {
+    id: 'whatsapp',
+    name: 'WhatsApp',
+    description: 'Automated WhatsApp messaging and responses',
     isActive: false,
     config: {
+      apiKey: '',
       responseTime: '5min',
       language: 'ro',
-      capabilities: ['email', 'notifications']
+      capabilities: ['messaging', 'notifications', 'chat']
     },
     stats: {
-      emailsSent: 456,
+      messagesSent: 456,
       automationsTriggered: 23,
       accuracy: 98.1
     }
   },
-  'data-analysis': {
-    id: 'data-analysis',
-    name: 'Data Analysis',
-    description: 'Business intelligence and reporting automation',
+  'reporting': {
+    id: 'reporting',
+    name: 'Raportare',
+    description: 'Automated reporting and business intelligence',
     isActive: true,
     config: {
+      apiKey: '',
       responseTime: '1hour',
       language: 'ro',
       capabilities: ['analysis', 'reporting', 'insights']

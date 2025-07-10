@@ -61,13 +61,13 @@ const TimelineForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) =
   // Enhance fields with dynamic options from IndexedDB
   const getEnhancedFields = () => {
     return baseFields.map(field => {
-      // Enhance treatmentId field for Dental Clinic
-      if (businessType.name === 'Dental Clinic' && field.name === 'treatmentId') {
+      // Enhance displayTreatment field for Dental Clinic
+      if (businessType.name === 'Dental Clinic' && field.name === 'displayTreatment') {
         return {
           ...field,
           type: 'searchable-select',
           options: filteredServices.map(service => ({
-            value: service.id,
+            value: service.name,
             label: service.name
           })),
           searchTerm: treatmentSearchTerm,
@@ -77,15 +77,15 @@ const TimelineForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) =
         };
       }
 
-      // Enhance medicId field for Dental Clinic
-      if (businessType.name === 'Dental Clinic' && field.name === 'medicId') {
+      // Enhance medicName field for Dental Clinic
+      if (businessType.name === 'Dental Clinic' && field.name === 'medicName') {
         return {
           ...field,
           type: 'searchable-select',
           options: filteredMembers
             .filter(member => member.role?.toLowerCase().includes('dentist') || member.role?.toLowerCase().includes('doctor'))
             .map(member => ({
-              value: member.id,
+              value: member.name,
               label: member.name
             })),
           searchTerm: medicSearchTerm,
@@ -95,29 +95,13 @@ const TimelineForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) =
         };
       }
 
-      // Auto-fill displayTreatment when treatmentId is selected
-      if (businessType.name === 'Dental Clinic' && field.name === 'displayTreatment') {
-        return {
-          ...field,
-          disabled: true // Auto-filled based on treatmentId selection
-        };
-      }
-
-      // Auto-fill medicName when medicId is selected
-      if (businessType.name === 'Dental Clinic' && field.name === 'medicName') {
-        return {
-          ...field,
-          disabled: true // Auto-filled based on medicId selection
-        };
-      }
-
       // Enhance sessionType field for Gym
       if (businessType.name === 'Gym' && field.name === 'sessionType') {
         return {
           ...field,
           type: 'searchable-select',
           options: filteredServices.map(service => ({
-            value: service.id,
+            value: service.name,
             label: service.name
           })),
           searchTerm: treatmentSearchTerm,
@@ -151,7 +135,7 @@ const TimelineForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) =
           ...field,
           type: 'searchable-select',
           options: filteredServices.map(service => ({
-            value: service.id,
+            value: service.name,
             label: service.name
           })),
           searchTerm: treatmentSearchTerm,
@@ -172,23 +156,9 @@ const TimelineForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) =
     const processedData = {
       ...formData,
       businessType: businessType.name,
-      status: mode === 'create' ? 'scheduled' : formData.status,
       createdAt: mode === 'create' ? new Date().toISOString() : formData.createdAt,
       updatedAt: new Date().toISOString()
     };
-
-    // Auto-fill displayTreatment and medicName if not set
-    if (businessType.name === 'Dental Clinic') {
-      if (formData.treatmentId && !formData.displayTreatment) {
-        const selectedTreatment = services.find(service => service.id === formData.treatmentId);
-        processedData.displayTreatment = selectedTreatment?.name || '';
-      }
-      
-      if (formData.medicId && !formData.medicName) {
-        const selectedMedic = members.find(member => member.id === formData.medicId);
-        processedData.medicName = selectedMedic?.name || '';
-      }
-    }
 
     if (onSubmit) {
       await onSubmit(processedData, mode);

@@ -11,7 +11,6 @@ const ReceiptPanel = ({
   onValidate, 
   onCancel,
   canCreateSale = true,
-  businessType = 'dental'
 }) => {
   // Calculează TVA și total
   const subtotal = total;
@@ -22,7 +21,7 @@ const ReceiptPanel = ({
     <div className={styles.receiptPanel}>
       <div className={styles.receiptPanelContent}>
         <div className={styles.receiptHeader}>
-          <h2>Receipt ({businessType})</h2>
+          <h2>Receipt</h2>
           <span className={styles.receiptDate}>{new Date().toLocaleDateString()}</span>
         </div>
 
