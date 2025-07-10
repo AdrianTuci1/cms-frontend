@@ -126,17 +126,30 @@
 .weekView {
   flex: 1;
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0;
   padding: 16px;
-  overflow-y: scroll;
+  overflow-y: auto;
+  align-items: stretch;
 }
 
 .dayColumn {
-  min-height: 150px;
+  min-height: 200px;
   border: 1px solid #e0e0e0;
-  border-radius: 4px;
+  border-radius: 0;
   background: #fafafa;
-  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.dayColumn:first-child {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+.dayColumn:last-child {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
 }
 
 .dayHeader {
@@ -159,14 +172,23 @@
   color: #333;
 }
 
+.appointmentsList {
+  padding: 8px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+
 .appointmentCard {
   background: #fff;
   border: 1px solid #e0e0e0;
-  border-radius: 4px;
+  border-radius: 6px;
   padding: 12px;
-  margin-bottom: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .appointmentCard:hover {
@@ -328,6 +350,10 @@
   text-align: center;
   color: #999;
   font-size: 0.875rem;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .emptyState {
@@ -357,7 +383,6 @@
   color: #666;
 }
 
-/* Loading State */
 .loadingState {
   display: flex;
   align-items: center;
@@ -394,7 +419,6 @@
   margin: 0;
 }
 
-/* Error State */
 .errorState {
   display: flex;
   flex-direction: column;
@@ -434,4 +458,33 @@
 .errorState button:hover {
   background: #d32f2f;
   color: #fff;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 768px) {
+  .weekView {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    padding: 12px;
+  }
+  
+  .dayColumn {
+    min-height: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .weekView {
+    grid-template-columns: 1fr;
+    padding: 8px;
+  }
+  
+  .dayColumn {
+    min-height: 160px;
+    border-radius: 8px;
+  }
+  
+  .dayColumn:first-child,
+  .dayColumn:last-child {
+    border-radius: 8px;
+  }
 } 

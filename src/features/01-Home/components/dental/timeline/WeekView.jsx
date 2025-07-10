@@ -33,6 +33,44 @@ const WeekView = ({
 
   const hasAnyAppointments = appointments.length > 0;
 
+  // Calculate height for each row separately
+  const calculateRowHeight = (startIndex, endIndex) => {
+    const rowDates = selectedWeek.slice(startIndex, endIndex);
+    const maxAppointmentsCount = Math.max(
+      ...rowDates.map(date => getAppointmentsForDay(date).length)
+    );
+
+    // Calculate the height needed for the row
+    const appointmentCardHeight = 200; // height of each appointment card
+    const appointmentGap = 8; // gap between appointments
+    const columnPadding = 16; // padding of appointmentsList
+    const headerHeight = 60; // approximate height of dayHeader
+    
+    return maxAppointmentsCount > 0 
+      ? headerHeight + columnPadding + (maxAppointmentsCount * appointmentCardHeight) + ((maxAppointmentsCount - 1) * appointmentGap)
+      : 200; // minimum height when no appointments
+  };
+
+  // Estimate how many columns fit per row based on minmax(220px, 1fr)
+  // This is an approximation - in practice, the browser will determine this
+  const getColumnsPerRow = () => {
+    // For responsive design, we'll use a simple estimation
+    // On larger screens: 7 columns per row
+    // On medium screens: 3-4 columns per row  
+    // On small screens: 2 columns per row
+    // On very small screens: 1 column per row
+    if (typeof window !== 'undefined') {
+      const width = window.innerWidth;
+      if (width >= 1200) return 7; // Large screens
+      if (width >= 768) return 4;  // Medium screens
+      if (width >= 480) return 2;  // Small screens
+      return 1; // Very small screens
+    }
+    return 7; // Default fallback
+  };
+
+  const columnsPerRow = getColumnsPerRow();
+
   if (isLoading) {
     return (
       <div className={styles.loadingState}>
@@ -60,8 +98,20 @@ const WeekView = ({
       {selectedWeek.map((date, index) => {
         const dayAppointments = getAppointmentsForDay(date);
         
+        // Calculate which row this column belongs to
+        const rowIndex = Math.floor(index / columnsPerRow);
+        const rowStartIndex = rowIndex * columnsPerRow;
+        const rowEndIndex = Math.min(rowStartIndex + columnsPerRow, selectedWeek.length);
+        
+        // Calculate height for this specific row
+        const rowHeight = calculateRowHeight(rowStartIndex, rowEndIndex);
+        
         return (
-          <div key={index} className={styles.dayColumn}>
+          <div 
+            key={index} 
+            className={styles.dayColumn}
+            style={{ height: `${rowHeight}px` }}
+          >
             <div className={styles.dayHeader}>
               <span>{formatDay(date)}</span>
               <span>{date.getDate()}</span>
