@@ -1,7 +1,7 @@
 import styles from './DashboardNavbar.module.css';
 import { FaChartLine, FaShoppingCart, FaUsers, FaRobot, FaUser, FaCalendarAlt, FaHistory, FaCog, FaDumbbell, FaHome, FaTooth, FaBed } from 'react-icons/fa';
 import useTabsStore from '../tabsStore';
-import useDrawerStore from '../../features/00-Drawers/store/drawerStore';
+import { openDrawer, DRAWER_TYPES } from '../../features/00-Drawers';
 
 import { useEffect } from 'react';
 import { getBusinessType, BUSINESS_TYPES } from '../../config/businessTypes';
@@ -10,7 +10,6 @@ import { getBusinessType, BUSINESS_TYPES } from '../../config/businessTypes';
 
 const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
   const { activeTab, setActiveTab, getTabsBySection } = useTabsStore();
-  const { openDrawer } = useDrawerStore();
   const businessType = getBusinessType();
 
   useEffect(() => {
@@ -145,8 +144,10 @@ const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
         <button 
           className={styles.navIcon}
           onClick={() => {
-            // openDrawer(<UserDrawer />, 'User Profile')
-            console.log('User Profile not implemented yet');
+            openDrawer('edit', DRAWER_TYPES.USER, null, {
+              title: 'User Profile',
+              size: 'medium'
+            });
           }}
         >
           <FaUser className={styles.icon} />

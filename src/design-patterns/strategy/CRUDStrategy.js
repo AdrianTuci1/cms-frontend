@@ -155,10 +155,10 @@ export class DentalCRUDStrategy extends BaseCRUDStrategy {
   validateData(data, resource) {
     const errors = [];
 
-    if (resource === 'appointment') {
-      if (!data.patientName) errors.push('Patient name is required');
-      if (!data.appointmentDate) errors.push('Appointment date is required');
-      if (!data.treatmentType) errors.push('Treatment type is required');
+    if (resource === 'appointment' || resource === 'timeline') {
+      if (!data.clientName) errors.push('Client name is required');
+      if (!data.date) errors.push('Appointment date is required');
+      if (!data.displayTreatment) errors.push('Treatment is required');
     }
 
     if (resource === 'client') {
@@ -173,7 +173,7 @@ export class DentalCRUDStrategy extends BaseCRUDStrategy {
   }
 
   processData(data, resource) {
-    if (resource === 'appointment') {
+    if (resource === 'appointment' || resource === 'timeline') {
       return {
         ...data,
         businessType: this.businessType,
@@ -253,6 +253,12 @@ export class GymCRUDStrategy extends BaseCRUDStrategy {
       if (!data.duration) errors.push('Duration is required');
     }
 
+    if (resource === 'timeline') {
+      if (!data.memberName) errors.push('Member name is required');
+      if (!data.date) errors.push('Date is required');
+      if (!data.activity) errors.push('Activity is required');
+    }
+
     return {
       isValid: errors.length === 0,
       errors
@@ -273,6 +279,14 @@ export class GymCRUDStrategy extends BaseCRUDStrategy {
         ...data,
         businessType: this.businessType,
         category: 'gym_package'
+      };
+    }
+
+    if (resource === 'timeline') {
+      return {
+        ...data,
+        businessType: this.businessType,
+        category: 'gym_timeline'
       };
     }
 
@@ -340,6 +354,12 @@ export class HotelCRUDStrategy extends BaseCRUDStrategy {
       if (!data.roomId) errors.push('Room ID is required');
     }
 
+    if (resource === 'timeline') {
+      if (!data.guestName) errors.push('Guest name is required');
+      if (!data.checkInDate) errors.push('Check-in date is required');
+      if (!data.roomNumber) errors.push('Room number is required');
+    }
+
     return {
       isValid: errors.length === 0,
       errors
@@ -360,6 +380,14 @@ export class HotelCRUDStrategy extends BaseCRUDStrategy {
         ...data,
         businessType: this.businessType,
         category: 'hotel_booking'
+      };
+    }
+
+    if (resource === 'timeline') {
+      return {
+        ...data,
+        businessType: this.businessType,
+        category: 'hotel_timeline'
       };
     }
 

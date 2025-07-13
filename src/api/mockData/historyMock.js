@@ -2,6 +2,18 @@
  * History Mock Data - Date mock pentru istoric
  */
 
+/**
+ * As avea cateva modificari de adus aici. Trebuie sa:
+ * 1. afisam date despre user-ul care a facut o anumita actiune (nume, rol, avatar)
+ * 2. sa afisam un status pentru actiunea respectiva: finalizat, in curs, anulat
+ * 3. detaliile vor fi sub forma: "{type} {action} on {serviceName}"
+ * 4. filtrare dupa tip de actiune
+ * 5. vom tine doar evenimentele din ziua curenta
+ * 6. anumite actiuni sunt reversibile, deci vom avea o actiune de undo
+ */
+
+
+
 // Mock data pentru history
 export const historyMock = {
   id: 'history-001',

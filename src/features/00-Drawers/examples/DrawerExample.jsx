@@ -133,6 +133,12 @@ const DrawerExample = () => {
     });
   };
 
+  const openUserDrawer = () => {
+    openDrawer('view', 'user', null, {
+      onClose: () => console.log('User drawer closed')
+    });
+  };
+
   return (
     <div className={styles.container}>
       <h2>Drawer System Example</h2>
@@ -191,6 +197,20 @@ const DrawerExample = () => {
             Edit Service
           </button>
         </div>
+      </div>
+
+      <div className={styles.section}>
+        <h3>User Drawer (with useDataSync & Auth)</h3>
+        <div className={styles.buttonGroup}>
+          <button onClick={openUserDrawer} className={styles.button}>
+            Open User Profile
+          </button>
+        </div>
+        <p className={styles.description}>
+          This drawer uses the useDataSync hook to fetch user data from the API with fallback to userDataMock. 
+          The component shows authentication data (roles, permissions, business type) and profile information.
+          Data comes from JWT token during login and additional profile data from /api/userData endpoint.
+        </p>
       </div>
 
       <div className={styles.codeExample}>

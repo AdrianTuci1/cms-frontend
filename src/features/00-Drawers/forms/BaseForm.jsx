@@ -35,10 +35,44 @@ const BaseForm = ({
   const [searchingFields, setSearchingFields] = useState(new Set());
   const [showQueryResults, setShowQueryResults] = useState({});
   const [showSearchResults, setShowSearchResults] = useState({});
+  const [showSearchableSelects, setShowSearchableSelects] = useState({});
 
   useEffect(() => {
     setFormData(data);
   }, [data]);
+
+  // Handle click outside to close dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const searchableSelects = document.querySelectorAll('[data-searchable-select]');
+      let clickedInside = false;
+      
+      searchableSelects.forEach(select => {
+        if (select.contains(event.target)) {
+          clickedInside = true;
+        }
+      });
+      
+      if (!clickedInside) {
+        // Close all searchable selects
+        setShowSearchableSelects({});
+      }
+    };
+
+    const handleEscapeKey = (event) => {
+      if (event.key === 'Escape') {
+        setShowSearchableSelects({});
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscapeKey);
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, []);
 
   // Debounced query function
   const debouncedQuery = useCallback(
@@ -135,6 +169,7 @@ const BaseForm = ({
     
     // Clear search results when selection is made
     setShowSearchResults(prev => ({ ...prev, [field]: false }));
+    setShowSearchableSelects(prev => ({ ...prev, [field]: false }));
     clearFieldResults(field);
     
     // Clear error when user makes selection
@@ -144,6 +179,10 @@ const BaseForm = ({
         [field]: null
       }));
     }
+  };
+
+  const closeSearchableSelect = (fieldName) => {
+    setShowSearchableSelects(prev => ({ ...prev, [fieldName]: false }));
   };
 
   const handleSearchInput = (field, searchTerm) => {
@@ -296,41 +335,67 @@ const BaseForm = ({
     switch (type) {
       case 'searchable-select':
         return (
-          <div className={styles.formGroup} key={name}>
+          <div className={styles.formGroup} key={name} data-searchable-select>
             <label className={`${styles.formLabel} ${isRequired ? styles.requiredLabel : ''}`}>
               {label || name.charAt(0).toUpperCase() + name.slice(1)}
             </label>
             
-            {/* Search input */}
-            <input
-              type="text"
-              className={getInputClassName(name)}
-              placeholder={placeholder || `Search ${label || name}...`}
-              value={searchTerm || ''}
-              onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
-              disabled={mode === 'view' || isLoading}
-              style={{ marginBottom: '8px' }}
-            />
+            {/* Search input with integrated selection */}
+            <div style={{ position: 'relative' }}>
+              <input
+                type="text"
+                className={getInputClassName(name)}
+                placeholder={placeholder || `Search ${label || name}...`}
+                value={searchTerm || formData[name] || ''}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Clear the selected value when user starts typing
+                  if (value !== formData[name]) {
+                    handleSelectChange(name, '');
+                  }
+                  onSearchChange && onSearchChange(value);
+                }}
+                onFocus={() => {
+                  setShowSearchableSelects(prev => ({ ...prev, [name]: true }));
+                }}
+                onBlur={() => {
+                  // Delay closing to allow for clicks on dropdown items
+                  setTimeout(() => {
+                    setShowSearchableSelects(prev => ({ ...prev, [name]: false }));
+                  }, 150);
+                }}
+                disabled={mode === 'view' || isLoading}
+              />
+              {!searchTerm && !formData[name] && options.length > 0 && (
+                <div style={{
+                  position: 'absolute',
+                  right: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: '#9ca3af',
+                  fontSize: '0.75rem',
+                  pointerEvents: 'none'
+                }}>
+                  {options.length} available
+                </div>
+              )}
+            </div>
             
             {/* Options dropdown */}
-            {(showInitialResults || searchTerm) && options.length > 0 && (
+            {options.length > 0 && showSearchableSelects[name] && (
               <div className={styles.searchResults}>
                 {options.map((option, index) => (
                   <div
                     key={index}
                     className={styles.searchResultItem}
-                    onClick={() => handleSelectChange(name, option.value)}
+                    onClick={() => {
+                      handleSelectChange(name, option.value);
+                      onSearchChange && onSearchChange(option.label);
+                    }}
                   >
                     {option.label}
                   </div>
                 ))}
-              </div>
-            )}
-            
-            {/* Selected value display */}
-            {formData[name] && (
-              <div className={styles.selectedValue}>
-                Selected: {options.find(opt => opt.value === formData[name])?.label || formData[name]}
               </div>
             )}
             

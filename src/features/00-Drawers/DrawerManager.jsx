@@ -6,6 +6,7 @@ import ServiceForm from './forms/ServiceForm';
 import StockForm from './forms/StockForm';
 import MemberForm from './forms/MemberForm';
 import PermissionsForm from './forms/PermissionsForm';
+import UserDrawer from './forms/UserDrawer';
 
 const DrawerManager = () => {
   const {
@@ -78,6 +79,9 @@ const DrawerManager = () => {
         
       case DRAWER_TYPES.PERMISSIONS:
         return <PermissionsForm {...formProps} />;
+        
+      case DRAWER_TYPES.USER:
+        return <UserDrawer onClose={() => closeDrawer(activeDrawer.id)} />;
         
       case DRAWER_TYPES.AI_ASSISTANT:
         // AI Assistant drawer - don't touch as requested

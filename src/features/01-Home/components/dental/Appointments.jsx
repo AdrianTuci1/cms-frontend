@@ -2,7 +2,7 @@ import { useEffect, lazy, Suspense, useState, useMemo } from 'react';
 import AppointmentHeader from './timeline/AppointmentHeader';
 import WeekNavigator from './timeline/WeekNavigator';
 import styles from './timeline/Appointments.module.css';
-import { openDrawer, useDrawer, useDrawerStore, DRAWER_TYPES } from '../../../00-Drawers';
+import { openDrawer, useDrawer, DRAWER_TYPES } from '../../../00-Drawers';
 import { useDentalTimelineWithAPI } from '../../store/dentalTimeline';
 import { useDataSync } from '../../../../design-patterns/hooks';
 

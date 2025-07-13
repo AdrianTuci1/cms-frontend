@@ -8,6 +8,7 @@ export { default as TimelineForm } from './forms/TimelineForm';
 export { default as ServiceForm } from './forms/ServiceForm';
 export { default as StockForm } from './forms/StockForm';
 export { default as MemberForm } from './forms/MemberForm';
+export { default as UserDrawer } from './forms/UserDrawer';
 
 // Store and hooks
 export { default as useDrawerStore } from './store/drawerStore';

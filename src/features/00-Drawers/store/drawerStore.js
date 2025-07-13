@@ -10,7 +10,8 @@ export const DRAWER_TYPES = {
   MEMBER: 'member',
   SERVICE: 'service',
   AI_ASSISTANT: 'ai-assistant',
-  PERMISSIONS: 'permissions'
+  PERMISSIONS: 'permissions',
+  USER: 'user'
 };
 
 // Drawer modes - only edit and create

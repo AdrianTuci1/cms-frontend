@@ -272,7 +272,7 @@ export const useDataSync = (resource, options = {}) => {
 
       // Validate data if validation is enabled
       if (enableValidation) {
-        const validation = validateData(operationData, operation);
+        const validation = validateData(operationData, resourceRef.current);
         if (!validation.isValid) {
           throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
         }
