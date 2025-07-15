@@ -1,12 +1,13 @@
 /**
- * API Sync Manager - Handles API synchronization using the new simplified structure
+ * API Sync Manager - Handles API synchronization using single endpoint pattern
+ * Updated to work with ConnectivityManager and new endpoint structure
  */
 
 import { createApiManager } from '../../api/index.js';
 import eventBus from '../observer/base/EventBus';
 
 class ApiSyncManager {
-  constructor() {
+  constructor(connectivityManager = null) {
     // Check if we're in test mode
     this.testMode = import.meta.env.VITE_TEST_MODE === 'true';
     
@@ -14,22 +15,26 @@ class ApiSyncManager {
       console.log('API Sync Manager: Running in TEST MODE - API calls disabled');
     }
     
+    // Store connectivity manager reference
+    this.connectivityManager = connectivityManager;
+    
     // Initialize API Manager with simplified structure
     this.apiManager = createApiManager({
-      baseURL: 'http://localhost:3001/api',
+      baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3001',
+      businessInfoURL: import.meta.env.VITE_BUSINESS_INFO_URL || import.meta.env.VITE_API_URL || 'http://localhost:3001',
       debug: false,
       timeout: 30000
     });
   }
 
   /**
-   * Sync data via API using the new API structure from requests.md
+   * Sync data via API using the new single endpoint pattern
    * @param {string} resource - Resource name
    * @param {Object} data - Data to sync
    * @param {Object} config - Resource configuration
-   * @param {string} businessType - Business type for dynamic endpoints
+   * @param {Object} resourceRegistry - Resource registry for endpoint generation
    */
-  async syncViaAPI(resource, data, config, businessType = null) {
+  async syncViaAPI(resource, data, config, resourceRegistry) {
     // In test mode, simulate successful sync without making API calls
     if (this.testMode) {
       console.log(`TEST MODE: Simulating API sync for ${resource}`, data);
@@ -37,35 +42,74 @@ class ApiSyncManager {
       return { success: true, message: 'Test mode - sync simulated' };
     }
 
+    // Check connectivity first
+    if (this.connectivityManager && this.connectivityManager.isOffline()) {
+      throw new Error('Backend indisponibil - folosind datele din IndexedDB');
+    }
+
     try {
       const operation = data._operation || 'update';
-      const endpoint = config.apiEndpoints[operation.toLowerCase()];
-      
-      if (!endpoint) {
-        throw new Error(`No API endpoint configured for ${operation} on ${resource}`);
+      let url;
+      let requestData = { ...data };
+
+      if (config.useSingleEndpoint) {
+        // Use single endpoint pattern
+        if (!resourceRegistry.isSingleEndpointReady()) {
+          throw new Error('Business ID and Location ID must be set before using single endpoint');
+        }
+        
+        url = resourceRegistry.getSingleEndpointUrl();
+        
+        // Add resource type to request data
+        requestData.resourceType = config.resourceType;
+        requestData.operation = operation;
+        
+        // Add ID to URL for update/delete operations
+        if ((operation === 'update' || operation === 'delete') && data.id) {
+          url += `/${data.id}`;
+        }
+      } else {
+        // Use traditional endpoint (for auth and businessInfo)
+        const endpoint = config.apiEndpoints[operation.toLowerCase()];
+        
+        if (!endpoint) {
+          throw new Error(`No API endpoint configured for ${operation} on ${resource}`);
+        }
+        
+        url = endpoint;
+        
+        // Replace ID placeholder
+        if (data.id && url.includes(':id')) {
+          url = url.replace(':id', data.id);
+        }
+        
+        // Replace business ID placeholder for businessInfo
+        if (resource === 'businessInfo' && url.includes(':businessId') && data.businessId) {
+          url = url.replace(':businessId', data.businessId);
+        }
       }
 
-      let url = endpoint;
-      
-      // Handle business-specific endpoints
-      if (businessType && url.includes('{businessType}')) {
-        url = url.replace('{businessType}', businessType);
-      }
-
-      // Replace ID placeholder
-      if (data.id && url.includes(':id')) {
-        url = url.replace(':id', data.id);
-      }
-
-      // Determine which API service to use
+      // Determine which API service to use based on server connectivity
       let response;
       
       if (config.requiresAuth === false) {
-        // Resources that don't require JWT
-        response = await this.apiManager.generalRequest(operation.toUpperCase(), url, data, { noRetry: true });
+        // Resources that don't require JWT (auth, businessInfo)
+        const serverOnline = resource === 'businessInfo' 
+          ? this.connectivityManager?.isBusinessInfoServerOnline() ?? true
+          : this.connectivityManager?.isAuthResourcesServerOnline() ?? true;
+          
+        if (!serverOnline) {
+          throw new Error('Backend indisponibil - folosind datele din IndexedDB');
+        }
+        
+        response = await this.apiManager.generalRequest(operation.toUpperCase(), url, requestData, { noRetry: true });
       } else {
         // Resources that require JWT
-        response = await this.apiManager.secureRequest(operation.toUpperCase(), url, data, { noRetry: true });
+        if (!this.connectivityManager?.isAuthResourcesServerOnline()) {
+          throw new Error('Backend indisponibil - folosind datele din IndexedDB');
+        }
+        
+        response = await this.apiManager.secureRequest(operation.toUpperCase(), url, requestData, { noRetry: true });
       }
 
       eventBus.emit('datasync:api-synced', { resource, operation, data: response });
@@ -88,13 +132,13 @@ class ApiSyncManager {
   }
 
   /**
-   * Fetch data from API using the new API structure from requests.md
+   * Fetch data from API using the new single endpoint pattern
    * @param {string} resource - Resource name
    * @param {Object} options - Query options
    * @param {Object} config - Resource configuration
-   * @param {string} businessType - Business type for dynamic endpoints
+   * @param {Object} resourceRegistry - Resource registry for endpoint generation
    */
-  async fetchFromAPI(resource, options = {}, config, businessType = null) {
+  async fetchFromAPI(resource, options = {}, config, resourceRegistry) {
     // In test mode, throw a connectivity error to force fallback to IndexedDB/mock data
     if (this.testMode) {
       console.log(`TEST MODE: Simulating API fetch for ${resource} - forcing fallback to local data`);
@@ -103,18 +147,41 @@ class ApiSyncManager {
       throw testError;
     }
 
+    // Check connectivity first
+    if (this.connectivityManager && this.connectivityManager.isOffline()) {
+      throw new Error('Backend indisponibil - folosind datele din IndexedDB');
+    }
+
     try {
-      if (!config || !config.apiEndpoints.get) {
-        throw new Error(`No API endpoint configured for ${resource}`);
+      let endpoint;
+      let params = { ...options.params };
+
+      if (config.useSingleEndpoint) {
+        // Use single endpoint pattern
+        if (!resourceRegistry.isSingleEndpointReady()) {
+          throw new Error('Business ID and Location ID must be set before using single endpoint');
+        }
+        
+        endpoint = resourceRegistry.getSingleEndpointUrl();
+        
+        // Add resource type as parameter
+        params.resourceType = config.resourceType;
+      } else {
+        // Use traditional endpoint (for auth and businessInfo)
+        if (!config || !config.apiEndpoints.get) {
+          throw new Error(`No API endpoint configured for ${resource}`);
+        }
+        
+        endpoint = config.apiEndpoints.get;
+        
+        // Replace business ID placeholder for businessInfo
+        if (resource === 'businessInfo' && endpoint.includes(':businessId') && resourceRegistry.getBusinessId()) {
+          endpoint = endpoint.replace(':businessId', resourceRegistry.getBusinessId());
+        }
       }
 
-      let endpoint = config.apiEndpoints.get;
-      const params = { ...options.params };
-
-      // Handle business-specific endpoints
-      if (businessType && endpoint.includes('{businessType}')) {
-        endpoint = endpoint.replace('{businessType}', businessType);
-      }
+      // Validate and filter query parameters using ResourceRegistry
+      params = resourceRegistry.validateQueryParams(resource, params);
 
       // Add date range parameters for timeline
       if (config.requiresDateRange) {
@@ -130,25 +197,40 @@ class ApiSyncManager {
       }
 
       // Add current day filter for resources that need it
-      if (config.currentDayOnly) {
+      if (config.currentDayOnly && !params.date && !params.startDate) {
         const today = new Date().toISOString().split('T')[0];
-        params.date = params.date || today;
+        params.date = today;
       }
 
+      // Final validation of parameters
+      const validatedParams = resourceRegistry.validateQueryParams(resource, params);
+
       // Add query parameters
-      if (Object.keys(params).length > 0) {
-        const queryString = new URLSearchParams(params).toString();
+      if (Object.keys(validatedParams).length > 0) {
+        const queryString = new URLSearchParams(validatedParams).toString();
         endpoint += `?${queryString}`;
       }
 
-      // Determine which API service to use based on resource
+      // Determine which API service to use based on server connectivity
       let response;
       
       if (config.requiresAuth === false) {
-        // Resources that don't require JWT
+        // Resources that don't require JWT (auth, businessInfo)
+        const serverOnline = resource === 'businessInfo' 
+          ? this.connectivityManager?.isBusinessInfoServerOnline() ?? true
+          : this.connectivityManager?.isAuthResourcesServerOnline() ?? true;
+          
+        if (!serverOnline) {
+          throw new Error('Backend indisponibil - folosind datele din IndexedDB');
+        }
+        
         response = await this.apiManager.generalRequest('GET', endpoint, null, { noRetry: true });
       } else {
         // Resources that require JWT
+        if (!this.connectivityManager?.isAuthResourcesServerOnline()) {
+          throw new Error('Backend indisponibil - folosind datele din IndexedDB');
+        }
+        
         response = await this.apiManager.secureRequest('GET', endpoint, null, { noRetry: true });
       }
 
@@ -172,20 +254,20 @@ class ApiSyncManager {
   }
 
   /**
-   * Get default date range for timeline (current week)
+   * Get default date range for timeline resources
    * @returns {Object} Object with startDate and endDate
    */
   getDefaultDateRange() {
-    const now = new Date();
-    const startOfWeek = new Date(now);
-    startOfWeek.setDate(now.getDate() - now.getDay()); // Start of current week (Sunday)
+    const today = new Date();
+    const startDate = new Date(today);
+    startDate.setDate(today.getDate() - 7); // 7 days ago
     
-    const endOfWeek = new Date(now);
-    endOfWeek.setDate(now.getDate() + (6 - now.getDay())); // End of current week (Saturday)
-
+    const endDate = new Date(today);
+    endDate.setDate(today.getDate() + 7); // 7 days from now
+    
     return {
-      startDate: startOfWeek.toISOString().split('T')[0],
-      endDate: endOfWeek.toISOString().split('T')[0]
+      startDate: startDate.toISOString().split('T')[0],
+      endDate: endDate.toISOString().split('T')[0]
     };
   }
 
@@ -211,6 +293,6 @@ class ApiSyncManager {
   }
 }
 
-export function createApiSyncManager() {
-  return new ApiSyncManager();
+export function createApiSyncManager(connectivityManager = null) {
+  return new ApiSyncManager(connectivityManager);
 } 

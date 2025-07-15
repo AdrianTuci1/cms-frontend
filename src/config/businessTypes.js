@@ -1,37 +1,22 @@
 export const BUSINESS_TYPES = {
   DENTAL: {
     name: 'Dental Clinic',
-    homeComponents: ['Medics', 'Treatments'],
-    dashboardComponents: ['Timeline', 'Sales', 'Clients', 'Stocks'],
-    customRoutes: [
-      { path: '/medics', component: 'Medics' },
-      { path: '/treatments', component: 'Treatments' }
-    ]
   },
   GYM: {
     name: 'Gym',
-    homeComponents: ['Packages', 'Classes'],
-    dashboardComponents: ['Timeline', 'Sales', 'Clients', 'Stocks'],
-    customRoutes: [
-      { path: '/packages', component: 'Packages' },
-      { path: '/classes', component: 'Classes' },
-      { path: '/gym-demo', component: 'GymDemo' }
-    ]
   },
   HOTEL: {
     name: 'Hotel',
-    homeComponents: ['Rooms'],
-    dashboardComponents: ['Timeline', 'Sales', 'Clients', 'Stocks'],
-    customRoutes: [
-      { path: '/rooms', component: 'Rooms' },
-      { path: '/hotel-demo', component: 'HotelDemo' }
-    ]
   }
 };
 
 // Default business type - can be changed here or via environment variable
 const DEFAULT_BUSINESS_TYPE = 'DENTAL';
 
+/**
+ * Get current business type configuration
+ * @returns {Object} Business type configuration
+ */
 export const getBusinessType = () => {
   // Get from environment variable
   const envBusinessType = import.meta.env.VITE_BUSINESS_TYPE;
@@ -65,4 +50,30 @@ export const getBusinessTypeKey = () => {
  */
 export const getBusinessTypeKeyForSync = (businessTypeKey) => {
   return businessTypeKey.toLowerCase();
+};
+
+/**
+ * Get current business type for data sync (lowercase)
+ * @returns {string} Current business type for sync
+ */
+export const getCurrentBusinessTypeForSync = () => {
+  const businessTypeKey = getBusinessTypeKey();
+  return getBusinessTypeKeyForSync(businessTypeKey);
+};
+
+/**
+ * Get all available business types
+ * @returns {Array} Array of business type keys
+ */
+export const getAvailableBusinessTypes = () => {
+  return Object.keys(BUSINESS_TYPES);
+};
+
+/**
+ * Check if business type is valid
+ * @param {string} businessTypeKey - Business type key to validate
+ * @returns {boolean} True if valid
+ */
+export const isValidBusinessType = (businessTypeKey) => {
+  return Object.keys(BUSINESS_TYPES).includes(businessTypeKey);
 }; 

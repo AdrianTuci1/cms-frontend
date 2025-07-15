@@ -126,7 +126,9 @@ export default class RequestManager {
       requestConfig.signal = AbortSignal.timeout(timeout || this.client.timeout);
     }
     
-    const fullUrl = url.startsWith('http') ? url : `${this.client.baseURL}${url}`;
+    // Use the appropriate base URL based on the request URL
+    const baseURL = this.client.getBaseURLForRequest ? this.client.getBaseURLForRequest(url) : this.client.baseURL;
+    const fullUrl = url.startsWith('http') ? url : `${baseURL}${url}`;
     
     try {
       const response = await fetch(fullUrl, requestConfig);

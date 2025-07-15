@@ -3,7 +3,8 @@ import { FaHome, FaRobot, FaHistory, FaUsers, FaArrowLeft, FaArrowRight, FaMapMa
 import useTabsStore from '../tabsStore';
 import { useState, useEffect } from 'react';
 import React from 'react';
-import { getMockData } from '../../api/mockData';
+import { tenantUtils } from '../../config/tenant.js';
+import GeneralService from '../../api/services/GeneralService.js';
 
 const DashboardSidebar = ({ currentSection, setCurrentSection, isExpanded, setIsExpanded, selectedLocation }) => {
   const { setActiveSection } = useTabsStore();
@@ -14,9 +15,35 @@ const DashboardSidebar = ({ currentSection, setCurrentSection, isExpanded, setIs
     // Fetch business info to get locations
     const fetchLocations = async () => {
       try {
-        const businessInfo = getMockData('business-info');
-        if (businessInfo?.locations) {
-          setLocations(businessInfo.locations);
+        // În test mode, folosește datele de demo direct
+        if (tenantUtils.isTestMode()) {
+          console.log('TEST MODE: Using demo business locations data');
+          const demoInfo = tenantUtils.getDemoBusinessInfo();
+          if (demoInfo?.locations) {
+            setLocations(demoInfo.locations);
+          }
+          return;
+        }
+        
+        // Try to get business info from API first
+        const generalService = new GeneralService();
+        try {
+          const businessInfo = await generalService.getBusinessInfo();
+          if (businessInfo?.locations) {
+            setLocations(businessInfo.locations);
+          }
+        } catch (apiError) {
+          console.warn('Failed to get business info from API, using tenant config:', apiError);
+          
+          // Fallback to tenant configuration
+          const tenantConfig = tenantUtils.getTenantConfig();
+          const fallbackLocations = [{
+            id: tenantConfig.defaultLocation,
+            name: `${tenantConfig.name} - Main Location`,
+            address: 'Main Office',
+            isActive: true
+          }];
+          setLocations(fallbackLocations);
         }
       } catch (error) {
         console.error('Error fetching locations:', error);

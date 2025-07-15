@@ -18,6 +18,7 @@ import { crudStrategyFactory } from '../strategy/CRUDStrategy.js';
  */
 export const useDataSync = (resource, options = {}) => {
   const {
+    // businessType is deprecated - now gets from business info
     businessType = null,
     onDataUpdate = null,
     onError = null,
@@ -28,6 +29,11 @@ export const useDataSync = (resource, options = {}) => {
     // Pagination parameters for clients/members
     page = 1,
     limit = 20,
+    // Search and filter parameters
+    search = null,
+    filters = {},
+    sortBy = null,
+    sortOrder = 'asc',
     // Strategy options
     enableValidation = true,
     enableBusinessLogic = true
@@ -58,21 +64,32 @@ export const useDataSync = (resource, options = {}) => {
    * Initialize strategy based on business type
    */
   useEffect(() => {
-    if (enableBusinessLogic && businessType) {
-      try {
-        strategy.current = crudStrategyFactory.create(businessType);
-      } catch (err) {
-        console.warn(`No strategy found for business type: ${businessType}`);
-        strategy.current = null;
+    if (enableBusinessLogic) {
+      const currentBusinessType = getBusinessType();
+      if (currentBusinessType) {
+        try {
+          strategy.current = crudStrategyFactory.create(currentBusinessType);
+        } catch (err) {
+          console.warn(`No strategy found for business type: ${currentBusinessType}`);
+          strategy.current = null;
+        }
       }
     }
-  }, [businessType, enableBusinessLogic]);
+  }, [enableBusinessLogic, getBusinessType]);
 
   /**
-   * Set business type if provided
+   * Get business type from data sync manager (no longer hardcoded)
+   */
+  const getBusinessType = useCallback(() => {
+    return dataSyncManager.resourceRegistry?.getBusinessType() || null;
+  }, []);
+
+  /**
+   * Set business type if provided (for backward compatibility)
    */
   useEffect(() => {
-    if (businessType && dataSyncManager.businessType !== businessType) {
+    if (businessType) {
+      console.warn('Passing businessType to useDataSync is deprecated. Business type should come from business info.');
       dataSyncManager.setBusinessType(businessType);
     }
   }, [businessType]);
@@ -111,11 +128,31 @@ export const useDataSync = (resource, options = {}) => {
   }, [enableBusinessLogic]);
 
   /**
-   * Build request parameters based on resource configuration
+   * Build request parameters based on resource configuration and query options
    */
   const buildRequestParams = useCallback(() => {
     const config = dataSyncManager.getResourceConfig(resourceRef.current);
     const requestParams = { ...params };
+
+    // Add search parameters
+    if (search) {
+      requestParams.search = search;
+    }
+
+    // Add filter parameters
+    if (filters && Object.keys(filters).length > 0) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== null && value !== undefined && value !== '') {
+          requestParams[key] = value;
+        }
+      });
+    }
+
+    // Add sorting parameters
+    if (sortBy) {
+      requestParams.sortBy = sortBy;
+      requestParams.sortOrder = sortOrder;
+    }
 
     // Add date range parameters for timeline
     if (config && config.requiresDateRange) {
@@ -130,7 +167,7 @@ export const useDataSync = (resource, options = {}) => {
     }
 
     return requestParams;
-  }, [params, startDate, endDate, page, limit]);
+  }, [params, search, filters, sortBy, sortOrder, startDate, endDate, page, limit]);
 
   /**
    * Funcția principală de preluare date
@@ -191,53 +228,40 @@ export const useDataSync = (resource, options = {}) => {
     } catch (err) {
       console.error(`Error fetching ${resourceRef.current}:`, err);
       
-      // Verifică dacă eroarea este de conectivitate
-      const isConnectivityError = err.message.includes('Backend indisponibil') || 
-                                 err.message.includes('fetch') ||
-                                 err.code === 'NETWORK_ERROR';
-      
-      if (isConnectivityError) {
-        // Pentru erori de conectivitate, nu setează eroarea în state
-        // Datele vor fi preluate din IndexedDB sau mock data
-        console.warn(`Connectivity error for ${resourceRef.current}, using fallback data`);
+      // Încearcă să obțină date din cache ca fallback
+      try {
+        const fallbackData = await dataSyncManager.getDataWithFallback(resourceRef.current, {
+          forceRefresh: false,
+          useCache: true,
+          params: requestParams
+        });
         
-        // Încearcă să obțină date din cache sau mock
-        try {
-          const fallbackData = await dataSyncManager.getDataWithFallback(resourceRef.current, {
-            forceRefresh: false,
-            useCache: true,
-            params: requestParams
-          });
-          
-          // For timeline, preserve the structure (reservations array) for dental timeline hook
-          let processedFallbackData = fallbackData;
-          if (resourceRef.current === 'timeline') {
-            // If fallbackData is already an array (from standardizeTimelineData), wrap it in reservations
-            if (Array.isArray(fallbackData)) {
-              processedFallbackData = { reservations: fallbackData };
-            } else if (fallbackData && fallbackData.reservations) {
-              // If fallbackData already has reservations, keep it as is
-              processedFallbackData = fallbackData;
-            } else {
-              // Fallback: wrap single item in reservations array
-              processedFallbackData = { reservations: [fallbackData] };
-            }
+        // For timeline, preserve the structure (reservations array) for dental timeline hook
+        let processedFallbackData = fallbackData;
+        if (resourceRef.current === 'timeline') {
+          // If fallbackData is already an array, wrap it in reservations
+          if (Array.isArray(fallbackData)) {
+            processedFallbackData = { reservations: fallbackData };
+          } else if (fallbackData && fallbackData.reservations) {
+            // If fallbackData already has reservations, keep it as is
+            processedFallbackData = fallbackData;
+          } else {
+            // Fallback: wrap single item in reservations array
+            processedFallbackData = { reservations: [fallbackData || []] };
           }
-          
-          processedFallbackData = processData(processedFallbackData, 'read');
-          
-          setData(processedFallbackData);
-          setLastUpdated(new Date().toISOString());
-          
-          if (onDataUpdateRef.current) {
-            onDataUpdateRef.current(processedFallbackData);
-          }
-        } catch (fallbackError) {
-          console.error(`Fallback data also failed for ${resourceRef.current}:`, fallbackError);
-          setError(fallbackError);
         }
-      } else {
-        setError(err);
+        
+        processedFallbackData = processData(processedFallbackData, 'read');
+        
+        setData(processedFallbackData);
+        setLastUpdated(new Date().toISOString());
+        
+        if (onDataUpdateRef.current) {
+          onDataUpdateRef.current(processedFallbackData);
+        }
+      } catch (fallbackError) {
+        console.error(`No data available for ${resourceRef.current}:`, fallbackError);
+        setError(new Error(`No data available for resource '${resourceRef.current}'. API is unavailable and no cached data found.`));
       }
     } finally {
       setLoading(false);
@@ -290,7 +314,7 @@ export const useDataSync = (resource, options = {}) => {
       const dataWithOperation = {
         ...processedData,
         _operation: operation,
-        businessType: businessTypeRef.current || dataSyncManager.businessType
+        businessType: getBusinessType()
       };
 
       // Actualizare optimistă
@@ -462,6 +486,25 @@ export const useDataSync = (resource, options = {}) => {
     }
   }, [fetchData]);
 
+  /**
+   * Get supported query parameters for the current resource
+   */
+  const getSupportedQueryParams = useCallback(() => {
+    return dataSyncManager.resourceRegistry?.getSupportedQueryParams(resourceRef.current) || {
+      supported: [],
+      searchable: [],
+      filterable: [],
+      sortable: []
+    };
+  }, []);
+
+  /**
+   * Build search query for the current resource
+   */
+  const buildSearchQuery = useCallback((searchTerm) => {
+    return dataSyncManager.resourceRegistry?.buildSearchQuery(resourceRef.current, searchTerm) || {};
+  }, []);
+
   return {
     // Data state
     data,
@@ -484,11 +527,15 @@ export const useDataSync = (resource, options = {}) => {
     
     // Strategy info
     strategy: strategy.current?.getName() || 'No Strategy',
-    businessType: businessType || dataSyncManager.businessType,
+    businessType: getBusinessType(),
     
     // Utility operations
     clearDuplicates,
-    clearResourceData
+    clearResourceData,
+    
+    // Query parameter utilities
+    getSupportedQueryParams,
+    buildSearchQuery
   };
 };
 

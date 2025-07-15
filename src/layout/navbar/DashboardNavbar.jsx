@@ -2,6 +2,7 @@ import styles from './DashboardNavbar.module.css';
 import { FaChartLine, FaShoppingCart, FaUsers, FaRobot, FaUser, FaCalendarAlt, FaHistory, FaCog, FaDumbbell, FaHome, FaTooth, FaBed } from 'react-icons/fa';
 import useTabsStore from '../tabsStore';
 import useDrawerStore, { DRAWER_TYPES } from '../../features/00-Drawers/store/drawerStore';
+import { useOfflineStatus } from '../../design-patterns/hooks/useOfflineData';
 
 import { useEffect } from 'react';
 import { getBusinessTypeKey, BUSINESS_TYPES } from '../../config/businessTypes';
@@ -12,6 +13,13 @@ const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
   const { activeTab, setActiveTab, getTabsBySection } = useTabsStore();
   const businessTypeKey = getBusinessTypeKey();
   const { openDrawer } = useDrawerStore();
+  const { isOnline } = useOfflineStatus();
+
+  // Check if we're in test/demo mode
+  const isTestMode = import.meta.env.VITE_TEST_MODE === 'true';
+  
+  // In test mode, show offline status since there's no real backend
+  const connectionStatus = isTestMode ? false : isOnline;
 
   useEffect(() => {
     const views = getNavbarViews();
@@ -114,6 +122,10 @@ const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
         <div className={styles.logo}>
           <div className={styles.logoContainer}>
             {getBusinessLogo()}
+            {/* Connection Status Indicator */}
+            <div className={`${styles.connectionStatus} ${connectionStatus ? styles.online : styles.offline}`} 
+                 title={connectionStatus ? 'Online' : (isTestMode ? 'Demo Mode - Offline' : 'Offline')}>
+            </div>
           </div>
         </div>
       </div>

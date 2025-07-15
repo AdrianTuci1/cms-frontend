@@ -7,7 +7,8 @@
 // Environment variables
 export const ENV_CONFIG = {
   VITE_TENANT_ID: import.meta.env.VITE_TENANT_ID || 'T0001',
-  VITE_BUSINESS_TYPE: import.meta.env.VITE_BUSINESS_TYPE || 'dental'
+  VITE_BUSINESS_TYPE: import.meta.env.VITE_BUSINESS_TYPE || 'dental',
+  VITE_TEST_MODE: import.meta.env.VITE_TEST_MODE === 'true'
 };
 
 // Tenant configuration mapping
@@ -42,6 +43,135 @@ export const TENANT_CONFIG = {
 };
 
 /**
+ * Demo business info data for TEST_MODE
+ */
+export const DEMO_BUSINESS_INFO = {
+  dental: {
+    business: {
+      id: 'T0001',
+      name: 'Demo Dental Clinic',
+      businessType: 'dental',
+      tenantId: 'T0001',
+      email: 'contact@demodental.ro',
+      phone: '+40 123 456 789',
+      website: 'https://demodental.ro',
+      description: 'Demo dental clinic for presentations and testing'
+    },
+    location: {
+      id: 'T0001-01',
+      name: 'Demo Dental Clinic - Main Office',
+      address: 'Strada Demo 123, București',
+      phone: '+40 123 456 789',
+      email: 'contact@demodental.ro',
+      isActive: true
+    },
+    locations: [
+      {
+        id: 'T0001-01',
+        name: 'Demo Dental Clinic - Main Office',
+        address: 'Strada Demo 123, București',
+        phone: '+40 123 456 789',
+        email: 'contact@demodental.ro',
+        isActive: true
+      },
+      {
+        id: 'T0001-02',
+        name: 'Demo Dental Clinic - Sector 2',
+        address: 'Bulevardul Demo 456, București',
+        phone: '+40 123 456 790',
+        email: 'sector2@demodental.ro',
+        isActive: true
+      }
+    ],
+    features: {
+      appointments: true,
+      treatments: true,
+      consultations: true,
+      invoices: true,
+      aiAssistant: true,
+      timeline: true,
+      reports: true
+    }
+  },
+  gym: {
+    business: {
+      id: 'T0002',
+      name: 'Demo Fitness Center',
+      businessType: 'gym',
+      tenantId: 'T0002',
+      email: 'contact@demofitness.ro',
+      phone: '+40 123 456 788',
+      website: 'https://demofitness.ro',
+      description: 'Demo fitness center for presentations and testing'
+    },
+    location: {
+      id: 'T0002-01',
+      name: 'Demo Fitness Center - Main Gym',
+      address: 'Strada Fitness 123, București',
+      phone: '+40 123 456 788',
+      email: 'contact@demofitness.ro',
+      isActive: true
+    },
+    locations: [
+      {
+        id: 'T0002-01',
+        name: 'Demo Fitness Center - Main Gym',
+        address: 'Strada Fitness 123, București',
+        phone: '+40 123 456 788',
+        email: 'contact@demofitness.ro',
+        isActive: true
+      }
+    ],
+    features: {
+      memberships: true,
+      classes: true,
+      personal_training: true,
+      invoices: true,
+      timeline: true,
+      reports: true
+    }
+  },
+  hotel: {
+    business: {
+      id: 'T0003',
+      name: 'Demo Hotel',
+      businessType: 'hotel',
+      tenantId: 'T0003',
+      email: 'contact@demohotel.ro',
+      phone: '+40 123 456 787',
+      website: 'https://demohotel.ro',
+      description: 'Demo hotel for presentations and testing'
+    },
+    location: {
+      id: 'T0003-01',
+      name: 'Demo Hotel - Main Building',
+      address: 'Bulevardul Hotelului 123, București',
+      phone: '+40 123 456 787',
+      email: 'contact@demohotel.ro',
+      isActive: true
+    },
+    locations: [
+      {
+        id: 'T0003-01',
+        name: 'Demo Hotel - Main Building',
+        address: 'Bulevardul Hotelului 123, București',
+        phone: '+40 123 456 787',
+        email: 'contact@demohotel.ro',
+        isActive: true
+      }
+    ],
+    features: {
+      reservations: true,
+      rooms: true,
+      conference: true,
+      spa: true,
+      timeline: true,
+      reports: true
+    }
+  }
+};
+
+/**
  * Tenant utilities
  */
 export const tenantUtils = {
@@ -57,6 +187,21 @@ export const tenantUtils = {
    */
   getCurrentBusinessType() {
     return ENV_CONFIG.VITE_BUSINESS_TYPE;
+  },
+
+  /**
+   * Check if we're in test mode
+   */
+  isTestMode() {
+    return ENV_CONFIG.VITE_TEST_MODE;
+  },
+
+  /**
+   * Get demo business info for test mode
+   */
+  getDemoBusinessInfo(businessType = null) {
+    const currentBusinessType = businessType || this.getCurrentBusinessType();
+    return DEMO_BUSINESS_INFO[currentBusinessType] || DEMO_BUSINESS_INFO.dental;
   },
 
   /**
@@ -295,6 +440,7 @@ export const resourceUtils = {
 export default {
   ENV_CONFIG,
   TENANT_CONFIG,
+  DEMO_BUSINESS_INFO,
   tenantUtils,
   locationUtils,
   resourceUtils

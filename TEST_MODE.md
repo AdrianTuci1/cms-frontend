@@ -49,8 +49,38 @@ VITE_TEST_MODE=true
 
 ### Data Sources
 1. **IndexedDB** - Datele salvate local
-2. **Mock Data** - Date de test predefinite
-3. **Fallback** - Date mock ca ultimă soluție
+2. **Demo Data** - Date de demo predefinite pentru business info (în test mode)
+3. **Fallback** - Configuratie tenant ca ultimă soluție
+
+### Demo Business Info
+
+În test mode (`VITE_TEST_MODE=true`), aplicația va folosi date de demo pentru business info în loc să facă apeluri API:
+
+```javascript
+// Date de demo pentru clinică dentară
+{
+  business: {
+    name: 'Demo Dental Clinic',
+    businessType: 'dental',
+    email: 'contact@demodental.ro'
+  },
+  locations: [
+    {
+      name: 'Demo Dental Clinic - Main Office',
+      address: 'Strada Demo 123, București'
+    },
+    {
+      name: 'Demo Dental Clinic - Sector 2', 
+      address: 'Bulevardul Demo 456, București'
+    }
+  ]
+}
+```
+
+Sunt disponibile date de demo pentru toate tipurile de business:
+- **dental** - Demo Dental Clinic
+- **gym** - Demo Fitness Center  
+- **hotel** - Demo Hotel
 
 ## Verificare Test Mode
 

@@ -15,6 +15,9 @@ export class ApiClient extends BaseClient {
     this.tenantId = config.tenantId || import.meta.env.VITE_TENANT_ID;
     this.locationId = config.locationId;
     
+    // Two-server architecture support
+    this.businessInfoBaseURL = config.businessInfoURL || import.meta.env.VITE_BUSINESS_INFO_URL || this.baseURL;
+    
     // Inițializează manager-ele
     this.authManager = new AuthManager({
       baseURL: this.baseURL,
@@ -28,6 +31,26 @@ export class ApiClient extends BaseClient {
     
     // Inițializează client-ul
     this.initialize();
+  }
+
+  /**
+   * Determine which base URL to use based on the request URL
+   * @param {string} url - Request URL
+   * @returns {string} Base URL to use
+   */
+  getBaseURLForRequest(url) {
+    // If URL starts with /api/businessInfo, use business info server
+    if (url.startsWith('/api/businessInfo')) {
+      return this.businessInfoBaseURL;
+    }
+    
+    // For absolute URLs, return as is (they already contain the base URL)
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return '';
+    }
+    
+    // Default to main API server
+    return this.baseURL;
   }
 
   /**

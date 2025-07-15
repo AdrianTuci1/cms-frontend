@@ -10,7 +10,7 @@
 
 import { ApiClient } from '../core/client/ApiClient.js';
 import requestBuilder from '../utils/requestBuilder.js';
-import { getMockData, tenantUtils } from '../mockData/index.js';
+import { tenantUtils } from '../../config/tenant.js';
 
 class GeneralService {
   constructor(apiClient = null) {
@@ -53,47 +53,38 @@ class GeneralService {
 
   /**
    * Obține informațiile despre business și locații
-   * Endpoint: /api/business-info
+   * Endpoint: /api/businessInfo/{businessId}
+   * @param {string} businessId - Business ID
    * @returns {Promise<Object>} Informațiile despre business
    */
-  async getBusinessInfo() {
+  async getBusinessInfo(businessId) {
     try {
-      // Verifică dacă suntem offline sau în development
-      if (!navigator.onLine || import.meta.env.DEV) {
-        console.log('Using mock business info data');
-        const mockData = getMockData('business-info');
-        
-        // Salvează tenant ID-ul în cookie
-        if (mockData.business && mockData.business.tenantId) {
-          tenantUtils.setTenantId(mockData.business.tenantId);
-        }
-        
-        return mockData;
+      // În test mode, returnează date de demo
+      if (tenantUtils.isTestMode()) {
+        console.log('TEST MODE: Using demo business info data');
+        const demoData = tenantUtils.getDemoBusinessInfo();
+        return demoData;
       }
 
-      // Construiește cererea folosind utilitarele
-      const requestConfig = requestBuilder.requestUtils.get('/api/business-info');
+      // Construiește cererea folosind utilitarele - noul endpoint
+      const endpoint = businessId ? `/api/businessInfo/${businessId}` : '/api/businessInfo';
+      const requestConfig = requestBuilder.requestUtils.get(endpoint);
 
-      const response = await this.apiClient.get(requestConfig.url);
+      // Use business info server URL if different from main API
+      const businessInfoServerUrl = import.meta.env.VITE_BUSINESS_INFO_URL;
+      let fullUrl = requestConfig.url;
       
-      // Salvează tenant ID-ul în cookie dacă există în răspuns
-      if (response.data && response.data.business && response.data.business.tenantId) {
-        tenantUtils.setTenantId(response.data.business.tenantId);
+      if (businessInfoServerUrl && businessInfoServerUrl !== import.meta.env.VITE_API_URL) {
+        // Use separate business info server
+        fullUrl = `${businessInfoServerUrl}${requestConfig.url}`;
       }
+
+      const response = await this.apiClient.get(fullUrl);
       
       return response.data;
     } catch (error) {
-      console.warn('API request failed for business-info, using mock data:', error.message);
-      
-      // Returnează date mock în caz de eroare
-      const mockData = getMockData('business-info');
-      
-      // Salvează tenant ID-ul în cookie
-      if (mockData.business && mockData.business.tenantId) {
-        tenantUtils.setTenantId(mockData.business.tenantId);
-      }
-      
-      return mockData;
+      console.error('Failed to fetch business info from API:', error.message);
+      throw this.handleGeneralError(error);
     }
   }
 
@@ -102,8 +93,8 @@ class GeneralService {
    */
   async request(method, endpoint, data = null, options = {}) {
     try {
-      // Adaugă tenant ID-ul din cookie la headers dacă există
-      const tenantId = tenantUtils.getTenantId();
+      // Adaugă tenant ID-ul la headers dacă există
+      const tenantId = tenantUtils.getCurrentTenantId();
       if (tenantId) {
         options.headers = {
           ...options.headers,

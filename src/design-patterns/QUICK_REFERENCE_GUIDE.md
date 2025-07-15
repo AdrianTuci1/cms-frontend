@@ -17,9 +17,22 @@ const {
   create, 
   update, 
   remove, 
-  refresh 
+  refresh,
+  getSupportedQueryParams,
+  buildSearchQuery
 } = useDataSync('resourceName', {
-  businessType: 'dental', // or 'gym', 'hotel'
+  // Search and filtering
+  search: 'search term',
+  filters: { status: 'active' },
+  sortBy: 'name',
+  sortOrder: 'asc',
+  // Pagination
+  page: 1,
+  limit: 20,
+  // Date range
+  startDate: '2024-01-01',
+  endDate: '2024-01-31',
+  // Options
   enableValidation: true,
   enableBusinessLogic: true
 });
@@ -90,6 +103,48 @@ const ResourceComponent = () => {
     </div>
   );
 };
+```
+
+---
+
+## Query Parameters
+
+### **Search and Filter**
+```javascript
+// Simple search
+const { data } = useDataSync('clients', {
+  search: 'john doe'
+});
+
+// Advanced filtering
+const { data } = useDataSync('clients', {
+  search: 'john',
+  filters: {
+    status: 'active',
+    businessType: 'dental'
+  },
+  sortBy: 'name',
+  sortOrder: 'desc',
+  page: 1,
+  limit: 20
+});
+
+// Date range filtering
+const { data } = useDataSync('timeline', {
+  startDate: '2024-01-01',
+  endDate: '2024-01-31',
+  filters: {
+    status: 'scheduled',
+    medicId: 123
+  }
+});
+```
+
+### **Getting Supported Parameters**
+```javascript
+const { getSupportedQueryParams } = useDataSync('clients');
+const params = getSupportedQueryParams();
+// Returns: { supported: [...], searchable: [...], filterable: [...], sortable: [...] }
 ```
 
 ---

@@ -11,7 +11,7 @@
 
 import { ApiClient } from '../core/client/ApiClient.js';
 import requestBuilder from '../utils/requestBuilder.js';
-import { tenantUtils } from '../mockData/index.js';
+import { tenantUtils } from '../../config/tenant.js';
 
 class TimelineService {
   constructor(apiClient = null) {
@@ -132,7 +132,7 @@ class TimelineService {
   async request(method, endpoint, data = null, options = {}) {
     try {
       // Adaugă tenant ID-ul din cookie la headers dacă există
-      const tenantId = tenantUtils.getTenantId();
+      const tenantId = tenantUtils.getCurrentTenantId();
       if (tenantId) {
         options.headers = {
           ...options.headers,

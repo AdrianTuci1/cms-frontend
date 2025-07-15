@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getMockData, tenantUtils } from '../api/mockData';
+import { tenantUtils } from '../config/tenant.js';
+import GeneralService from '../api/services/GeneralService.js';
 import styles from './LocationsPage.module.css';
 
 // Mock user data for demonstration
@@ -19,15 +20,53 @@ const LocationsPage = () => {
   const [selectedLocation, setSelectedLocation] = useState(null);
 
   // Get current tenant info
-  const currentTenantId = tenantUtils.getTenantId();
-  const currentBusinessType = tenantUtils.getBusinessType();
+  const currentTenantId = tenantUtils.getCurrentTenantId();
+  const currentBusinessType = tenantUtils.getCurrentBusinessType();
 
   useEffect(() => {
     const fetchBusinessInfo = async () => {
       try {
         setLoading(true);
-        const info = getMockData('business-info', currentTenantId);
-        setBusinessInfo(info);
+        
+        // În test mode, folosește datele de demo direct
+        if (tenantUtils.isTestMode()) {
+          console.log('TEST MODE: Using demo business info data');
+          const demoInfo = tenantUtils.getDemoBusinessInfo();
+          setBusinessInfo(demoInfo);
+          return;
+        }
+        
+        // Try to get business info from API
+        const generalService = new GeneralService();
+        try {
+          const info = await generalService.getBusinessInfo();
+          setBusinessInfo(info);
+        } catch (apiError) {
+          console.warn('Failed to get business info from API, using tenant config:', apiError);
+          
+          // Fallback to tenant configuration
+          const tenantConfig = tenantUtils.getTenantConfig();
+          const fallbackInfo = {
+            business: {
+              id: tenantConfig.tenantId,
+              name: tenantConfig.name,
+              businessType: tenantConfig.businessType,
+              tenantId: tenantConfig.tenantId
+            },
+            location: {
+              id: tenantConfig.defaultLocation,
+              name: `${tenantConfig.name} - Main Location`,
+              address: 'Main Office'
+            },
+            locations: [{
+              id: tenantConfig.defaultLocation,
+              name: `${tenantConfig.name} - Main Location`,
+              address: 'Main Office',
+              isActive: true
+            }]
+          };
+          setBusinessInfo(fallbackInfo);
+        }
       } catch (err) {
         setError('Failed to load business information');
         console.error('Error fetching business info:', err);
