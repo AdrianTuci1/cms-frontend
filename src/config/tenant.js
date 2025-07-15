@@ -4,171 +4,13 @@
  * Manages tenant-specific configuration and environment variables
  */
 
+import { getDemoBusinessInfo, getDemoUserData } from '../mockData/index.js';
+
 // Environment variables
 export const ENV_CONFIG = {
   VITE_TENANT_ID: import.meta.env.VITE_TENANT_ID || 'T0001',
   VITE_BUSINESS_TYPE: import.meta.env.VITE_BUSINESS_TYPE || 'dental',
   VITE_TEST_MODE: import.meta.env.VITE_TEST_MODE === 'true'
-};
-
-// Tenant configuration mapping
-export const TENANT_CONFIG = {
-  'T0001': {
-    id: 'T0001',
-    businessType: 'dental',
-    name: 'Dental Clinic Mock',
-    tenantId: 'T0001',
-    description: 'Mock dental clinic for development and testing',
-    features: ['appointments', 'treatments', 'consultations', 'invoices'],
-    defaultLocation: 'T0001-01'
-  },
-  'T0002': {
-    id: 'T0002', 
-    businessType: 'gym',
-    name: 'Fitness Center Mock',
-    tenantId: 'T0002',
-    description: 'Mock fitness center for development and testing',
-    features: ['memberships', 'classes', 'personal_training', 'invoices'],
-    defaultLocation: 'T0002-01'
-  },
-  'T0003': {
-    id: 'T0003',
-    businessType: 'hotel', 
-    name: 'Hotel Mock',
-    tenantId: 'T0003',
-    description: 'Mock hotel for development and testing',
-    features: ['reservations', 'rooms', 'conference', 'spa'],
-    defaultLocation: 'T0003-01'
-  }
-};
-
-/**
- * Demo business info data for TEST_MODE
- */
-export const DEMO_BUSINESS_INFO = {
-  dental: {
-    business: {
-      id: 'T0001',
-      name: 'Demo Dental Clinic',
-      businessType: 'dental',
-      tenantId: 'T0001',
-      email: 'contact@demodental.ro',
-      phone: '+40 123 456 789',
-      website: 'https://demodental.ro',
-      description: 'Demo dental clinic for presentations and testing'
-    },
-    location: {
-      id: 'T0001-01',
-      name: 'Demo Dental Clinic - Main Office',
-      address: 'Strada Demo 123, București',
-      phone: '+40 123 456 789',
-      email: 'contact@demodental.ro',
-      isActive: true
-    },
-    locations: [
-      {
-        id: 'T0001-01',
-        name: 'Demo Dental Clinic - Main Office',
-        address: 'Strada Demo 123, București',
-        phone: '+40 123 456 789',
-        email: 'contact@demodental.ro',
-        isActive: true
-      },
-      {
-        id: 'T0001-02',
-        name: 'Demo Dental Clinic - Sector 2',
-        address: 'Bulevardul Demo 456, București',
-        phone: '+40 123 456 790',
-        email: 'sector2@demodental.ro',
-        isActive: true
-      }
-    ],
-    features: {
-      appointments: true,
-      treatments: true,
-      consultations: true,
-      invoices: true,
-      aiAssistant: true,
-      timeline: true,
-      reports: true
-    }
-  },
-  gym: {
-    business: {
-      id: 'T0002',
-      name: 'Demo Fitness Center',
-      businessType: 'gym',
-      tenantId: 'T0002',
-      email: 'contact@demofitness.ro',
-      phone: '+40 123 456 788',
-      website: 'https://demofitness.ro',
-      description: 'Demo fitness center for presentations and testing'
-    },
-    location: {
-      id: 'T0002-01',
-      name: 'Demo Fitness Center - Main Gym',
-      address: 'Strada Fitness 123, București',
-      phone: '+40 123 456 788',
-      email: 'contact@demofitness.ro',
-      isActive: true
-    },
-    locations: [
-      {
-        id: 'T0002-01',
-        name: 'Demo Fitness Center - Main Gym',
-        address: 'Strada Fitness 123, București',
-        phone: '+40 123 456 788',
-        email: 'contact@demofitness.ro',
-        isActive: true
-      }
-    ],
-    features: {
-      memberships: true,
-      classes: true,
-      personal_training: true,
-      invoices: true,
-      timeline: true,
-      reports: true
-    }
-  },
-  hotel: {
-    business: {
-      id: 'T0003',
-      name: 'Demo Hotel',
-      businessType: 'hotel',
-      tenantId: 'T0003',
-      email: 'contact@demohotel.ro',
-      phone: '+40 123 456 787',
-      website: 'https://demohotel.ro',
-      description: 'Demo hotel for presentations and testing'
-    },
-    location: {
-      id: 'T0003-01',
-      name: 'Demo Hotel - Main Building',
-      address: 'Bulevardul Hotelului 123, București',
-      phone: '+40 123 456 787',
-      email: 'contact@demohotel.ro',
-      isActive: true
-    },
-    locations: [
-      {
-        id: 'T0003-01',
-        name: 'Demo Hotel - Main Building',
-        address: 'Bulevardul Hotelului 123, București',
-        phone: '+40 123 456 787',
-        email: 'contact@demohotel.ro',
-        isActive: true
-      }
-    ],
-    features: {
-      reservations: true,
-      rooms: true,
-      conference: true,
-      spa: true,
-      timeline: true,
-      reports: true
-    }
-  }
 };
 
 /**
@@ -198,43 +40,73 @@ export const tenantUtils = {
 
   /**
    * Get demo business info for test mode
+   * @param {string} businessType - Business type (dental, gym, hotel)
+   * @returns {Object} Demo business info
    */
   getDemoBusinessInfo(businessType = null) {
     const currentBusinessType = businessType || this.getCurrentBusinessType();
-    return DEMO_BUSINESS_INFO[currentBusinessType] || DEMO_BUSINESS_INFO.dental;
+    return getDemoBusinessInfo(currentBusinessType);
   },
 
   /**
-   * Get tenant configuration by ID
+   * Get demo user data for test mode
+   * @param {string} businessType - Business type (dental, gym, hotel)
+   * @returns {Object} Demo user data
+   */
+  getDemoUserData(businessType = null) {
+    const currentBusinessType = businessType || this.getCurrentBusinessType();
+    return getDemoUserData(currentBusinessType);
+  },
+
+  /**
+   * Get tenant configuration by ID (derived from demo data)
    */
   getTenantConfig(tenantId = null) {
     const currentTenantId = tenantId || this.getCurrentTenantId();
-    return TENANT_CONFIG[currentTenantId] || TENANT_CONFIG['T0001'];
+    const businessType = this.getBusinessTypeByTenant(currentTenantId);
+    const demoInfo = this.getDemoBusinessInfo(businessType);
+    
+    return {
+      id: currentTenantId,
+      businessType: businessType,
+      name: demoInfo.business.name,
+      tenantId: currentTenantId,
+      description: demoInfo.business.description,
+      features: Object.keys(demoInfo.features).filter(key => demoInfo.features[key]),
+      defaultLocation: demoInfo.location.id
+    };
   },
 
   /**
    * Get business type by tenant ID
    */
-  getBusinessTypeByTenant(tenantId = null) {
-    const config = this.getTenantConfig(tenantId);
-    return config.businessType;
+  getBusinessTypeByTenant(tenantId) {
+    const tenantMap = {
+      'T0001': 'dental',
+      'T0002': 'gym', 
+      'T0003': 'hotel'
+    };
+    return tenantMap[tenantId] || 'dental';
   },
 
   /**
    * Get tenant ID by business type
    */
   getTenantIdByBusinessType(businessType) {
-    const tenant = Object.values(TENANT_CONFIG).find(config => 
-      config.businessType === businessType
-    );
-    return tenant ? tenant.tenantId : 'T0001';
+    const businessTypeMap = {
+      'dental': 'T0001',
+      'gym': 'T0002',
+      'hotel': 'T0003'
+    };
+    return businessTypeMap[businessType] || 'T0001';
   },
 
   /**
    * Validate tenant ID
    */
   isValidTenantId(tenantId) {
-    return Object.keys(TENANT_CONFIG).includes(tenantId);
+    const validTenants = ['T0001', 'T0002', 'T0003'];
+    return validTenants.includes(tenantId);
   },
 
   /**
@@ -249,30 +121,36 @@ export const tenantUtils = {
    * Get all available tenants
    */
   getAllTenants() {
-    return Object.values(TENANT_CONFIG);
+    return [
+      { id: 'T0001', businessType: 'dental', name: 'Demo Dental Clinic' },
+      { id: 'T0002', businessType: 'gym', name: 'Demo Fitness Center' },
+      { id: 'T0003', businessType: 'hotel', name: 'Demo Hotel' }
+    ];
   },
 
   /**
    * Get all business types
    */
   getAllBusinessTypes() {
-    return Object.values(TENANT_CONFIG).map(config => config.businessType);
+    return ['dental', 'gym', 'hotel'];
   },
 
   /**
    * Check if feature is enabled for current tenant
    */
   isFeatureEnabled(feature, tenantId = null) {
-    const config = this.getTenantConfig(tenantId);
-    return config.features.includes(feature);
+    const businessType = this.getBusinessTypeByTenant(tenantId);
+    const demoInfo = this.getDemoBusinessInfo(businessType);
+    return demoInfo.features[feature] || false;
   },
 
   /**
    * Get all features for current tenant
    */
   getTenantFeatures(tenantId = null) {
-    const config = this.getTenantConfig(tenantId);
-    return config.features;
+    const businessType = this.getBusinessTypeByTenant(tenantId);
+    const demoInfo = this.getDemoBusinessInfo(businessType);
+    return Object.keys(demoInfo.features).filter(key => demoInfo.features[key]);
   }
 };
 
@@ -439,8 +317,6 @@ export const resourceUtils = {
 
 export default {
   ENV_CONFIG,
-  TENANT_CONFIG,
-  DEMO_BUSINESS_INFO,
   tenantUtils,
   locationUtils,
   resourceUtils
