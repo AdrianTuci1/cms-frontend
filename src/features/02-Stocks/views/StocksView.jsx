@@ -6,9 +6,11 @@ import InventoryCard from '../components/InventoryCard.jsx';
 import LowStockCard from '../components/LowStockCard.jsx';
 import useStocksStore from '../store/stocksStore';
 import { useDataSync } from '../../../design-patterns/hooks';
-import { openDrawer, DRAWER_TYPES } from '../../00-Drawers';
+import useDrawerStore, { DRAWER_TYPES } from '../../00-Drawers/store/drawerStore';
 
 const StocksView = ({ businessType = 'gym' }) => {
+  const { openDrawer } = useDrawerStore();
+  
   // Use useDataSync hook directly for stocks data - same as SalesView
   const stocksSync = useDataSync('stocks', {
     businessType,

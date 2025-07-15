@@ -35,7 +35,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 export default function TrendsReport() {
-  const { data: trends } = DASHBOARD_DATA.DENTAL_CLINIC.reports.trends;
+      const { data: trends } = DASHBOARD_DATA.DENTAL.reports.trends;
 
   return (
     <>

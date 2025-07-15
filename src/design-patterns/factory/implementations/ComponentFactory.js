@@ -2,7 +2,7 @@
  * Component Factory for creating business type-specific components
  * Implements the Factory pattern for component creation
  */
-import { getBusinessType } from '../../../config/businessTypes';
+import { getBusinessTypeKey } from '../../../config/businessTypes';
 
 class ComponentFactory {
   constructor() {
@@ -95,8 +95,8 @@ class ComponentFactory {
    * @returns {React.Component} Component instance
    */
   createForCurrentBusiness(componentType, props = {}, options = {}) {
-    const businessType = getBusinessType();
-    return this.create(componentType, props, { ...options, businessType: businessType.name });
+    const businessTypeKey = getBusinessTypeKey();
+    return this.create(componentType, props, { ...options, businessType: businessTypeKey });
   }
 
   /**

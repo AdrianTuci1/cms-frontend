@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import styles from './AdminView.module.css';
 import { FaPlus } from 'react-icons/fa';
-import { openDrawer, DRAWER_TYPES } from '../../00-Drawers';
+import useDrawerStore, { DRAWER_TYPES } from '../../00-Drawers/store/drawerStore';
 import { useDataSync } from '../../../design-patterns/hooks';
 import { getBusinessType } from '../../../config/businessTypes';
 import MembersTab from './Members/MembersTab';
@@ -13,6 +13,7 @@ const AdminView = () => {
   const { activeTab } = useTabsStore();
   const businessType = getBusinessType();
   const { roles, updateRolePermission } = useRolesStore();
+  const { openDrawer } = useDrawerStore();
   
   // Use useDataSync for members data
   const membersSync = useDataSync('members', {

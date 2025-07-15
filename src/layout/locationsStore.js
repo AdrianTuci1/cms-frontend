@@ -1,21 +1,21 @@
 import { create } from 'zustand';
-import { getBusinessType } from '../config/businessTypes';
+import { getBusinessTypeKey } from '../config/businessTypes';
 
 const useLocationsStore = create((set, get) => {
-  const businessType = getBusinessType();
+  const businessTypeKey = getBusinessTypeKey();
   
   // Mock data - should be replaced with API calls
   const mockLocations = {
-    'Dental Clinic': [
+    'DENTAL': [
       { id: 1, name: 'Dental Clinic Central', identifier: 'Strada Victoriei 10' },
       { id: 2, name: 'Dental Clinic Nord', identifier: 'Bulevardul Decebal 24' },
       { id: 3, name: 'Dental Clinic Vest', identifier: 'Calea Aradului 55' }
     ],
-    'Gym': [
+    'GYM': [
       { id: 1, name: 'Fitness Hub Central', identifier: 'Piața Unirii' },
       { id: 2, name: 'Fitness Hub Mall', identifier: 'Shopping City' }
     ],
-    'Hotel': [
+    'HOTEL': [
       { id: 1, name: 'Hotel Royal', identifier: 'Centru' },
       { id: 2, name: 'Hotel Elite', identifier: 'Gara' },
       { id: 3, name: 'Hotel Seaside', identifier: 'Plaja' }
@@ -23,8 +23,8 @@ const useLocationsStore = create((set, get) => {
   };
 
   return {
-    locations: mockLocations[businessType.name] || [],
-    currentLocation: mockLocations[businessType.name]?.[0] || null,
+    locations: mockLocations[businessTypeKey] || [],
+    currentLocation: mockLocations[businessTypeKey]?.[0] || null,
     
     // Set current location
     setCurrentLocation: (locationId) => {

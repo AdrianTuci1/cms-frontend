@@ -1,18 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { formatDate } from '../utils/dateUtils';
 import styles from '../CalendarView.module.css';
 
 const DateSelector = ({ startDate, endDate, setDateRange }) => {
   const [showDateInputs, setShowDateInputs] = useState(false);
-  const [tempStartDate, setTempStartDate] = useState(startDate);
-  const [tempEndDate, setTempEndDate] = useState(endDate);
+  const [tempStartDate, setTempStartDate] = useState(new Date(startDate));
+  const [tempEndDate, setTempEndDate] = useState(new Date(endDate));
+
+  // Update temp dates when props change
+  useEffect(() => {
+    setTempStartDate(new Date(startDate));
+    setTempEndDate(new Date(endDate));
+  }, [startDate, endDate]);
 
   const handlePreviousMonth = () => {
     const newStartDate = new Date(startDate);
     newStartDate.setMonth(newStartDate.getMonth() - 1);
     const newEndDate = new Date(newStartDate);
     newEndDate.setMonth(newEndDate.getMonth() + 1);
-    setDateRange(newStartDate, newEndDate);
+    setDateRange(newStartDate.toISOString().split('T')[0], newEndDate.toISOString().split('T')[0]);
   };
 
   const handleNextMonth = () => {
@@ -20,11 +26,11 @@ const DateSelector = ({ startDate, endDate, setDateRange }) => {
     newStartDate.setMonth(newStartDate.getMonth() + 1);
     const newEndDate = new Date(newStartDate);
     newEndDate.setMonth(newEndDate.getMonth() + 1);
-    setDateRange(newStartDate, newEndDate);
+    setDateRange(newStartDate.toISOString().split('T')[0], newEndDate.toISOString().split('T')[0]);
   };
 
   const handleDateChange = () => {
-    setDateRange(new Date(tempStartDate), new Date(tempEndDate));
+    setDateRange(tempStartDate.toISOString().split('T')[0], tempEndDate.toISOString().split('T')[0]);
     setShowDateInputs(false);
   };
 
@@ -72,7 +78,7 @@ const DateSelector = ({ startDate, endDate, setDateRange }) => {
           onClick={() => setShowDateInputs(true)}
           style={{ cursor: 'pointer' }}
         >
-          {formatDate(startDate)} - {formatDate(endDate)}
+          {formatDate(new Date(startDate))} - {formatDate(new Date(endDate))}
         </div>
       )}
       

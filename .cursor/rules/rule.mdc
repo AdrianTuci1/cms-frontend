@@ -1,0 +1,491 @@
+---
+description: crud operations inside components
+alwaysApply: false
+---
+# CMS Frontend Cursor Rules
+
+## Data Flow System Patterns
+
+When implementing CRUD operations for any resource in this CMS system, follow these established patterns from the design-patterns architecture.
+
+### 1. Resource Component Pattern
+
+For any resource management component, use this structure:
+
+```
+javascript
+import React, { useState, useEffect } from 'react';
+import { useDataSync } from '../design-patterns/hooks';
+import { getBusinessType } from '../config/businessTypes';
+
+const [ResourceName]Management = () => {
+  const businessType = getBusinessType();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selected[ResourceName], setSelected[ResourceName]] = useState(null);
+
+  // Business type mapping
+  const businessTypeKey = {
+    'Dental Clinic': 'dental',
+    'Gym': 'gym',
+    'Hotel': 'hotel'
+  }[businessType.name] || 'dental';
+
+  // Primary data sync hook
+  const [resourceName]Sync = useDataSync('[resourceName]', {
+    businessType: businessTypeKey,
+    page: currentPage,
+    limit: 20,
+    enableValidation: true,
+    enableBusinessLogic: true
+  });
+
+  const {
+    data: [resourceName]Data,
+    loading,
+    error,
+    refresh,
+    create: create[ResourceName],
+    update: update[ResourceName],
+    remove: remove[ResourceName],
+    validateData,
+    isOperationAllowed
+  } = [resourceName]Sync;
+
+  // Extract data array from structure
+  const [resourceName]s = [resourceName]Data?.items || [resourceName]Data || [];
+
+  // CRUD handlers with validation and permission checks
+  const handleCreate[ResourceName] = async ([resourceName]Data) => {
+    try {
+      const validation = validateData([resourceName]Data, 'create');
+      if (!validation.isValid) {
+        alert(`Validation errors: ${validation.errors.join(', ')}`);
+        return;
+      }
+
+      if (!isOperationAllowed('create[ResourceName]', [resourceName]Data)) {
+        alert('You do not have permission to create [resourceName]s');
+        return;
+      }
+
+      await create[ResourceName]([resourceName]Data);
+      console.log('[ResourceName] created successfully');
+      setSelected[ResourceName](null);
+    } catch (error) {
+      console.error('Failed to create [resourceName]:', error);
+      alert('Failed to create [resourceName]. Please try again.');
+    }
+  };
+
+  const handleUpdate[ResourceName] = async ([resourceName]Data) => {
+    try {
+      const validation = validateData([resourceName]Data, 'update');
+      if (!validation.isValid) {
+        alert(`Validation errors: ${validation.errors.join(', ')}`);
+        return;
+      }
+
+      if (!isOperationAllowed('update[ResourceName]', [resourceName]Data)) {
+        alert('You do not have permission to update [resourceName]s');
+        return;
+      }
+
+      await update[ResourceName]([resourceName]Data);
+      console.log('[ResourceName] updated successfully');
+      setSelected[ResourceName](null);
+    } catch (error) {
+      console.error('Failed to update [resourceName]:', error);
+      alert('Failed to update [resourceName]. Please try again.');
+    }
+  };
+
+  const handleDelete[ResourceName] = async ([resourceName]) => {
+    if (!confirm(`Are you sure you want to delete ${[resourceName].name}?`)) {
+      return;
+    }
+
+    try {
+      if (!isOperationAllowed('delete[ResourceName]', [resourceName])) {
+        alert('You do not have permission to delete [resourceName]s');
+        return;
+      }
+
+      await remove[ResourceName]([resourceName]);
+      console.log('[ResourceName] deleted successfully');
+      setSelected[ResourceName](null);
+    } catch (error) {
+      console.error('Failed to delete [resourceName]:', error);
+      alert('Failed to delete [resourceName]. Please try again.');
+    }
+  };
+
+  // Filter data based on search
+  const filtered[ResourceName]s = [resourceName]s.filter([resourceName] =>
+    [resourceName].name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    [resourceName].email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    [resourceName].phoneNumber?.includes(searchTerm)
+  );
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p>Loading [resourceName]s...</p>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="error-container">
+        <h3>Error loading [resourceName]s</h3>
+        <p>{error.message}</p>
+        <button onClick={refresh}>Retry</button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="[resourceName]s-management">
+      <div className="header">
+        <h2>{businessType.name} [ResourceName]s</h2>
+        <button 
+          onClick={() => setSelected[ResourceName]({})}
+          className="btn-primary"
+        >
+          Add New [ResourceName]
+        </button>
+      </div>
+
+      <div className="search-bar">
+        <input
+          type="text"
+          placeholder="Search [resourceName]s..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
+      <div className="[resourceName]s-list">
+        {filtered[ResourceName]s.map([resourceName] => (
+          <[ResourceName]Card
+            key={[resourceName].id}
+            [resourceName]={[resourceName]}
+            businessType={businessTypeKey}
+            onEdit={() => setSelected[ResourceName]([resourceName])}
+            onDelete={() => handleDelete[ResourceName]([resourceName])}
+          />
+        ))}
+      </div>
+
+      {/* Pagination */}
+      <div className="pagination">
+        <button 
+          onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+        <span>Page {currentPage}</span>
+        <button 
+          onClick={() => setCurrentPage(prev => prev + 1)}
+          disabled={filtered[ResourceName]s.length < 20}
+        >
+          Next
+        </button>
+      </div>
+
+      {/* Form Modal */}
+      {selected[ResourceName] && (
+        <[ResourceName]FormModal
+          [resourceName]={selected[ResourceName]}
+          businessType={businessTypeKey}
+          onSave={selected[ResourceName].id ? handleUpdate[ResourceName] : handleCreate[ResourceName]}
+          onCancel={() => setSelected[ResourceName](null)}
+        />
+      )}
+    </div>
+  );
+};
+
+export default [ResourceName]Management;
+```
+
+### 2. Simple Resource Hook Pattern
+
+For simpler components that just need data access:
+
+```javascript
+const [ResourceName]Component = () => {
+  const [resourceName]Sync = useDataSync('[resourceName]', {
+    businessType: 'dental', // or get from context
+    enableValidation: true,
+    enableBusinessLogic: true
+  });
+
+  const { data, loading, error, create, update, remove } = [resourceName]Sync;
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  return (
+    <div>
+      {/* Component content */}
+    </div>
+  );
+};
+```
+
+### 3. Timeline Resource Pattern
+
+For timeline resources that require date ranges:
+
+```javascript
+const [BusinessType]Timeline = () => {
+  const [startDate, setStartDate] = useState('2024-01-15');
+  const [endDate, setEndDate] = useState('2024-01-21');
+
+  const timelineSync = useDataSync('timeline', {
+    businessType: '[businessType]',
+    startDate,
+    endDate,
+    enableValidation: true,
+    enableBusinessLogic: true
+  });
+
+  // Business-specific hook integration
+  const timeline = use[BusinessType]TimelineWithAPI(timelineSync.data, {
+    startDate,
+    endDate,
+    enableValidation: true,
+    enableBusinessLogic: true
+  });
+
+  // Handle CRUD operations
+  const handleCreate = async (data) => {
+    try {
+      await timelineSync.create(data);
+    } catch (error) {
+      console.error('Failed to create:', error);
+    }
+  };
+
+  if (timelineSync.loading) {
+    return (
+      <div className="loading-state">
+        <div className="spinner"></div>
+        <p>Loading timeline...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="timeline-container">
+      {/* Timeline content */}
+    </div>
+  );
+};
+```
+
+### 4. Business Type Configuration
+
+Always include business type configuration at the component level:
+
+```javascript
+useEffect(() => {
+  if (businessType && dataSyncManager.businessType !== businessType) {
+    dataSyncManager.setBusinessType(businessType);
+  }
+}, [businessType]);
+```
+
+### 5. Form Handling Pattern
+
+For forms that handle resource creation/editing:
+
+```javascript
+const [ResourceName]Form = ({ [resourceName], onSave, onCancel }) => {
+  const [formData, setFormData] = useState({
+    name: [resourceName]?.name || '',
+    email: [resourceName]?.email || '',
+    phoneNumber: [resourceName]?.phoneNumber || '',
+    ...[resourceName]
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave(formData);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div className="form-group">
+        <label>Name *</label>
+        <input
+          type="text"
+          required
+          value={formData.name}
+          onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+        />
+      </div>
+      
+      {/* Additional fields */}
+
+      <div className="form-actions">
+        <button type="button" onClick={onCancel}>Cancel</button>
+        <button type="submit">{[resourceName]?.id ? 'Update' : 'Create'}</button>
+      </div>
+    </form>
+  );
+};
+```
+
+### 6. Error Handling Guidelines
+
+**Connectivity Errors**: Let the system handle automatically
+```javascript
+try {
+  await create(data);
+} catch (error) {
+  if (!error.message.includes('Backend indisponibil')) {
+    // Handle business logic errors only
+    showUserError(error.message);
+  }
+  // Connectivity errors are handled automatically with queue
+}
+```
+
+**Validation Errors**: Always validate before operations
+```javascript
+const validation = validateData(formData, 'create');
+if (!validation.isValid) {
+  showValidationErrors(validation.errors);
+  return;
+}
+```
+
+**Permission Checks**: Check permissions before operations
+```javascript
+if (!isOperationAllowed('createResource', formData)) {
+  showPermissionError();
+  return;
+}
+```
+
+### 7. Resource Configuration Rules
+
+When adding new resources to ResourceRegistry:
+
+```javascript
+// Business-specific resources
+this.registerResource('[resourceName]', {
+  enableOffline: true,
+  requiresAuth: true,
+  forceServerFetch: true,
+  supportsPagination: true, // for clients/members
+  requiresDateRange: true,  // for timeline
+  currentDayOnly: true,     // for invoices/stocks/sales
+  apiEndpoints: {
+    get: `/${businessType}/[resourceName]`,
+    post: `/${businessType}/[resourceName]`,
+    put: `/${businessType}/[resourceName]/:id`,
+    delete: `/${businessType}/[resourceName]/:id`
+  }
+});
+
+// General resources
+this.registerResource('[resourceName]', {
+  enableOffline: true,
+  requiresAuth: true,
+  forceServerFetch: true,
+  apiEndpoints: {
+    get: '/[resourceName]',
+    post: '/[resourceName]',
+    put: '/[resourceName]/:id',
+    delete: '/[resourceName]/:id'
+  }
+});
+```
+
+### 8. Import Patterns
+
+Standard imports for data sync components:
+
+```javascript
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useDataSync } from '../design-patterns/hooks';
+import { getBusinessType } from '../config/businessTypes';
+import eventBus from '../design-patterns/observer/base/EventBus';
+```
+
+### 9. File Naming Conventions
+
+- Management components: `[ResourceName]Management.jsx`
+- Card components: `[ResourceName]Card.jsx`
+- Form components: `[ResourceName]Form.jsx` or `[ResourceName]FormModal.jsx`
+- Business-specific hooks: `use[BusinessType][ResourceName]WithAPI.js`
+
+### 10. CSS Class Naming
+
+Use consistent CSS class patterns:
+- `.loading-container`, `.loading-state`
+- `.error-container`, `.error-state`
+- `.[resourceName]s-management`
+- `.[resourceName]-card`, `.[resourceName]-form`
+- `.btn-primary`, `.btn-secondary`, `.btn-danger`
+- `.form-group`, `.form-actions`
+- `.search-bar`, `.pagination`
+
+### 11. Performance Optimization
+
+Always use these patterns for performance:
+
+```javascript
+// Memoize derived data
+const processed[ResourceName]s = useMemo(() => 
+  [resourceName]Data?.items || [resourceName]Data || [],
+  [[resourceName]Data]
+);
+
+// Memoize filter operations
+const filtered[ResourceName]s = useMemo(() =>
+  processed[ResourceName]s.filter([resourceName] => 
+    [resourceName].name.toLowerCase().includes(searchTerm.toLowerCase())
+  ),
+  [processed[ResourceName]s, searchTerm]
+);
+
+// Use callbacks for event handlers
+const handleSearch = useCallback((term) => {
+  setSearchTerm(term);
+}, []);
+```
+
+### 12. Testing Considerations
+
+When writing tests, consider:
+- Test mode using `VITE_TEST_MODE=true`
+- Mock data integration
+- Offline functionality testing
+- Error state testing
+- Loading state testing
+
+---
+
+## Key Principles
+
+1. **Always use useDataSync** for data management
+2. **Include business type configuration** when needed
+3. **Handle loading and error states** consistently
+4. **Validate data before operations**
+5. **Check permissions before operations**
+6. **Use optimistic updates** (automatic with useDataSync)
+7. **Let the system handle connectivity errors**
+8. **Follow established naming conventions**
+9. **Use consistent CSS patterns**
+10. **Optimize for performance with useMemo/useCallback**
+
+When implementing any resource in this system, follow these patterns for consistency, reliability, and maintainability. 

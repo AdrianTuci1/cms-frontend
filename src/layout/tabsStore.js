@@ -1,8 +1,8 @@
 import { create } from 'zustand';
-import { getBusinessType } from '../config/businessTypes';
+import { getBusinessTypeKey } from '../config/businessTypes';
 
 const useTabsStore = create((set) => {
-  const businessType = getBusinessType();
+  const businessTypeKey = getBusinessTypeKey();
 
   // Common tabs for all business types
   const commonTabs = [
@@ -12,22 +12,22 @@ const useTabsStore = create((set) => {
 
   // Business type specific tabs
   const businessTypeTabs = {
-    'Dental Clinic': [
+    'DENTAL': [
       { id: 'dental-treatments', label: 'Tratamente', icon: '🦷', section: 'treatments' }
     ],
-    'Gym': [
+    'GYM': [
       { id: 'gym-subscriptions', label: 'Abonamente', icon: '💳', section: 'subscriptions' },
       { id: 'gym-classes', label: 'Clase', icon: '🏋️', section: 'classes' },
       { id: 'gym-facilities', label: 'Facilități', icon: '🏋️‍♀️', section: 'facilities' }
     ],
-    'Hotel': [
+    'HOTEL': [
       { id: 'reservations', label: 'Gestionare Rezervări', icon: '🔒', section: 'reservations' },
       { id: 'attractions', label: 'Atracții', icon: '🎡', section: 'attractions' },
       { id: 'services', label: 'Servicii', icon: '🛍️', section: 'services' }
     ]
   };
 
-  const allTabs = [...commonTabs, ...(businessTypeTabs[businessType.name] || [])];
+  const allTabs = [...commonTabs, ...(businessTypeTabs[businessTypeKey] || [])];
 
   return {
     // State

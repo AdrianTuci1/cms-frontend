@@ -1,91 +1,46 @@
-import React from 'react';
-import { getBusinessType } from '../../../../src/config/businessTypes';
+import React, { useState } from 'react';
+import { getBusinessTypeKey, getBusinessTypeKeyForSync } from '../../../../src/config/businessTypes';
 import BaseForm from './BaseForm';
+import styles from './MemberForm.module.css';
+import { useDataSync } from '../../../design-patterns/hooks';
 
 const MemberForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) => {
-  const businessType = getBusinessType();
+  const businessTypeKey = getBusinessTypeKey();
+  const businessTypeForSync = getBusinessTypeKeyForSync(businessTypeKey);
+  const [activeView, setActiveView] = useState('details'); // 'details' or 'appointments'
   
-  // Member field configurations
+  // Use useDataSync to fetch roles
+  const rolesSync = useDataSync('roles', {
+    businessType: businessTypeForSync,
+    enableValidation: true,
+    enableBusinessLogic: true
+  });
+  
+  // Only show for dental clinics
+  if (businessTypeKey !== 'DENTAL') {
+    return null;
+  }
+  
+  // Simplified fields for dental clinics
   const getFields = () => {
-    const baseFields = [
+    // Get role options from the roles data sync
+    const roleOptions = (rolesSync.items || []).map(role => ({
+      value: role.id.toString(),
+      label: role.name
+    }));
+
+    return [
       { name: 'name', type: 'text', label: 'Full Name', required: true },
       { name: 'email', type: 'email', label: 'Email Address', required: true },
-      { name: 'phoneNumber', type: 'tel', label: 'Phone Number', required: true },
-      { name: 'address', type: 'textarea', label: 'Address', placeholder: 'Enter full address...' },
-      { name: 'dateOfBirth', type: 'date', label: 'Date of Birth' }
+      { 
+        name: 'role', 
+        type: 'select', 
+        label: 'Role', 
+        required: true,
+        options: roleOptions
+      },
+      { name: 'dutyDays', type: 'textarea', label: 'Duty Days', placeholder: 'Enter duty days...' }
     ];
-
-    // Add business-specific fields
-    switch (businessType.name) {
-      case 'Dental Clinic':
-        return [
-          ...baseFields,
-          { name: 'emergencyContact', type: 'text', label: 'Emergency Contact' },
-          { name: 'emergencyPhone', type: 'tel', label: 'Emergency Phone' },
-          { name: 'medicalHistory', type: 'textarea', label: 'Medical History', placeholder: 'Relevant medical history...' },
-          { name: 'allergies', type: 'textarea', label: 'Allergies', placeholder: 'List any allergies...' },
-          { 
-            name: 'insuranceProvider', 
-            type: 'select', 
-            label: 'Insurance Provider',
-            options: [
-              { value: 'none', label: 'No Insurance' },
-              { value: 'blue_cross', label: 'Blue Cross' },
-              { value: 'aetna', label: 'Aetna' },
-              { value: 'cigna', label: 'Cigna' },
-              { value: 'other', label: 'Other' }
-            ]
-          },
-          { name: 'insuranceNumber', type: 'text', label: 'Insurance Number' }
-        ];
-        
-      case 'Gym':
-        return [
-          ...baseFields,
-          { 
-            name: 'membershipType', 
-            type: 'select', 
-            label: 'Membership Type',
-            options: [
-              { value: 'basic', label: 'Basic' },
-              { value: 'premium', label: 'Premium' },
-              { value: 'vip', label: 'VIP' },
-              { value: 'student', label: 'Student' },
-              { value: 'senior', label: 'Senior' }
-            ]
-          },
-          { name: 'membershipStartDate', type: 'date', label: 'Membership Start Date' },
-          { name: 'membershipEndDate', type: 'date', label: 'Membership End Date' },
-          { name: 'emergencyContact', type: 'text', label: 'Emergency Contact' },
-          { name: 'emergencyPhone', type: 'tel', label: 'Emergency Phone' },
-          { name: 'fitnessGoals', type: 'textarea', label: 'Fitness Goals', placeholder: 'Member\'s fitness goals...' },
-          { name: 'healthConditions', type: 'textarea', label: 'Health Conditions', placeholder: 'Any health conditions to be aware of...' }
-        ];
-        
-      case 'Hotel':
-        return [
-          ...baseFields,
-          { 
-            name: 'guestType', 
-            type: 'select', 
-            label: 'Guest Type',
-            options: [
-              { value: 'individual', label: 'Individual' },
-              { value: 'business', label: 'Business' },
-              { value: 'family', label: 'Family' },
-              { value: 'group', label: 'Group' },
-              { value: 'vip', label: 'VIP' }
-            ]
-          },
-          { name: 'preferredRoomType', type: 'text', label: 'Preferred Room Type' },
-          { name: 'specialRequests', type: 'textarea', label: 'Special Requests', placeholder: 'Any special requests or preferences...' },
-          { name: 'loyaltyNumber', type: 'text', label: 'Loyalty Number' },
-          { name: 'preferences', type: 'textarea', label: 'Preferences', placeholder: 'Guest preferences (room location, amenities, etc.)...' }
-        ];
-        
-      default:
-        return baseFields;
-    }
   };
 
   const getRequiredFields = () => {
@@ -94,16 +49,12 @@ const MemberForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) => 
   };
 
   const handleSubmit = async (formData, mode) => {
-    // Add business-specific data processing
     const processedData = {
       ...formData,
-      businessType: businessType.name,
+      businessType: businessTypeKey,
       status: 'active',
       createdAt: mode === 'create' ? new Date().toISOString() : formData.createdAt,
-      updatedAt: new Date().toISOString(),
-      // Add member-specific fields
-      memberSince: mode === 'create' ? new Date().toISOString() : formData.memberSince,
-      lastVisit: mode === 'create' ? null : formData.lastVisit
+      updatedAt: new Date().toISOString()
     };
 
     if (onSubmit) {
@@ -117,28 +68,79 @@ const MemberForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) => 
     }
   };
 
-  const getMemberTypeName = () => {
-    switch (businessType.name) {
-      case 'Dental Clinic': return 'Patient';
-      case 'Gym': return 'Member';
-      case 'Hotel': return 'Guest';
-      default: return 'Member';
-    }
+  const renderUpcomingAppointments = () => {
+    // Mock data - in real app this would come from props or API
+    const appointments = [
+      { id: 1, date: '2024-01-15', time: '10:00 AM', type: 'Check-up', status: 'Confirmed' },
+      { id: 2, date: '2024-01-22', time: '2:30 PM', type: 'Cleaning', status: 'Pending' },
+      { id: 3, date: '2024-01-29', time: '9:00 AM', type: 'Consultation', status: 'Confirmed' }
+    ];
+
+    return (
+      <div className={styles['appointments-view']}>
+        <h3>Upcoming Appointments</h3>
+        <div className={styles['appointments-list']}>
+          {appointments.map(appointment => (
+            <div key={appointment.id} className={styles['appointment-card']}>
+              <div className={styles['appointment-date']}>
+                <strong>{appointment.date}</strong> at {appointment.time}
+              </div>
+              <div className={styles['appointment-type']}>{appointment.type}</div>
+              <div className={`${styles['appointment-status']} ${styles[`status-${appointment.status.toLowerCase()}`]}`}>
+                {appointment.status}
+              </div>
+            </div>
+          ))}
+        </div>
+        {appointments.length === 0 && (
+          <p className={styles['no-appointments']}>No upcoming appointments</p>
+        )}
+      </div>
+    );
+  };
+
+  const renderViewToggle = () => {
+    return (
+      <div className={styles['view-toggle']}>
+        <button
+          className={`${styles['toggle-btn']} ${activeView === 'details' ? styles.active : ''}`}
+          onClick={() => setActiveView('details')}
+        >
+          Details
+        </button>
+        <button
+          className={`${styles['toggle-btn']} ${activeView === 'appointments' ? styles.active : ''}`}
+          onClick={() => setActiveView('appointments')}
+        >
+          Upcoming Appointments
+        </button>
+      </div>
+    );
   };
 
   return (
-    <BaseForm
-      mode={mode}
-      data={data}
-      fields={getFields()}
-      required={getRequiredFields()}
-      onSubmit={handleSubmit}
-      onDelete={handleDelete}
-      onCancel={onCancel}
-      isLoading={isLoading}
-      title={`${businessType.name} ${mode === 'create' ? 'New' : mode === 'edit' ? 'Edit' : 'View'} ${getMemberTypeName()}`}
-      businessType={businessType.name}
-    />
+    <div className={styles['member-form-container']}>
+      {renderViewToggle()}
+      
+      {activeView === 'details' ? (
+        <BaseForm
+          mode={mode}
+          data={data}
+          fields={getFields()}
+          required={getRequiredFields()}
+          onSubmit={handleSubmit}
+          onDelete={handleDelete}
+          onCancel={onCancel}
+          isLoading={isLoading}
+          title={`Dental Clinic ${mode === 'create' ? 'New' : mode === 'edit' ? 'Edit' : 'View'} Member`}
+          businessType={businessTypeKey}
+        />
+      ) : (
+        <div className={styles['appointments-container']}>
+          {renderUpcomingAppointments()}
+        </div>
+      )}
+    </div>
   );
 };
 

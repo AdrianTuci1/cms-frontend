@@ -21,8 +21,19 @@ const TimelineForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) =
     enableBusinessLogic: true
   });
 
-  const { data: membersData, loading: membersLoading } = membersSync;
-  const { data: servicesData, loading: servicesLoading } = servicesSync;
+  const { 
+    data: membersData, 
+    loading: membersLoading,
+    validateData: validateMemberData,
+    isOperationAllowed: isMemberOperationAllowed
+  } = membersSync;
+  
+  const { 
+    data: servicesData, 
+    loading: servicesLoading,
+    validateData: validateServiceData,
+    isOperationAllowed: isServiceOperationAllowed
+  } = servicesSync;
 
   // Extract items from data - handle different data structures
   // useDataSync returns data directly, not data.items or data.packages
@@ -262,22 +273,63 @@ const TimelineForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) =
   const fields = getEnhancedFields();
 
   const handleSubmit = async (formData, mode) => {
-    // Add business-specific data processing
-    const processedData = {
-      ...formData,
-      businessType: businessType.name,
-      createdAt: mode === 'create' ? new Date().toISOString() : formData.createdAt,
-      updatedAt: new Date().toISOString()
-    };
+    try {
+      // Add business-specific data processing
+      const processedData = {
+        ...formData,
+        businessType: businessType.name,
+        createdAt: mode === 'create' ? new Date().toISOString() : formData.createdAt,
+        updatedAt: new Date().toISOString()
+      };
 
-    if (onSubmit) {
-      await onSubmit(processedData, mode);
+      // Validate data before submitting (following cursor rules pattern)
+      const validation = validateMemberData ? validateMemberData(processedData, 'timeline') : { isValid: true, errors: [] };
+      if (!validation.isValid) {
+        console.error('Validation errors:', validation.errors);
+        alert(`Validation errors: ${validation.errors.join(', ')}`);
+        return;
+      }
+
+      // Check permissions before operation (following cursor rules pattern)
+      const operationName = mode === 'create' ? 'createTimeline' : 'updateTimeline';
+      const hasPermission = isMemberOperationAllowed ? isMemberOperationAllowed(operationName, processedData) : true;
+      if (!hasPermission) {
+        console.error('Operation not allowed:', operationName);
+        alert(`You do not have permission to ${mode === 'create' ? 'create' : 'update'} timeline entries`);
+        return;
+      }
+
+      if (onSubmit) {
+        await onSubmit(processedData, mode);
+        console.log(`Timeline ${mode === 'create' ? 'created' : 'updated'} successfully`);
+      }
+    } catch (error) {
+      console.error(`Failed to ${mode === 'create' ? 'create' : 'update'} timeline:`, error);
+      alert(`Failed to ${mode === 'create' ? 'create' : 'update'} timeline. Please try again.`);
     }
   };
 
   const handleDelete = async (formData) => {
-    if (onDelete) {
-      await onDelete(formData);
+    if (!confirm('Are you sure you want to delete this timeline entry?')) {
+      return;
+    }
+
+    try {
+      // Check permissions before deletion (following cursor rules pattern)
+      const hasPermission = isMemberOperationAllowed ? isMemberOperationAllowed('deleteTimeline', formData) : true;
+      if (!hasPermission) {
+        console.error('Delete operation not allowed');
+        alert('You do not have permission to delete timeline entries');
+        return;
+      }
+
+      if (onDelete) {
+        await onDelete(formData);
+        console.log('Timeline entry deleted successfully');
+      }
+    } catch (error) {
+      console.error('Failed to delete timeline:', error);
+      alert('Failed to delete timeline entry. Please try again.');
     }
   };
 
@@ -299,16 +351,40 @@ const TimelineForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) =
     });
   };
 
-  // Show loading state if data is still loading
+  // Show loading state if data is still loading (following cursor rules pattern)
   if (membersLoading || servicesLoading) {
     return (
-      <div style={{ padding: '20px', textAlign: 'center' }}>
+      <div className="loading-container" style={{ padding: '20px', textAlign: 'center' }}>
+        <div className="spinner" style={{ 
+          border: '3px solid #f3f3f3',
+          borderTop: '3px solid #3498db',
+          borderRadius: '50%',
+          width: '30px',
+          height: '30px',
+          animation: 'spin 1s linear infinite',
+          margin: '0 auto 10px'
+        }}></div>
+        <style jsx>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
         <p>Se încarcă datele pentru formulare...</p>
         <p>Members: {membersLoading ? 'Încărcare...' : 'Gata'} ({members.length} items)</p>
         <p>Services: {servicesLoading ? 'Încărcare...' : 'Gata'} ({services.length} items)</p>
         <p>Business Type: {businessType.name}</p>
-        <p>Members Data: {JSON.stringify(membersData).substring(0, 100)}...</p>
-        <p>Services Data: {JSON.stringify(servicesData).substring(0, 100)}...</p>
+      </div>
+    );
+  }
+
+  // Show error state if there are critical errors (following cursor rules pattern)
+  if (!membersData && !membersLoading) {
+    return (
+      <div className="error-container" style={{ padding: '20px', textAlign: 'center' }}>
+        <h3>Error loading form data</h3>
+        <p>Failed to load members data. Please try again.</p>
+        <button onClick={() => window.location.reload()}>Retry</button>
       </div>
     );
   }

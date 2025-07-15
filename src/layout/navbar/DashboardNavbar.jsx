@@ -1,16 +1,17 @@
 import styles from './DashboardNavbar.module.css';
 import { FaChartLine, FaShoppingCart, FaUsers, FaRobot, FaUser, FaCalendarAlt, FaHistory, FaCog, FaDumbbell, FaHome, FaTooth, FaBed } from 'react-icons/fa';
 import useTabsStore from '../tabsStore';
-import { openDrawer, DRAWER_TYPES } from '../../features/00-Drawers';
+import useDrawerStore, { DRAWER_TYPES } from '../../features/00-Drawers/store/drawerStore';
 
 import { useEffect } from 'react';
-import { getBusinessType, BUSINESS_TYPES } from '../../config/businessTypes';
+import { getBusinessTypeKey, BUSINESS_TYPES } from '../../config/businessTypes';
 // import AIAssistantChat from '../drawer/AIAssistant';
 // import UserDrawer from '../drawer/UserDrawer/UserDrawer';
 
 const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
   const { activeTab, setActiveTab, getTabsBySection } = useTabsStore();
-  const businessType = getBusinessType();
+  const businessTypeKey = getBusinessTypeKey();
+  const { openDrawer } = useDrawerStore();
 
   useEffect(() => {
     const views = getNavbarViews();
@@ -33,17 +34,17 @@ const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
         ];
         
         // Add Treatments view only for dental clinic
-        if (businessType.name === 'Dental Clinic') {
+        if (businessTypeKey === 'DENTAL') {
           views.push({ id: 'services', label: 'Treatments', icon: <FaTooth className={styles.icon} /> });
         }
         
         // Add Packages view only for gym
-        if (businessType.name === 'Gym') {
+        if (businessTypeKey === 'GYM') {
           views.push({ id: 'services', label: 'Packages', icon: <FaDumbbell className={styles.icon} /> });
         }
 
         // Add Rooms view only for hotel
-        if (businessType.name === 'Hotel') {
+        if (businessTypeKey === 'HOTEL') {
           views.push({ id: 'services', label: 'Rooms', icon: <FaBed className={styles.icon} /> });
         }
         
@@ -87,12 +88,12 @@ const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
     }
 
     // Display icon based on business type
-    switch (businessType.name) {
-      case BUSINESS_TYPES.DENTAL_CLINIC.name:
+    switch (businessTypeKey) {
+      case 'DENTAL':
         return <FaTooth className={styles.logoIcon} />;
-      case BUSINESS_TYPES.GYM.name:
+      case 'GYM':
         return <FaDumbbell className={styles.logoIcon} />;
-      case BUSINESS_TYPES.HOTEL.name:
+      case 'HOTEL':
         return <FaBed className={styles.logoIcon} />;
       default:
         return <FaHome className={styles.logoIcon} />;
@@ -116,6 +117,7 @@ const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
           </div>
         </div>
       </div>
+      
       <div className={styles.navbarCenter}>
         <div className={styles.navbarMenu}>
           {getNavbarViews().map((view) => (

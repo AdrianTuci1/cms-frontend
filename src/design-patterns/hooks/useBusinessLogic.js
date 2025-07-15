@@ -15,7 +15,9 @@ import { crudStrategyFactory } from '../strategy/CRUDStrategy.js';
 export const useBusinessLogic = (businessType) => {
   const strategy = useMemo(() => {
     try {
-      return crudStrategyFactory.create(businessType);
+      // Convert business type to lowercase for strategy factory
+      const businessTypeForStrategy = businessType.toLowerCase();
+      return crudStrategyFactory.create(businessTypeForStrategy);
     } catch (error) {
       console.warn(`No strategy found for business type: ${businessType}`, error);
       return null;

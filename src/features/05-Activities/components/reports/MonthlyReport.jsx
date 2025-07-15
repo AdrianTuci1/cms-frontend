@@ -35,7 +35,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 export default function MonthlyReport() {
-  const { profit, preferredTreatments } = DASHBOARD_DATA.DENTAL_CLINIC.reports.monthly;
+      const { profit, preferredTreatments } = DASHBOARD_DATA.DENTAL.reports.monthly;
   
   // Demo data for occupancy chart
   const occupancyData = [

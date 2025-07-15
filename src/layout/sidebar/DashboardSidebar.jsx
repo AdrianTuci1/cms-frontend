@@ -1,19 +1,30 @@
 import styles from './DashboardSidebar.module.css';
 import { FaHome, FaRobot, FaHistory, FaUsers, FaArrowLeft, FaArrowRight, FaMapMarkerAlt, FaAngleDown, FaChartLine, FaFileInvoiceDollar, FaBolt } from 'react-icons/fa';
 import useTabsStore from '../tabsStore';
-import useLocationsStore from '../locationsStore';
 import { useState, useEffect } from 'react';
 import React from 'react';
+import { getMockData } from '../../api/mockData';
 
-const DashboardSidebar = ({ currentSection, setCurrentSection, isExpanded, setIsExpanded }) => {
+const DashboardSidebar = ({ currentSection, setCurrentSection, isExpanded, setIsExpanded, selectedLocation }) => {
   const { setActiveSection } = useTabsStore();
-  const { locations, currentLocation, setCurrentLocation, fetchLocations } = useLocationsStore();
+  const [locations, setLocations] = useState([]);
   const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
   
   useEffect(() => {
-    // Fetch locations when component mounts
+    // Fetch business info to get locations
+    const fetchLocations = async () => {
+      try {
+        const businessInfo = getMockData('business-info');
+        if (businessInfo?.locations) {
+          setLocations(businessInfo.locations);
+        }
+      } catch (error) {
+        console.error('Error fetching locations:', error);
+      }
+    };
+    
     fetchLocations();
-  }, [fetchLocations]);
+  }, []);
 
   const getSidebarSections = () => {
     return [
@@ -35,9 +46,13 @@ const DashboardSidebar = ({ currentSection, setCurrentSection, isExpanded, setIs
   };
   
   const handleLocationChange = (locationId) => {
-    setCurrentLocation(locationId);
-    setIsLocationDropdownOpen(false);
+    // Update localStorage and reload to change location
+    localStorage.setItem('selectedLocation', locationId);
+    window.location.reload();
   };
+
+  // Find current location object from locations array
+  const currentLocation = locations.find(loc => loc.id === selectedLocation) || null;
 
   return (
     <aside className={`${styles.dashboardSidebar} ${isExpanded ? styles.expanded : ''}`}>
@@ -66,7 +81,7 @@ const DashboardSidebar = ({ currentSection, setCurrentSection, isExpanded, setIs
             </div>
             <div className={styles.locationInfo}>
               <div className={styles.locationName}>{currentLocation.name}</div>
-              <div className={styles.locationIdentifier}>{currentLocation.identifier}</div>
+              <div className={styles.locationIdentifier}>{currentLocation.id}</div>
             </div>
             <div className={`${styles.dropdownIcon} ${isLocationDropdownOpen ? styles.open : ''}`}>
               <FaAngleDown />
@@ -78,11 +93,11 @@ const DashboardSidebar = ({ currentSection, setCurrentSection, isExpanded, setIs
               {locations.map(location => (
                 <div 
                   key={location.id} 
-                  className={`${styles.locationOption} ${location.id === currentLocation.id ? styles.active : ''}`}
+                  className={`${styles.locationOption} ${location.id === selectedLocation ? styles.active : ''}`}
                   onClick={() => handleLocationChange(location.id)}
                 >
                   <div className={styles.locationName}>{location.name}</div>
-                  <div className={styles.locationIdentifier}>{location.identifier}</div>
+                  <div className={styles.locationIdentifier}>{location.id}</div>
                 </div>
               ))}
             </div>

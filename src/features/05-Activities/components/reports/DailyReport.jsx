@@ -35,7 +35,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 export default function DailyReport() {
-  const { sales } = DASHBOARD_DATA.DENTAL_CLINIC.reports.daily;
+      const { sales } = DASHBOARD_DATA.DENTAL.reports.daily;
 
   return (
     <>

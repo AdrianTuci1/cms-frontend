@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import styles from './ServicesView.module.css';
 import { getBusinessType, BUSINESS_TYPES } from '../../../../config/businessTypes';
 import { useDataSync } from '../../../../design-patterns/hooks';
-import { openDrawer, DRAWER_TYPES } from '../../../00-Drawers';
+import useDrawerStore, { DRAWER_TYPES } from '../../../00-Drawers/store/drawerStore';
 import TreatmentCard from '../../components/dental/services/TreatmentCard.jsx';
 import PackageCard from '../../components/gym/services/PackageCard.jsx';
 import RoomCard from '../../components/hotel/services/RoomCard.jsx';
@@ -11,6 +11,7 @@ import RoomCard from '../../components/hotel/services/RoomCard.jsx';
 const ServicesView = () => {
   const businessType = getBusinessType();
   const [searchQuery, setSearchQuery] = useState('');
+  const { openDrawer } = useDrawerStore();
 
   // Use useDataSync hook directly for services data
   const servicesSync = useDataSync('services', {
@@ -126,7 +127,7 @@ const ServicesView = () => {
 
   const getSearchPlaceholder = () => {
     switch (businessType.name) {
-      case BUSINESS_TYPES.DENTAL_CLINIC.name:
+      case BUSINESS_TYPES.DENTAL.name:
         return 'Search treatments...';
       case BUSINESS_TYPES.GYM.name:
         return 'Search packages...';
@@ -140,7 +141,7 @@ const ServicesView = () => {
   const getCountText = () => {
     const count = filteredServices.length;
     switch (businessType.name) {
-      case BUSINESS_TYPES.DENTAL_CLINIC.name:
+      case BUSINESS_TYPES.DENTAL.name:
         return `${count} treatments`;
       case BUSINESS_TYPES.GYM.name:
         return `${count} packages`;
@@ -181,7 +182,7 @@ const ServicesView = () => {
     };
 
     switch (businessType.name) {
-      case BUSINESS_TYPES.DENTAL_CLINIC.name:
+      case BUSINESS_TYPES.DENTAL.name:
         return <TreatmentCard key={service.id} treatment={service} {...cardProps} />;
       case BUSINESS_TYPES.GYM.name:
         return <PackageCard key={service.id} packageData={service} {...cardProps} />;

@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './MembersTab.module.css';
 import { FaEnvelope, FaPhone } from 'react-icons/fa';
 import { useDataSync } from '../../../../design-patterns/hooks';
-import { openDrawer, DRAWER_TYPES } from '../../../00-Drawers';
+import useDrawerStore, { DRAWER_TYPES } from '../../../00-Drawers/store/drawerStore';
 
 const MembersTab = ({ businessType = 'hotel' }) => {
   // Use useDataSync hook for members data - same as StocksView
@@ -13,6 +13,7 @@ const MembersTab = ({ businessType = 'hotel' }) => {
   });
 
   const { data: membersData, loading: membersLoading, error: membersError, isOnline, lastUpdated } = membersSync;
+  const { openDrawer } = useDrawerStore();
 
   // Extract the actual member items from the members data - same as StocksView
   const memberItems = membersData?.items || membersData || [];

@@ -6,19 +6,57 @@ import { useMemo, useCallback } from 'react';
 // Mock data temporar
 const mockRoomsData = {
   rooms: [
-    { id: 1, roomNumber: '101', type: 'single', price: 100 },
-    { id: 2, roomNumber: '102', type: 'double', price: 150 },
-    { id: 3, roomNumber: '103', type: 'suite', price: 250 }
+    { id: 1, roomNumber: '101', type: 'Single', price: 100 },
+    { id: 2, roomNumber: '102', type: 'Double', price: 150 },
+    { id: 3, roomNumber: '103', type: 'Suite', price: 250 },
+    { id: 4, roomNumber: '201', type: 'Single', price: 100 },
+    { id: 5, roomNumber: '202', type: 'Double', price: 150 },
+    { id: 6, roomNumber: '203', type: 'Suite', price: 250 }
   ]
 };
+
+// Calculate current date range for mock data
+const today = new Date();
+const fiveDaysPrior = new Date(today);
+fiveDaysPrior.setDate(today.getDate() - 5);
+const twoWeeksFromToday = new Date(today);
+twoWeeksFromToday.setDate(today.getDate() + 14);
 
 const mockReservationsData = {
   reservations: [
     {
       id: 1,
       rooms: [
-        { roomId: '101', startDate: '2024-01-01', endDate: '2024-01-05' }
-      ]
+        { 
+          roomId: '101', 
+          startDate: fiveDaysPrior.toISOString().split('T')[0], 
+          endDate: new Date(fiveDaysPrior.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          status: 'occupied'
+        }
+      ],
+      client: {
+        clientId: 1,
+        clientName: 'John Doe',
+        phone: '+40 123 456 789',
+        email: 'john@example.com'
+      }
+    },
+    {
+      id: 2,
+      rooms: [
+        { 
+          roomId: '102', 
+          startDate: new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], 
+          endDate: new Date(today.getTime() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          status: 'pending'
+        }
+      ],
+      client: {
+        clientId: 2,
+        clientName: 'Jane Smith',
+        phone: '+40 987 654 321',
+        email: 'jane@example.com'
+      }
     }
   ]
 };
@@ -35,34 +73,14 @@ const isDateRangeOverlapping = (start1, end1, start2, end2) => {
 
 // Helper function to get date range from reservations
 const getDateRangeFromReservations = (reservations) => {
-  if (!reservations || reservations.length === 0) {
-    const today = new Date();
-    const twoWeeksLater = new Date(today);
-    twoWeeksLater.setDate(today.getDate() + 14);
-    return { startDate: today, endDate: twoWeeksLater };
-  }
+  // Always use 5 days prior from today and 2 weeks from today
+  const today = new Date();
+  const fiveDaysPrior = new Date(today);
+  fiveDaysPrior.setDate(today.getDate() - 5);
+  const twoWeeksFromToday = new Date(today);
+  twoWeeksFromToday.setDate(today.getDate() + 14);
 
-  let minDate = new Date(reservations[0].rooms[0].startDate);
-  let maxDate = new Date(reservations[0].rooms[0].endDate);
-
-  reservations.forEach(res => {
-    res.rooms.forEach(room => {
-      const startDate = new Date(room.startDate);
-      const endDate = new Date(room.endDate);
-      
-      if (startDate < minDate) minDate = startDate;
-      if (endDate > maxDate) maxDate = endDate;
-    });
-  });
-
-  // Ensure at least 2 weeks range
-  const rangeInDays = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24));
-  if (rangeInDays < 21) {
-    const additionalDays = 21 - rangeInDays;
-    maxDate.setDate(maxDate.getDate() + additionalDays);
-  }
-
-  return { startDate: minDate, endDate: maxDate };
+  return { startDate: fiveDaysPrior, endDate: twoWeeksFromToday };
 };
 
 const { startDate, endDate } = getDateRangeFromReservations(mockReservationsData.reservations);

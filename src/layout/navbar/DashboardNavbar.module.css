@@ -14,6 +14,9 @@
 
 .navbarStart {
   width: 200px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
 .logo {
@@ -58,6 +61,60 @@
 .logo .icon {
   width: 24px;
   height: 24px;
+}
+
+/* Location Display Styles */
+.locationDisplay {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e1e8ed;
+  max-width: 200px;
+  overflow: hidden;
+}
+
+.locationDisplay:hover {
+  background-color: #f8f9fa;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.locationIcon {
+  color: #667eea;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.locationInfo {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.locationName {
+  font-size: 12px;
+  font-weight: 600;
+  color: #2d3748;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.locationAddress {
+  font-size: 10px;
+  color: #718096;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
 }
 
 .navbarCenter {
@@ -204,66 +261,91 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px;
-  border: none;
-  background: none;
-  color: #666;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
   cursor: pointer;
+  transition: background-color 0.2s;
   font-size: 14px;
+  color: #495057;
 }
 
 .backButton:hover {
-  color: #333;
+  background: #e9ecef;
 }
 
 .conversationContent {
-  min-height: 200px;
-  border: 1px solid #eee;
-  border-radius: 6px;
-  padding: 12px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .intentForm {
   display: flex;
-  gap: 8px;
-  align-items: center;
-  background: white;
-  padding: 4px;
-  border-radius: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
 }
 
 .intentInput {
-  width: 200px;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 16px;
+  padding: 12px;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
   font-size: 14px;
-  outline: none;
-  transition: all 0.3s ease;
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
 }
 
 .intentInput:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .intentSubmit {
-  padding: 8px;
-  border: none;
-  background: #007bff;
+  padding: 10px 20px;
+  background: #667eea;
   color: white;
-  border-radius: 50%;
+  border: none;
+  border-radius: 6px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+  align-self: flex-start;
 }
 
 .intentSubmit:hover {
-  background: #0056b3;
-  transform: scale(1.05);
+  background: #5a67d8;
+}
+
+/* Responsive styles for location display */
+@media (max-width: 768px) {
+  .navbarStart {
+    width: auto;
+    gap: 10px;
+  }
+  
+  .locationDisplay {
+    max-width: 150px;
+    padding: 6px 8px;
+  }
+  
+  .locationName {
+    font-size: 11px;
+  }
+  
+  .locationAddress {
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 480px) {
+  .locationDisplay {
+    display: none; /* Hide on very small screens */
+  }
 } 

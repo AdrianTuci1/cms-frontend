@@ -1,5 +1,5 @@
 export const BUSINESS_TYPES = {
-  DENTAL_CLINIC: {
+  DENTAL: {
     name: 'Dental Clinic',
     homeComponents: ['Medics', 'Treatments'],
     dashboardComponents: ['Timeline', 'Sales', 'Clients', 'Stocks'],
@@ -29,19 +29,40 @@ export const BUSINESS_TYPES = {
   }
 };
 
-const ENV_TO_BUSINESS_TYPE = {
-  'DENTAL': 'DENTAL_CLINIC',
-  'GYM': 'GYM',
-  'HOTEL': 'HOTEL'
-};
+// Default business type - can be changed here or via environment variable
+const DEFAULT_BUSINESS_TYPE = 'DENTAL';
 
 export const getBusinessType = () => {
+  // Get from environment variable
   const envBusinessType = import.meta.env.VITE_BUSINESS_TYPE;
-  const mappedType = ENV_TO_BUSINESS_TYPE[envBusinessType];
   
-  if (!envBusinessType || !mappedType || !BUSINESS_TYPES[mappedType]) {
-    console.warn('Invalid or missing BUSINESS_TYPE in .env, defaulting to DENTAL_CLINIC');
-    return BUSINESS_TYPES.DENTAL_CLINIC;
-  }
-  return BUSINESS_TYPES[mappedType];
+  // Use environment variable if valid, otherwise use default
+  const businessTypeKey = (envBusinessType && BUSINESS_TYPES[envBusinessType]) 
+    ? envBusinessType 
+    : DEFAULT_BUSINESS_TYPE;
+  
+  return BUSINESS_TYPES[businessTypeKey];
+};
+
+/**
+ * Get current business type key (DENTAL, GYM, HOTEL)
+ * @returns {string} Business type key
+ */
+export const getBusinessTypeKey = () => {
+  const envBusinessType = import.meta.env.VITE_BUSINESS_TYPE;
+  
+  const businessTypeKey = (envBusinessType && BUSINESS_TYPES[envBusinessType]) 
+    ? envBusinessType 
+    : DEFAULT_BUSINESS_TYPE;
+  
+  return businessTypeKey;
+};
+
+/**
+ * Get business type key for data sync (lowercase)
+ * @param {string} businessTypeKey - Business type key (DENTAL, GYM, HOTEL)
+ * @returns {string} Lowercase business type key
+ */
+export const getBusinessTypeKeyForSync = (businessTypeKey) => {
+  return businessTypeKey.toLowerCase();
 }; 

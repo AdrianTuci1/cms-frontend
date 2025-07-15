@@ -364,52 +364,37 @@ export const timelineTestUtils = {
 };
 
 import { useDataSync } from '../../../design-patterns/hooks';
-import { getBusinessType } from '../../../config/businessTypes';
+import { getBusinessType, getBusinessTypeKey, getBusinessTypeKeyForSync } from '../../../config/businessTypes';
 
 /**
  * Shared data provider hook for dashboard views
  * Preloads all necessary data and provides it to child components
  */
 export const useDashboardData = () => {
-  const businessType = getBusinessType();
-
-  // Map business type name to the format expected by the data sync system
-  const getBusinessTypeKey = (businessTypeName) => {
-    switch (businessTypeName) {
-      case 'Dental Clinic':
-        return 'dental';
-      case 'Gym':
-        return 'gym';
-      case 'Hotel':
-        return 'hotel';
-      default:
-        return 'dental';
-    }
-  };
-
-  const businessTypeKey = getBusinessTypeKey(businessType.name);
+  const businessTypeKey = getBusinessTypeKey();
+  const businessTypeForSync = getBusinessTypeKeyForSync(businessTypeKey);
 
   // Preload all necessary data for dashboard views
   const clientsSync = useDataSync('clients', {
-    businessType: businessTypeKey,
+    businessType: businessTypeForSync,
     enableValidation: true,
     enableBusinessLogic: true
   });
 
   const packagesSync = useDataSync('packages', {
-    businessType: businessTypeKey,
+    businessType: businessTypeForSync,
     enableValidation: true,
     enableBusinessLogic: true
   });
 
   const stocksSync = useDataSync('stocks', {
-    businessType: businessTypeKey,
+    businessType: businessTypeForSync,
     enableValidation: true,
     enableBusinessLogic: true
   });
 
   const timelineSync = useDataSync('timeline', {
-    businessType: businessTypeKey,
+    businessType: businessTypeForSync,
     enableValidation: true,
     enableBusinessLogic: true
   });
@@ -449,7 +434,7 @@ export const useDashboardData = () => {
     refreshAll,
     
     // Business type
-    businessType: businessType.name,
+    businessType: businessTypeKey,
     
     // Convenience getters
     get clients() { return clientsSync.data || []; },

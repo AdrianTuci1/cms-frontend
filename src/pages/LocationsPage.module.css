@@ -1,0 +1,442 @@
+/* Container */
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.content {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  max-width: 1200px;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Header */
+.header {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e1e8ed;
+}
+
+.businessInfo {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.businessIcon {
+  font-size: 48px;
+  width: 80px;
+  height: 80px;
+  background: white;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.businessDetails h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  color: #2d3748;
+}
+
+.businessType {
+  margin: 5px 0 0 0;
+  font-size: 16px;
+  color: #718096;
+  font-weight: 500;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: white;
+  padding: 15px 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.userAvatar {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 20px;
+}
+
+.userDetails {
+  text-align: right;
+}
+
+.userName {
+  margin: 0;
+  font-weight: 600;
+  color: #2d3748;
+  font-size: 16px;
+}
+
+.userEmail {
+  margin: 2px 0 0 0;
+  color: #718096;
+  font-size: 14px;
+}
+
+/* Greeting */
+.greeting {
+  padding: 40px;
+  text-align: center;
+  background: white;
+}
+
+.greeting h2 {
+  margin: 0 0 15px 0;
+  font-size: 28px;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.greeting p {
+  margin: 0;
+  font-size: 18px;
+  color: #718096;
+}
+
+/* Locations */
+.locations {
+  padding: 0 40px 40px 40px;
+  background: white;
+}
+
+.locations h3 {
+  margin: 0 0 30px 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #2d3748;
+  text-align: center;
+}
+
+.locationsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 25px;
+  margin-bottom: 40px;
+}
+
+.locationCard {
+  background: #f7fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 15px;
+  padding: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.locationCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border-color: #667eea;
+}
+
+.locationCard.selected {
+  border-color: #667eea;
+  background: linear-gradient(135deg, #f0f4ff 0%, #e6f3ff 100%);
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+}
+
+.locationHeader {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.locationIcon {
+  font-size: 24px;
+  width: 50px;
+  height: 50px;
+  background: white;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.locationHeader h4 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.locationDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.locationAddress {
+  margin: 0;
+  font-size: 16px;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.locationPhone {
+  margin: 0;
+  font-size: 14px;
+  color: #718096;
+}
+
+.businessHours {
+  background: white;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.businessHours p {
+  margin: 0;
+  font-size: 14px;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.locationServices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.serviceTag {
+  background: #667eea;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.defaultBadge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: #48bb78;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Actions */
+.actions {
+  padding: 40px;
+  text-align: center;
+  background: #f7fafc;
+  border-top: 1px solid #e2e8f0;
+}
+
+.continueButton {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 15px 40px;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.continueButton:hover:not(.disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.continueButton.disabled {
+  background: #cbd5e0;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.selectionHint {
+  margin: 15px 0 0 0;
+  font-size: 14px;
+  color: #718096;
+}
+
+/* Footer */
+.footer {
+  padding: 20px 40px;
+  background: #2d3748;
+  color: #a0aec0;
+  text-align: center;
+}
+
+.footer p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+/* Loading */
+.loadingContainer {
+  text-align: center;
+  color: white;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loadingContainer p {
+  font-size: 18px;
+  margin: 0;
+}
+
+/* Error */
+.errorContainer {
+  text-align: center;
+  color: white;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.errorIcon {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.errorContainer h2 {
+  margin: 0 0 15px 0;
+  font-size: 24px;
+}
+
+.errorContainer p {
+  margin: 0 0 25px 0;
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+.retryButton {
+  background: white;
+  color: #2d3748;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.retryButton:hover {
+  background: #f7fafc;
+  transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+  
+  .content {
+    border-radius: 15px;
+  }
+  
+  .header {
+    padding: 30px 20px;
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+  
+  .businessInfo {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .userInfo {
+    align-self: center;
+  }
+  
+  .greeting {
+    padding: 30px 20px;
+  }
+  
+  .greeting h2 {
+    font-size: 24px;
+  }
+  
+  .locations {
+    padding: 0 20px 30px 20px;
+  }
+  
+  .locationsGrid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .actions {
+    padding: 30px 20px;
+  }
+  
+  .footer {
+    padding: 15px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .businessIcon {
+    width: 60px;
+    height: 60px;
+    font-size: 36px;
+  }
+  
+  .businessDetails h1 {
+    font-size: 24px;
+  }
+  
+  .locationCard {
+    padding: 20px;
+  }
+  
+  .locationHeader h4 {
+    font-size: 18px;
+  }
+} 

@@ -1,18 +1,40 @@
 /**
  * Business Info Mock Data
  * 
- * Comprehensive mock data for business information across different business types
+ * Simplified mock data for business information with tenant and location management
  * Used for development and offline mode
  */
 
-// Mock data pentru business-info
+// Tenant configuration mapping
+export const TENANT_CONFIG = {
+  'T0001': {
+    id: 'T0001',
+    businessType: 'dental',
+    name: 'Dental Clinic Mock',
+    tenantId: 'T0001'
+  },
+  'T0002': {
+    id: 'T0002', 
+    businessType: 'gym',
+    name: 'Fitness Center Mock',
+    tenantId: 'T0002'
+  },
+  'T0003': {
+    id: 'T0003',
+    businessType: 'hotel', 
+    name: 'Hotel Mock',
+    tenantId: 'T0003'
+  }
+};
+
+// Base business info structure
 export const businessInfoMock = {
   id: 'business-info-001',
   business: {
     id: 'mock-business-001',
     name: 'Mock Business',
     type: 'dental',
-    tenantId: 'mock-tenant-123',
+    tenantId: 'T0001',
     settings: {
       timezone: 'Europe/Bucharest',
       currency: 'RON',
@@ -28,8 +50,8 @@ export const businessInfoMock = {
   },
   locations: [
     {
-      id: 'mock-location-001',
-      name: 'Mock Location 1',
+      id: 'T0001-01',
+      name: 'Main Dental Clinic',
       address: {
         street: 'Strada Mock 123',
         city: 'București',
@@ -49,11 +71,12 @@ export const businessInfoMock = {
         sunday: { open: null, close: null, closed: true }
       },
       services: ['appointments', 'consultations', 'treatments'],
-      capacity: 50
+      capacity: 50,
+      isDefault: true
     },
     {
-      id: 'mock-location-002',
-      name: 'Mock Location 2',
+      id: 'T0001-02',
+      name: 'Dental Clinic Branch',
       address: {
         street: 'Strada Test 456',
         city: 'Cluj-Napoca',
@@ -73,7 +96,8 @@ export const businessInfoMock = {
         sunday: { open: null, close: null, closed: true }
       },
       services: ['appointments', 'consultations'],
-      capacity: 30
+      capacity: 30,
+      isDefault: false
     }
   ],
   features: {
@@ -118,86 +142,72 @@ export const businessInfoMock = {
       allowCustomPricing: true,
       requireDescription: true
     }
-  },
-  integrations: {
-    payment: {
-      stripe: { enabled: false, testMode: true },
-      paypal: { enabled: false, testMode: true },
-      local: { enabled: true, methods: ['cash', 'card', 'transfer'] }
-    },
-    communication: {
-      email: { enabled: true, provider: 'smtp' },
-      sms: { enabled: false, provider: null },
-      whatsapp: { enabled: false, provider: null }
-    },
-    calendar: {
-      google: { enabled: false },
-      outlook: { enabled: false },
-      local: { enabled: true }
-    }
-  },
-  branding: {
-    logo: null,
-    colors: {
-      primary: '#2563eb',
-      secondary: '#64748b',
-      accent: '#f59e0b'
-    },
-    fonts: {
-      primary: 'Inter',
-      secondary: 'Roboto'
-    }
-  },
-  notifications: {
-    email: {
-      appointmentReminders: true,
-      invoiceNotifications: true,
-      systemAlerts: true
-    },
-    sms: {
-      appointmentReminders: false,
-      invoiceNotifications: false,
-      systemAlerts: false
-    },
-    push: {
-      enabled: false
-    }
-  },
-  security: {
-    twoFactorAuth: false,
-    sessionTimeout: 3600,
-    passwordPolicy: {
-      minLength: 8,
-      requireUppercase: true,
-      requireLowercase: true,
-      requireNumbers: true,
-      requireSpecialChars: false
-    }
-  },
-  analytics: {
-    enabled: true,
-    tracking: {
-      pageViews: true,
-      userActions: true,
-      performance: true
-    },
-    privacy: {
-      anonymizeData: true,
-      respectDNT: true
-    }
   }
 };
 
-// Business info pentru diferite tipuri de business
-export const businessInfoByType = {
-  dental: {
+// Business info by tenant
+export const businessInfoByTenant = {
+  'T0001': {
     ...businessInfoMock,
     business: {
       ...businessInfoMock.business,
       type: 'dental',
       name: 'Dental Clinic Mock',
+      tenantId: 'T0001',
       specialties: ['General Dentistry', 'Orthodontics', 'Surgery']
     },
+    locations: [
+      {
+        id: 'T0001-01',
+        name: 'Main Dental Clinic',
+        address: {
+          street: 'Strada Mock 123',
+          city: 'București',
+          county: 'București',
+          postalCode: '010000',
+          country: 'România'
+        },
+        phone: '+40 123 456 789',
+        email: 'contact@mockbusiness.ro',
+        businessHours: {
+          monday: { open: '09:00', close: '18:00', closed: false },
+          tuesday: { open: '09:00', close: '18:00', closed: false },
+          wednesday: { open: '09:00', close: '18:00', closed: false },
+          thursday: { open: '09:00', close: '18:00', closed: false },
+          friday: { open: '09:00', close: '18:00', closed: false },
+          saturday: { open: '10:00', close: '16:00', closed: false },
+          sunday: { open: null, close: null, closed: true }
+        },
+        services: ['appointments', 'consultations', 'treatments'],
+        capacity: 50,
+        isDefault: true
+      },
+      {
+        id: 'T0001-02',
+        name: 'Dental Clinic Branch',
+        address: {
+          street: 'Strada Test 456',
+          city: 'Cluj-Napoca',
+          county: 'Cluj',
+          postalCode: '400000',
+          country: 'România'
+        },
+        phone: '+40 123 456 790',
+        email: 'cluj@mockbusiness.ro',
+        businessHours: {
+          monday: { open: '08:00', close: '17:00', closed: false },
+          tuesday: { open: '08:00', close: '17:00', closed: false },
+          wednesday: { open: '08:00', close: '17:00', closed: false },
+          thursday: { open: '08:00', close: '17:00', closed: false },
+          friday: { open: '08:00', close: '17:00', closed: false },
+          saturday: { open: '09:00', close: '15:00', closed: false },
+          sunday: { open: null, close: null, closed: true }
+        },
+        services: ['appointments', 'consultations'],
+        capacity: 30,
+        isDefault: false
+      }
+    ],
     features: {
       ...businessInfoMock.features,
       appointments: {
@@ -211,14 +221,42 @@ export const businessInfoByType = {
       }
     }
   },
-  gym: {
+  'T0002': {
     ...businessInfoMock,
     business: {
       ...businessInfoMock.business,
       type: 'gym',
       name: 'Fitness Center Mock',
+      tenantId: 'T0002',
       specialties: ['Cardio', 'Strength Training', 'Yoga', 'Swimming']
     },
+    locations: [
+      {
+        id: 'T0002-01',
+        name: 'Main Fitness Center',
+        address: {
+          street: 'Strada Fitness 789',
+          city: 'București',
+          county: 'București',
+          postalCode: '010000',
+          country: 'România'
+        },
+        phone: '+40 123 456 791',
+        email: 'contact@fitnessmock.ro',
+        businessHours: {
+          monday: { open: '06:00', close: '23:00', closed: false },
+          tuesday: { open: '06:00', close: '23:00', closed: false },
+          wednesday: { open: '06:00', close: '23:00', closed: false },
+          thursday: { open: '06:00', close: '23:00', closed: false },
+          friday: { open: '06:00', close: '23:00', closed: false },
+          saturday: { open: '08:00', close: '22:00', closed: false },
+          sunday: { open: '08:00', close: '22:00', closed: false }
+        },
+        services: ['memberships', 'classes', 'personal_training'],
+        capacity: 200,
+        isDefault: true
+      }
+    ],
     features: {
       ...businessInfoMock.features,
       memberships: {
@@ -232,14 +270,42 @@ export const businessInfoByType = {
       }
     }
   },
-  hotel: {
+  'T0003': {
     ...businessInfoMock,
     business: {
       ...businessInfoMock.business,
       type: 'hotel',
       name: 'Hotel Mock',
+      tenantId: 'T0003',
       specialties: ['Accommodation', 'Conference', 'Spa', 'Restaurant']
     },
+    locations: [
+      {
+        id: 'T0003-01',
+        name: 'Main Hotel',
+        address: {
+          street: 'Strada Hotel 321',
+          city: 'București',
+          county: 'București',
+          postalCode: '010000',
+          country: 'România'
+        },
+        phone: '+40 123 456 792',
+        email: 'contact@hotelmock.ro',
+        businessHours: {
+          monday: { open: '00:00', close: '23:59', closed: false },
+          tuesday: { open: '00:00', close: '23:59', closed: false },
+          wednesday: { open: '00:00', close: '23:59', closed: false },
+          thursday: { open: '00:00', close: '23:59', closed: false },
+          friday: { open: '00:00', close: '23:59', closed: false },
+          saturday: { open: '00:00', close: '23:59', closed: false },
+          sunday: { open: '00:00', close: '23:59', closed: false }
+        },
+        services: ['accommodation', 'conference', 'spa', 'restaurant'],
+        capacity: 150,
+        isDefault: true
+      }
+    ],
     features: {
       ...businessInfoMock.features,
       reservations: {
@@ -256,19 +322,54 @@ export const businessInfoByType = {
 };
 
 /**
- * Funcție pentru obținerea business info după tip
+ * Funcție pentru obținerea business info după tenant ID
  */
-export function getBusinessInfo(businessType = 'dental') {
-  return businessInfoByType[businessType] || businessInfoMock;
+export function getBusinessInfo(tenantId = 'T0001') {
+  return businessInfoByTenant[tenantId] || businessInfoMock;
+}
+
+/**
+ * Funcție pentru obținerea business info după business type
+ */
+export function getBusinessInfoByType(businessType = 'dental') {
+  const tenantId = Object.keys(TENANT_CONFIG).find(key => 
+    TENANT_CONFIG[key].businessType === businessType
+  );
+  return getBusinessInfo(tenantId);
+}
+
+/**
+ * Funcție pentru obținerea tenant ID după business type
+ */
+export function getTenantIdByType(businessType = 'dental') {
+  const tenant = Object.values(TENANT_CONFIG).find(config => 
+    config.businessType === businessType
+  );
+  return tenant ? tenant.tenantId : 'T0001';
+}
+
+/**
+ * Funcție pentru obținerea business type după tenant ID
+ */
+export function getBusinessTypeByTenant(tenantId = 'T0001') {
+  return TENANT_CONFIG[tenantId]?.businessType || 'dental';
+}
+
+/**
+ * Funcție pentru obținerea locației implicite pentru un tenant
+ */
+export function getDefaultLocation(tenantId = 'T0001') {
+  const businessInfo = getBusinessInfo(tenantId);
+  return businessInfo.locations.find(location => location.isDefault) || businessInfo.locations[0];
 }
 
 /**
  * Funcție pentru actualizarea business info
  */
-export function updateBusinessInfo(businessType, updates) {
-  if (businessInfoByType[businessType]) {
-    businessInfoByType[businessType] = {
-      ...businessInfoByType[businessType],
+export function updateBusinessInfo(tenantId, updates) {
+  if (businessInfoByTenant[tenantId]) {
+    businessInfoByTenant[tenantId] = {
+      ...businessInfoByTenant[tenantId],
       ...updates
     };
   }
@@ -276,7 +377,12 @@ export function updateBusinessInfo(businessType, updates) {
 
 export default {
   businessInfoMock,
-  businessInfoByType,
+  businessInfoByTenant,
+  TENANT_CONFIG,
   getBusinessInfo,
+  getBusinessInfoByType,
+  getTenantIdByType,
+  getBusinessTypeByTenant,
+  getDefaultLocation,
   updateBusinessInfo
 }; 

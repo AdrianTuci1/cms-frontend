@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { getBusinessType } from '../../../../config/businessTypes';
 import { FaSearch, FaPlus } from 'react-icons/fa';
 import { useDataSync } from '../../../../design-patterns/hooks';
-import { openDrawer, DRAWER_TYPES } from '../../../00-Drawers';
+import useDrawerStore, { DRAWER_TYPES } from '../../../00-Drawers/store/drawerStore';
 import GymClientCard from '../../components/gym/clients/GymClientCard';
 import DentalClientCard from '../../components/dental/clients/DentalClientCard';
 import HotelClientCard from '../../components/hotel/clients/HotelClientCard';
@@ -11,6 +11,7 @@ import styles from './ClientsView.module.css';
 const ClientsView = () => {
   const businessType = getBusinessType();
   const [searchTerm, setSearchTerm] = useState('');
+  const { openDrawer } = useDrawerStore();
 
   // Use useDataSync hook directly for clients data
   const clientsSync = useDataSync('clients', {

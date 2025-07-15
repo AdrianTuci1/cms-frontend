@@ -1,9 +1,11 @@
 import React from 'react';
-import { openDrawer, useDrawer, DRAWER_MODES, DRAWER_TYPES } from '../index';
+import { useDrawer, DRAWER_MODES, DRAWER_TYPES } from '../index';
+import useDrawerStore from '../store/drawerStore';
 import styles from './DrawerExample.module.css';
 
 const DrawerExample = () => {
   const { isOpen, currentMode, currentDrawerType } = useDrawer();
+  const { openDrawer } = useDrawerStore();
 
   // Example data
   const sampleTimeline = {
