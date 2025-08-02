@@ -46,7 +46,6 @@ const Appointments = () => {
 
   // Use useDataSync hook directly for timeline data
   const timelineSync = useDataSync('timeline', {
-    businessType: businessTypeForSync,
     startDate,
     endDate,
     enableValidation: true,

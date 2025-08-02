@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
-import { getBusinessType } from '../config/businessTypes';
+import { getBusinessType, getBusinessTypeKey, getCurrentBusinessTypeForSync } from '../config/businessTypes';
+import { tenantUtils } from '../config/tenant.js';
+import dataSyncManager from '../design-patterns/data-sync';
 import DashboardNavbar from './navbar/DashboardNavbar';
 import DashboardSidebar from './sidebar/DashboardSidebar';
 import DrawerManager from '../features/00-Drawers/DrawerManager';
+import useDrawerStore from '../features/00-Drawers/store/drawerStore';
 import { Outlet, useNavigate } from 'react-router-dom';
 import styles from './DashboardLayout.module.css';
 
@@ -16,6 +19,10 @@ const STORAGE_KEYS = {
 const DashboardLayout = () => {
   const navigate = useNavigate();
   const businessType = getBusinessType();
+  
+  // Drawer state
+  const { isOpen: isDrawerOpen, getActiveDrawerSize } = useDrawerStore();
+  const drawerSize = getActiveDrawerSize();
   
   // Initialize state with values from localStorage or defaults
   const [currentSection, setCurrentSection] = useState(() => {
@@ -44,6 +51,43 @@ const DashboardLayout = () => {
     }
   }, [selectedLocation, navigate]);
 
+  // Initialize data sync manager with business info
+  useEffect(() => {
+    if (selectedLocation) {
+      const initializeDataSync = async () => {
+        try {
+          // Get business info from tenant config
+          const tenantConfig = tenantUtils.getTenantConfig();
+          const businessTypeKey = getBusinessTypeKey();
+          const businessTypeForSync = getCurrentBusinessTypeForSync();
+          
+          // Create business info object
+          const businessInfo = {
+            business: {
+              id: tenantConfig.tenantId,
+              name: tenantConfig.name,
+              businessType: businessTypeForSync,
+              tenantId: tenantConfig.tenantId
+            },
+            location: {
+              id: selectedLocation,
+              name: `${tenantConfig.name} - Location ${selectedLocation}`,
+              address: 'Main Office'
+            }
+          };
+
+          // Initialize data sync manager with business info
+          dataSyncManager.setBusinessInfo(businessInfo);
+          console.log('DataSyncManager initialized with business info:', businessInfo);
+        } catch (error) {
+          console.error('Failed to initialize DataSyncManager with business info:', error);
+        }
+      };
+
+      initializeDataSync();
+    }
+  }, [selectedLocation]);
+
   // Save state to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.SECTION, currentSection);
@@ -62,6 +106,12 @@ const DashboardLayout = () => {
       localStorage.setItem(STORAGE_KEYS.SELECTED_LOCATION, selectedLocation);
     }
   }, [selectedLocation]);
+
+  // Get drawer size class
+  const getDrawerSizeClass = () => {
+    if (!isDrawerOpen) return '';
+    return `mainWithDrawer${drawerSize.charAt(0).toUpperCase() + drawerSize.slice(1)}`;
+  };
 
   // If no location is selected, show loading
   if (!selectedLocation) {
@@ -89,18 +139,20 @@ const DashboardLayout = () => {
           setIsExpanded={setIsSidebarExpanded}
           selectedLocation={selectedLocation}
         />
-        <main className={`${styles.dashboardMain} ${isSidebarExpanded ? styles.mainExpanded : ''}`}>
-          <Outlet context={{ 
-            currentSection, 
-            setCurrentSection,
-            currentView, 
-            setCurrentView,
-            selectedLocation,
-            setSelectedLocation
-          }} />
+        <main className={`${styles.dashboardMain} ${isSidebarExpanded ? styles.mainExpanded : ''} ${getDrawerSizeClass()}`}>
+          <div className={styles.mainContent}>
+            <Outlet context={{ 
+              currentSection, 
+              setCurrentSection,
+              currentView, 
+              setCurrentView,
+              selectedLocation,
+              setSelectedLocation
+            }} />
+          </div>
+          <DrawerManager />
         </main>
       </div>
-      <DrawerManager />
     </div>
   );
 };

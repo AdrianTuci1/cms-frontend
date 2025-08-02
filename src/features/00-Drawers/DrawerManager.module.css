@@ -1,0 +1,40 @@
+.drawerContainer {
+  position: relative;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 1000;
+  height: 100%;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  isolation: isolate; /* Creates a new stacking context */
+  overflow: visible; /* Allow drawers to overflow for stacking */
+}
+
+.drawerContainer > * {
+  pointer-events: auto;
+  position: absolute; /* Each drawer is absolutely positioned for stacking */
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+/* Drawer container widths based on drawer size */
+.drawerContainerSmall {
+  width: 320px;
+}
+
+.drawerContainerMedium {
+  width: 480px;
+}
+
+.drawerContainerLarge {
+  width: 640px;
+}
+
+.drawerContainerFull {
+  width: 100%;
+} 

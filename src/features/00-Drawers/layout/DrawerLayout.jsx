@@ -9,7 +9,10 @@ const DrawerLayout = ({
   children, 
   isLoading = false,
   actions = null,
-  size = 'medium' // 'small', 'medium', 'large', 'full'
+  size = 'medium', // 'small', 'medium', 'large', 'full'
+  drawerIndex = 0,
+  totalDrawers = 1,
+  isActive = true
 }) => {
   if (!isOpen) return null;
 
@@ -35,9 +38,22 @@ const DrawerLayout = ({
     };
   }, []);
 
+  // Calculate stacked positioning - drawers on top of each other
+  const zIndex = 1000 + (drawerIndex * 10); // Higher z-index for newer drawers with more spacing
+
   return (
-    <div className={styles.drawerOverlay} onClick={handleBackdropClick}>
-      <div className={`${styles.drawer} ${styles[size]}`}>
+    <div 
+      className={styles.drawerOverlay} 
+      onClick={handleBackdropClick}
+      style={{ zIndex }}
+    >
+      <div 
+        className={`${styles.drawer} ${styles[size]} ${isActive ? styles.active : ''}`}
+        style={{
+          zIndex: zIndex + 1 // Drawer should be above its overlay
+        }}
+      >
+        
         {/* Header */}
         <div className={styles.drawerHeader}>
           <div className={styles.headerContent}>
@@ -45,16 +61,24 @@ const DrawerLayout = ({
             {isLoading && (
               <div className={styles.loadingIndicator}>
                 <FaSpinner className={styles.spinner} />
+                Loading...
               </div>
             )}
           </div>
-          <button 
-            className={styles.closeButton} 
-            onClick={onClose}
-            aria-label="Close drawer"
-          >
-            <FaTimes />
-          </button>
+          <div className={styles.headerActions}>
+            {totalDrawers > 1 && (
+              <div className={styles.drawerCounter}>
+                {drawerIndex + 1}/{totalDrawers}
+              </div>
+            )}
+            <button 
+              className={styles.closeButton}
+              onClick={onClose}
+              aria-label="Close drawer"
+            >
+              <FaTimes />
+            </button>
+          </div>
         </div>
 
         {/* Content */}

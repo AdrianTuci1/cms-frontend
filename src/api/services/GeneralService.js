@@ -52,7 +52,7 @@ class GeneralService {
   }
 
   /**
-   * Obține informațiile despre business și locații
+   * Obține informațiile despre business și locații (Read-Only)
    * Endpoint: /api/businessInfo/{businessId}
    * @param {string} businessId - Business ID
    * @returns {Promise<Object>} Informațiile despre business
@@ -70,14 +70,8 @@ class GeneralService {
       const endpoint = businessId ? `/api/businessInfo/${businessId}` : '/api/businessInfo';
       const requestConfig = requestBuilder.requestUtils.get(endpoint);
 
-      // Use business info server URL if different from main API
-      const businessInfoServerUrl = import.meta.env.VITE_BUSINESS_INFO_URL;
-      let fullUrl = requestConfig.url;
-      
-      if (businessInfoServerUrl && businessInfoServerUrl !== import.meta.env.VITE_API_URL) {
-        // Use separate business info server
-        fullUrl = `${businessInfoServerUrl}${requestConfig.url}`;
-      }
+      // Use main API server URL (unified architecture)
+      const fullUrl = requestConfig.url;
 
       const response = await this.apiClient.get(fullUrl);
       

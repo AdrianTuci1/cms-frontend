@@ -5,13 +5,13 @@ import useDrawerStore, { DRAWER_TYPES } from '../../features/00-Drawers/store/dr
 import { useOfflineStatus } from '../../design-patterns/hooks/useOfflineData';
 
 import { useEffect } from 'react';
-import { getBusinessTypeKey, BUSINESS_TYPES } from '../../config/businessTypes';
+import { tenantUtils } from '../../config/tenant.js';
 // import AIAssistantChat from '../drawer/AIAssistant';
 // import UserDrawer from '../drawer/UserDrawer/UserDrawer';
 
 const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
   const { activeTab, setActiveTab, getTabsBySection } = useTabsStore();
-  const businessTypeKey = getBusinessTypeKey();
+  const currentBusinessType = tenantUtils.getCurrentBusinessType();
   const { openDrawer } = useDrawerStore();
   const { isOnline } = useOfflineStatus();
 
@@ -42,17 +42,17 @@ const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
         ];
         
         // Add Treatments view only for dental clinic
-        if (businessTypeKey === 'DENTAL') {
+        if (currentBusinessType === 'dental') {
           views.push({ id: 'services', label: 'Treatments', icon: <FaTooth className={styles.icon} /> });
         }
         
         // Add Packages view only for gym
-        if (businessTypeKey === 'GYM') {
+        if (currentBusinessType === 'gym') {
           views.push({ id: 'services', label: 'Packages', icon: <FaDumbbell className={styles.icon} /> });
         }
 
         // Add Rooms view only for hotel
-        if (businessTypeKey === 'HOTEL') {
+        if (currentBusinessType === 'hotel') {
           views.push({ id: 'services', label: 'Rooms', icon: <FaBed className={styles.icon} /> });
         }
         
@@ -96,12 +96,12 @@ const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
     }
 
     // Display icon based on business type
-    switch (businessTypeKey) {
-      case 'DENTAL':
+    switch (currentBusinessType) {
+      case 'dental':
         return <FaTooth className={styles.logoIcon} />;
-      case 'GYM':
+      case 'gym':
         return <FaDumbbell className={styles.logoIcon} />;
-      case 'HOTEL':
+      case 'hotel':
         return <FaBed className={styles.logoIcon} />;
       default:
         return <FaHome className={styles.logoIcon} />;

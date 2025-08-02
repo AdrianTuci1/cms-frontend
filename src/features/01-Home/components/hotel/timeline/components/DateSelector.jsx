@@ -3,7 +3,6 @@ import { formatDate } from '../utils/dateUtils';
 import styles from '../CalendarView.module.css';
 
 const DateSelector = ({ startDate, endDate, setDateRange }) => {
-  const [showDateInputs, setShowDateInputs] = useState(false);
   const [tempStartDate, setTempStartDate] = useState(new Date(startDate));
   const [tempEndDate, setTempEndDate] = useState(new Date(endDate));
 
@@ -13,25 +12,16 @@ const DateSelector = ({ startDate, endDate, setDateRange }) => {
     setTempEndDate(new Date(endDate));
   }, [startDate, endDate]);
 
-  const handlePreviousMonth = () => {
-    const newStartDate = new Date(startDate);
-    newStartDate.setMonth(newStartDate.getMonth() - 1);
-    const newEndDate = new Date(newStartDate);
-    newEndDate.setMonth(newEndDate.getMonth() + 1);
-    setDateRange(newStartDate.toISOString().split('T')[0], newEndDate.toISOString().split('T')[0]);
+  const handleStartDateChange = (e) => {
+    const newDate = new Date(e.target.value);
+    setTempStartDate(newDate);
+    setDateRange(newDate.toISOString().split('T')[0], tempEndDate.toISOString().split('T')[0]);
   };
 
-  const handleNextMonth = () => {
-    const newStartDate = new Date(startDate);
-    newStartDate.setMonth(newStartDate.getMonth() + 1);
-    const newEndDate = new Date(newStartDate);
-    newEndDate.setMonth(newEndDate.getMonth() + 1);
-    setDateRange(newStartDate.toISOString().split('T')[0], newEndDate.toISOString().split('T')[0]);
-  };
-
-  const handleDateChange = () => {
-    setDateRange(tempStartDate.toISOString().split('T')[0], tempEndDate.toISOString().split('T')[0]);
-    setShowDateInputs(false);
+  const handleEndDateChange = (e) => {
+    const newDate = new Date(e.target.value);
+    setTempEndDate(newDate);
+    setDateRange(tempStartDate.toISOString().split('T')[0], newDate.toISOString().split('T')[0]);
   };
 
   const formatDateForInput = (date) => {
@@ -40,51 +30,32 @@ const DateSelector = ({ startDate, endDate, setDateRange }) => {
 
   return (
     <div className={styles.dateSelector}>
-      <button onClick={handlePreviousMonth} className={styles.navigationButton}>
-        &lt;
-      </button>
-      
-      {showDateInputs ? (
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+      <div style={{ 
+        display: 'flex', 
+        gap: '1rem', 
+        alignItems: 'center',
+        background: '#ffffff',
+        padding: '1rem 1.5rem',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span style={{ color: '#64748b', fontSize: '0.875rem', fontWeight: '500' }}>From:</span>
           <input
             type="date"
             className={styles.dateInput}
             value={formatDateForInput(tempStartDate)}
-            onChange={(e) => setTempStartDate(new Date(e.target.value))}
+            onChange={handleStartDateChange}
           />
-          <span>-</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span style={{ color: '#64748b', fontSize: '0.875rem', fontWeight: '500' }}>To:</span>
           <input
             type="date"
             className={styles.dateInput}
             value={formatDateForInput(tempEndDate)}
-            onChange={(e) => setTempEndDate(new Date(e.target.value))}
+            onChange={handleEndDateChange}
           />
-          <button 
-            onClick={handleDateChange}
-            className={styles.navigationButton}
-          >
-            OK
-          </button>
-          <button 
-            onClick={() => setShowDateInputs(false)}
-            className={styles.navigationButton}
-          >
-            Anulează
-          </button>
         </div>
-      ) : (
-        <div 
-          className={styles.dateRange}
-          onClick={() => setShowDateInputs(true)}
-          style={{ cursor: 'pointer' }}
-        >
-          {formatDate(new Date(startDate))} - {formatDate(new Date(endDate))}
-        </div>
-      )}
-      
-      <button onClick={handleNextMonth} className={styles.navigationButton}>
-        &gt;
-      </button>
+      </div>
     </div>
   );
 };

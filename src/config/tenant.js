@@ -4,12 +4,12 @@
  * Manages tenant-specific configuration and environment variables
  */
 
-import { getDemoBusinessInfo, getDemoUserData } from '../mockData/index.js';
+import { getDemoBusinessInfo, getCurrentDemoUser } from '../mockData/index.js';
 
-// Environment variables
+// Environment variables with localStorage override support
 export const ENV_CONFIG = {
-  VITE_TENANT_ID: import.meta.env.VITE_TENANT_ID || 'T0001',
-  VITE_BUSINESS_TYPE: import.meta.env.VITE_BUSINESS_TYPE || 'dental',
+  VITE_TENANT_ID: localStorage.getItem('VITE_TENANT_ID') || import.meta.env.VITE_TENANT_ID || 'T0001',
+  VITE_BUSINESS_TYPE: localStorage.getItem('VITE_BUSINESS_TYPE') || import.meta.env.VITE_BUSINESS_TYPE || 'dental',
   VITE_TEST_MODE: import.meta.env.VITE_TEST_MODE === 'true'
 };
 
@@ -17,6 +17,32 @@ export const ENV_CONFIG = {
  * Tenant utilities
  */
 export const tenantUtils = {
+  /**
+   * Update tenant configuration dynamically
+   * @param {string} tenantId - New tenant ID
+   * @param {string} businessType - New business type
+   */
+  updateTenantConfig(tenantId, businessType) {
+    // Update localStorage
+    localStorage.setItem('VITE_TENANT_ID', tenantId);
+    localStorage.setItem('VITE_BUSINESS_TYPE', businessType);
+
+    // Update ENV_CONFIG object
+    ENV_CONFIG.VITE_TENANT_ID = tenantId;
+    ENV_CONFIG.VITE_BUSINESS_TYPE = businessType;
+  },
+
+  /**
+   * Reset tenant configuration to environment defaults
+   */
+  resetTenantConfig() {
+    localStorage.removeItem('VITE_TENANT_ID');
+    localStorage.removeItem('VITE_BUSINESS_TYPE');
+
+    // Reload ENV_CONFIG from environment
+    ENV_CONFIG.VITE_TENANT_ID = import.meta.env.VITE_TENANT_ID || 'T0001';
+    ENV_CONFIG.VITE_BUSINESS_TYPE = import.meta.env.VITE_BUSINESS_TYPE || 'dental';
+  },
   /**
    * Get current tenant ID from environment
    */
@@ -55,7 +81,7 @@ export const tenantUtils = {
    */
   getDemoUserData(businessType = null) {
     const currentBusinessType = businessType || this.getCurrentBusinessType();
-    return getDemoUserData(currentBusinessType);
+    return getCurrentDemoUser(currentBusinessType);
   },
 
   /**
@@ -65,7 +91,7 @@ export const tenantUtils = {
     const currentTenantId = tenantId || this.getCurrentTenantId();
     const businessType = this.getBusinessTypeByTenant(currentTenantId);
     const demoInfo = this.getDemoBusinessInfo(businessType);
-    
+
     return {
       id: currentTenantId,
       businessType: businessType,
@@ -83,7 +109,7 @@ export const tenantUtils = {
   getBusinessTypeByTenant(tenantId) {
     const tenantMap = {
       'T0001': 'dental',
-      'T0002': 'gym', 
+      'T0002': 'gym',
       'T0003': 'hotel'
     };
     return tenantMap[tenantId] || 'dental';
@@ -275,7 +301,7 @@ export const resourceUtils = {
   generateShardedDocument(tenantId, locationId, resourceType, data, dateRange = null) {
     const documentId = this.generateDocumentId(tenantId, locationId, resourceType);
     const timestamp = new Date().toISOString();
-    
+
     return {
       id: documentId,
       tenantId,
@@ -306,12 +332,12 @@ export const resourceUtils = {
    * Check if document is a sharded document
    */
   isShardedDocument(document) {
-    return document && 
-           document.id && 
-           document.tenantId && 
-           document.locationId && 
-           document.resourceType && 
-           document.data !== undefined;
+    return document &&
+      document.id &&
+      document.tenantId &&
+      document.locationId &&
+      document.resourceType &&
+      document.data !== undefined;
   }
 };
 

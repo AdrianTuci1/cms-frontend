@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { getBusinessType } from '../../../../config/businessTypes';
+import { tenantUtils } from '../../../../config/tenant.js';
 import { FaSearch, FaPlus } from 'react-icons/fa';
 import { useDataSync } from '../../../../design-patterns/hooks';
 import useDrawerStore, { DRAWER_TYPES } from '../../../00-Drawers/store/drawerStore';
@@ -9,13 +9,13 @@ import HotelClientCard from '../../components/hotel/clients/HotelClientCard';
 import styles from './ClientsView.module.css';
 
 const ClientsView = () => {
-  const businessType = getBusinessType();
+  const currentBusinessType = tenantUtils.getCurrentBusinessType();
   const [searchTerm, setSearchTerm] = useState('');
   const { openDrawer } = useDrawerStore();
 
   // Use useDataSync hook directly for clients data
   const clientsSync = useDataSync('clients', {
-    businessType: businessType.name,
+    businessType: currentBusinessType,
     page: 1,
     limit: 100,
     enableValidation: true,
@@ -83,7 +83,7 @@ const ClientsView = () => {
     };
 
     openDrawer('edit', DRAWER_TYPES.MEMBER, clientData, {
-      title: `Edit ${businessType.name === 'Dental Clinic' ? 'Patient' : businessType.name === 'Gym' ? 'Member' : 'Guest'}`,
+      title: `Edit ${currentBusinessType === 'dental' ? 'Patient' : currentBusinessType === 'gym' ? 'Member' : 'Guest'}`,
       onSave: async (data, mode) => {
         console.log('Updating client:', data);
         
@@ -124,7 +124,7 @@ const ClientsView = () => {
     };
 
     openDrawer('create', DRAWER_TYPES.MEMBER, newClient, {
-      title: `New ${businessType.name === 'Dental Clinic' ? 'Patient' : businessType.name === 'Gym' ? 'Member' : 'Guest'}`,
+      title: `New ${currentBusinessType === 'dental' ? 'Patient' : currentBusinessType === 'gym' ? 'Member' : 'Guest'}`,
       onSave: async (data, mode) => {
         console.log('Creating client:', data);
         
@@ -149,12 +149,12 @@ const ClientsView = () => {
       onClick: () => handleClientClick(client)
     };
 
-    switch (businessType.name) {
-      case 'Gym':
+    switch (currentBusinessType) {
+      case 'gym':
         return <GymClientCard key={client.id} {...cardProps} />;
-      case 'Dental Clinic':
+      case 'dental':
         return <DentalClientCard key={client.id} {...cardProps} />;
-      case 'Hotel':
+      case 'hotel':
         return <HotelClientCard key={client.id} {...cardProps} />;
       default:
         return null;

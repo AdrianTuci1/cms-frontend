@@ -7,6 +7,7 @@ import StockForm from './forms/StockForm';
 import MemberForm from './forms/MemberForm';
 import PermissionsForm from './forms/PermissionsForm';
 import UserDrawer from './forms/UserDrawer';
+import styles from './DrawerManager.module.css';
 
 const DrawerManager = () => {
   const {
@@ -14,57 +15,66 @@ const DrawerManager = () => {
     activeDrawerId,
     isOpen,
     closeDrawer,
-    isLoading
+    isLoading,
+    getTotalDrawers,
+    getDrawerIndex,
+    isTopDrawer,
+    getActiveDrawerSize
   } = useDrawerStore();
 
-  const activeDrawer = drawers.find(d => d.id === activeDrawerId);
-
-  if (!isOpen || !activeDrawer) {
+  if (!isOpen || drawers.length === 0) {
     return null;
   }
 
-  const handleSubmit = async (formData) => {
+  // Get the active drawer size for container styling
+  const activeDrawerSize = getActiveDrawerSize();
+  const containerSizeClass = `drawerContainer${activeDrawerSize.charAt(0).toUpperCase() + activeDrawerSize.slice(1)}`;
+
+  const handleSubmit = async (formData, drawerId) => {
+    const drawer = drawers.find(d => d.id === drawerId);
     try {
-      if (activeDrawer.onSave) {
-        await activeDrawer.onSave(formData, activeDrawer.mode);
+      if (drawer?.onSave) {
+        await drawer.onSave(formData, drawer.mode);
       }
-      closeDrawer(activeDrawer.id);
+      closeDrawer(drawerId);
     } catch (error) {
       console.error('Error saving data:', error);
       // You could show a toast notification here
     }
   };
 
-  const handleDelete = async (formData) => {
+  const handleDelete = async (formData, drawerId) => {
+    const drawer = drawers.find(d => d.id === drawerId);
     try {
-      if (activeDrawer.onDelete) {
-        await activeDrawer.onDelete(formData);
+      if (drawer?.onDelete) {
+        await drawer.onDelete(formData);
       }
-      closeDrawer(activeDrawer.id);
+      closeDrawer(drawerId);
     } catch (error) {
       console.error('Error deleting data:', error);
       // You could show a toast notification here
     }
   };
 
-  const handleCancel = () => {
-    if (activeDrawer.onCancel) {
-      activeDrawer.onCancel();
+  const handleCancel = (drawerId) => {
+    const drawer = drawers.find(d => d.id === drawerId);
+    if (drawer?.onCancel) {
+      drawer.onCancel();
     }
-    closeDrawer(activeDrawer.id);
+    closeDrawer(drawerId);
   };
 
-  const renderForm = () => {
+  const renderForm = (drawer) => {
     const formProps = {
-      mode: activeDrawer.mode,
-      data: activeDrawer.data || {},
-      onSubmit: handleSubmit,
-      onDelete: handleDelete,
-      onCancel: handleCancel,
+      mode: drawer.mode,
+      data: drawer.data || {},
+      onSubmit: (formData) => handleSubmit(formData, drawer.id),
+      onDelete: (formData) => handleDelete(formData, drawer.id),
+      onCancel: () => handleCancel(drawer.id),
       isLoading
     };
 
-    switch (activeDrawer.type) {
+    switch (drawer.type) {
       case DRAWER_TYPES.TIMELINE:
         return <TimelineForm {...formProps} />;
         
@@ -81,27 +91,40 @@ const DrawerManager = () => {
         return <PermissionsForm {...formProps} />;
         
       case DRAWER_TYPES.USER:
-        return <UserDrawer onClose={() => closeDrawer(activeDrawer.id)} />;
+        return <UserDrawer onClose={() => closeDrawer(drawer.id)} />;
         
       case DRAWER_TYPES.AI_ASSISTANT:
         // AI Assistant drawer - don't touch as requested
-        return activeDrawer.data?.content || <div>AI Assistant Content</div>;
+        return drawer.data?.content || <div>AI Assistant Content</div>;
         
       default:
-        return <div>Unsupported drawer type: {activeDrawer.type}</div>;
+        return <div>Unsupported drawer type: {drawer.type}</div>;
     }
   };
 
   return (
-    <DrawerLayout
-      isOpen={isOpen}
-      onClose={() => closeDrawer(activeDrawer.id)}
-      title={activeDrawer.title}
-      isLoading={isLoading}
-      size={activeDrawer.size || 'medium'}
-    >
-      {renderForm()}
-    </DrawerLayout>
+    <div className={`${styles.drawerContainer} ${styles[containerSizeClass]}`}>
+      {drawers.map((drawer, index) => {
+        const drawerIndex = getDrawerIndex(drawer.id);
+        const isActive = isTopDrawer(drawer.id);
+        
+        return (
+          <DrawerLayout
+            key={drawer.id}
+            isOpen={true}
+            onClose={() => closeDrawer(drawer.id)}
+            title={drawer.title}
+            isLoading={isLoading}
+            size={drawer.size || 'medium'}
+            drawerIndex={drawerIndex}
+            totalDrawers={getTotalDrawers()}
+            isActive={isActive}
+          >
+            {renderForm(drawer)}
+          </DrawerLayout>
+        );
+      })}
+    </div>
   );
 };
 

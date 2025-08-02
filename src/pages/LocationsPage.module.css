@@ -60,6 +60,12 @@
   font-weight: 500;
 }
 
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
 .userInfo {
   display: flex;
   align-items: center;
@@ -389,6 +395,12 @@
   .businessInfo {
     flex-direction: column;
     text-align: center;
+  }
+  
+  .headerActions {
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
   }
   
   .userInfo {

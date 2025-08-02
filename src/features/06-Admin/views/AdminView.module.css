@@ -1,21 +1,24 @@
 .adminContainer {
   margin: 0 auto;
+  height: calc(100vh - 64px);
 }
 
 .adminView {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: calc(100vh - 64px);
   background-color: var(--bg-secondary);
-  border-radius: 8px;
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
   overflow: hidden;
+  
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
+  padding: 0.5rem;
   border-bottom: 1px solid var(--border-color);
 }
 

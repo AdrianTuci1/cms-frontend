@@ -18,10 +18,9 @@ class ApiSyncManager {
     // Store connectivity manager reference
     this.connectivityManager = connectivityManager;
     
-    // Initialize API Manager with simplified structure
+    // Initialize API Manager with unified structure
     this.apiManager = createApiManager({
       baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3001',
-      businessInfoURL: import.meta.env.VITE_BUSINESS_INFO_URL || import.meta.env.VITE_API_URL || 'http://localhost:3001',
       debug: false,
       timeout: 30000
     });
@@ -94,11 +93,7 @@ class ApiSyncManager {
       
       if (config.requiresAuth === false) {
         // Resources that don't require JWT (auth, businessInfo)
-        const serverOnline = resource === 'businessInfo' 
-          ? this.connectivityManager?.isBusinessInfoServerOnline() ?? true
-          : this.connectivityManager?.isAuthResourcesServerOnline() ?? true;
-          
-        if (!serverOnline) {
+        if (!this.connectivityManager?.isAuthResourcesServerOnline()) {
           throw new Error('Backend indisponibil - folosind datele din IndexedDB');
         }
         
@@ -216,11 +211,7 @@ class ApiSyncManager {
       
       if (config.requiresAuth === false) {
         // Resources that don't require JWT (auth, businessInfo)
-        const serverOnline = resource === 'businessInfo' 
-          ? this.connectivityManager?.isBusinessInfoServerOnline() ?? true
-          : this.connectivityManager?.isAuthResourcesServerOnline() ?? true;
-          
-        if (!serverOnline) {
+        if (!this.connectivityManager?.isAuthResourcesServerOnline()) {
           throw new Error('Backend indisponibil - folosind datele din IndexedDB');
         }
         

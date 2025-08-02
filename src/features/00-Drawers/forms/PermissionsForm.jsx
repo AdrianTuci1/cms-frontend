@@ -111,10 +111,6 @@ const PermissionsForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }
 
   return (
     <div className={styles.permissionsForm}>
-      <div className={styles.formHeader}>
-        <FaShieldAlt className={styles.headerIcon} />
-        <h2>{mode === 'create' ? 'Rol Nou' : 'Editare Rol'}</h2>
-      </div>
 
       <form onSubmit={handleSubmit} className={styles.form}>
         {/* Basic Role Information */}

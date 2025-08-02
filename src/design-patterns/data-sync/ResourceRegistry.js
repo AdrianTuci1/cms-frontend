@@ -177,12 +177,13 @@ class ResourceRegistry {
       sortableFields: ['name', 'email', 'joinedAt', 'expiresAt']
     });
 
-    // Business info - separate endpoint /api/businessInfo/{businessId}
+    // Business info - read-only endpoint /api/businessInfo/{businessId}
     this.registerResource('businessInfo', {
       enableOffline: true,
       requiresAuth: false,
       forceServerFetch: true,
       useSingleEndpoint: false,
+      readOnly: true,
       apiEndpoints: {
         get: '/api/businessInfo/:businessId'
       }

@@ -414,30 +414,41 @@ const BaseForm = ({
               {label || name.charAt(0).toUpperCase() + name.slice(1)}
             </label>
             
-            {/* Search input for select fields */}
-            <input
-              type="text"
-              className={getInputClassName(name)}
-              placeholder={`Search ${label || name}...`}
-              onChange={(e) => handleSearchInput(name, e.target.value)}
-              disabled={mode === 'view' || isLoading}
-              style={{ marginBottom: '8px' }}
-            />
-            
-            {/* Search results dropdown */}
-            {showSearch && searchResults.length > 0 && (
-              <div className={styles.searchResults}>
-                {searchResults.map((result, index) => (
-                  <div
-                    key={index}
-                    className={styles.searchResultItem}
-                    onClick={() => handleSelectChange(name, result.value)}
-                  >
-                    {result.label}
+            {/* Only show search input if options are not predefined (for dynamic searches) */}
+            {!options || options.length === 0 ? (
+              <>
+                <input
+                  type="text"
+                  className={getInputClassName(name)}
+                  placeholder={`Search ${label || name}...`}
+                  onChange={(e) => handleSearchInput(name, e.target.value)}
+                  disabled={mode === 'view' || isLoading}
+                  style={{ marginBottom: '8px' }}
+                />
+                
+                {/* Search results dropdown */}
+                {showSearch && searchResults.length > 0 && (
+                  <div className={styles.searchResults}>
+                    {searchResults.map((result, index) => (
+                      <div
+                        key={index}
+                        className={styles.searchResultItem}
+                        onClick={() => handleSelectChange(name, result.value)}
+                      >
+                        {result.label}
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            )}
+                )}
+                
+                {isSearching && (
+                  <div className={styles.loadingIndicator}>
+                    <FaSpinner className={styles.spinner} />
+                    Searching...
+                  </div>
+                )}
+              </>
+            ) : null}
             
             <select
               className={getSelectClassName(name)}
@@ -453,13 +464,6 @@ const BaseForm = ({
                 </option>
               ))}
             </select>
-            
-            {isSearching && (
-              <div className={styles.loadingIndicator}>
-                <FaSpinner className={styles.spinner} />
-                Searching...
-              </div>
-            )}
             
             {error && (
               <div className={styles.errorMessage}>

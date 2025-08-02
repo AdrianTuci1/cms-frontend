@@ -2,19 +2,15 @@ import React, { useState } from 'react';
 import { getBusinessTypeKey, getBusinessTypeKeyForSync } from '../../../../src/config/businessTypes';
 import BaseForm from './BaseForm';
 import styles from './MemberForm.module.css';
-import { useDataSync } from '../../../design-patterns/hooks';
+import useRolesStore from '../../06-Admin/store/rolesStore';
 
 const MemberForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) => {
   const businessTypeKey = getBusinessTypeKey();
   const businessTypeForSync = getBusinessTypeKeyForSync(businessTypeKey);
   const [activeView, setActiveView] = useState('details'); // 'details' or 'appointments'
   
-  // Use useDataSync to fetch roles
-  const rolesSync = useDataSync('roles', {
-    businessType: businessTypeForSync,
-    enableValidation: true,
-    enableBusinessLogic: true
-  });
+  // Use useRolesStore to get actual roles data
+  const { roles } = useRolesStore();
   
   // Only show for dental clinics
   if (businessTypeKey !== 'DENTAL') {
@@ -23,8 +19,8 @@ const MemberForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) => 
   
   // Simplified fields for dental clinics
   const getFields = () => {
-    // Get role options from the roles data sync
-    const roleOptions = (rolesSync.items || []).map(role => ({
+    // Get role options from the roles store
+    const roleOptions = (roles || []).map(role => ({
       value: role.id.toString(),
       label: role.name
     }));
@@ -112,7 +108,7 @@ const MemberForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) => 
           className={`${styles['toggle-btn']} ${activeView === 'appointments' ? styles.active : ''}`}
           onClick={() => setActiveView('appointments')}
         >
-          Upcoming Appointments
+          Upcoming
         </button>
       </div>
     );

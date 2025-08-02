@@ -44,7 +44,7 @@ export const useDataSync = (resource, options = {}) => {
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-  
+
   const eventListenersRef = useRef([]);
   const resourceRef = useRef(resource);
   const businessTypeRef = useRef(businessType);
@@ -59,6 +59,18 @@ export const useDataSync = (resource, options = {}) => {
   businessTypeRef.current = businessType;
   onDataUpdateRef.current = onDataUpdate;
   onErrorRef.current = onError;
+
+  /**
+   * Get business type from data sync manager (no longer hardcoded)
+   */
+  const getBusinessType = useCallback(() => {
+    try {
+      return dataSyncManager.resourceRegistry?.getBusinessType() || businessType || null;
+    } catch (error) {
+      console.warn('Error getting business type from dataSyncManager:', error);
+      return businessType || null;
+    }
+  }, [businessType]);
 
   /**
    * Initialize strategy based on business type
@@ -76,13 +88,6 @@ export const useDataSync = (resource, options = {}) => {
       }
     }
   }, [enableBusinessLogic, getBusinessType]);
-
-  /**
-   * Get business type from data sync manager (no longer hardcoded)
-   */
-  const getBusinessType = useCallback(() => {
-    return dataSyncManager.resourceRegistry?.getBusinessType() || null;
-  }, []);
 
   /**
    * Set business type if provided (for backward compatibility)
@@ -189,7 +194,7 @@ export const useDataSync = (resource, options = {}) => {
       };
 
       const result = await dataSyncManager.getDataWithFallback(resourceRef.current, fetchOptions);
-      
+
       // For timeline, preserve the structure (reservations array) for dental timeline hook
       let timelineResult = result;
       if (resourceRef.current === 'timeline') {
@@ -204,13 +209,13 @@ export const useDataSync = (resource, options = {}) => {
           timelineResult = { reservations: [result] };
         }
       }
-      
+
       // Process data using strategy
       const processedResult = processData(timelineResult, 'read');
-      
+
       setData(processedResult);
       setLastUpdated(new Date().toISOString());
-      
+
       if (onDataUpdateRef.current) {
         onDataUpdateRef.current(processedResult);
       }
@@ -222,12 +227,12 @@ export const useDataSync = (resource, options = {}) => {
           forceRefresh: true,
           useCache: false,
           params: requestParams
-        }).catch(() => {/* background refresh failure ignored */});
+        }).catch(() => {/* background refresh failure ignored */ });
       }
 
     } catch (err) {
       console.error(`Error fetching ${resourceRef.current}:`, err);
-      
+
       // Încearcă să obțină date din cache ca fallback
       try {
         const fallbackData = await dataSyncManager.getDataWithFallback(resourceRef.current, {
@@ -235,7 +240,7 @@ export const useDataSync = (resource, options = {}) => {
           useCache: true,
           params: requestParams
         });
-        
+
         // For timeline, preserve the structure (reservations array) for dental timeline hook
         let processedFallbackData = fallbackData;
         if (resourceRef.current === 'timeline') {
@@ -250,12 +255,12 @@ export const useDataSync = (resource, options = {}) => {
             processedFallbackData = { reservations: [fallbackData || []] };
           }
         }
-        
+
         processedFallbackData = processData(processedFallbackData, 'read');
-        
+
         setData(processedFallbackData);
         setLastUpdated(new Date().toISOString());
-        
+
         if (onDataUpdateRef.current) {
           onDataUpdateRef.current(processedFallbackData);
         }
@@ -281,7 +286,7 @@ export const useDataSync = (resource, options = {}) => {
   const optimisticUpdate = useCallback((updater) => {
     setData(prevData => {
       const newData = typeof updater === 'function' ? updater(prevData) : updater;
-      
+
       return newData;
     });
   }, []);
@@ -326,7 +331,7 @@ export const useDataSync = (resource, options = {}) => {
       } else if (operation === 'update') {
         optimisticUpdate(prevData => {
           if (Array.isArray(prevData)) {
-            return prevData.map(item => 
+            return prevData.map(item =>
               item.id === processedData.id ? { ...item, ...processedData } : item
             );
           }
@@ -350,10 +355,10 @@ export const useDataSync = (resource, options = {}) => {
     } catch (err) {
       console.error(`Error performing ${operation} on ${resourceRef.current}:`, err);
       setError(err);
-      
+
       // Revert optimistic update
       await fetchData();
-      
+
       if (onErrorRef.current) {
         onErrorRef.current(err);
       }
@@ -380,7 +385,7 @@ export const useDataSync = (resource, options = {}) => {
       const processedData = processData(eventData.data, 'read');
       setData(processedData);
       setLastUpdated(new Date().toISOString());
-      
+
       if (onDataUpdateRef.current) {
         onDataUpdateRef.current(processedData);
       }
@@ -437,14 +442,14 @@ export const useDataSync = (resource, options = {}) => {
    */
   useEffect(() => {
     let isMounted = true;
-    
+
     const loadData = async () => {
       if (!isMounted) return;
       await fetchData();
     };
-    
+
     loadData();
-    
+
     return () => {
       isMounted = false;
     };
@@ -457,10 +462,10 @@ export const useDataSync = (resource, options = {}) => {
     try {
       const count = await dataSyncManager.clearDuplicates(resourceRef.current);
       console.log(`Cleared ${count} duplicates from ${resourceRef.current}`);
-      
+
       // Refresh data after clearing duplicates
       await fetchData();
-      
+
       return count;
     } catch (error) {
       console.error(`Error clearing duplicates for ${resourceRef.current}:`, error);
@@ -475,10 +480,10 @@ export const useDataSync = (resource, options = {}) => {
     try {
       const count = await dataSyncManager.clearResourceData(resourceRef.current);
       console.log(`Cleared ${count} records from ${resourceRef.current}`);
-      
+
       // Refresh data after clearing
       await fetchData();
-      
+
       return count;
     } catch (error) {
       console.error(`Error clearing data for ${resourceRef.current}:`, error);
@@ -512,27 +517,27 @@ export const useDataSync = (resource, options = {}) => {
     error,
     lastUpdated,
     isOnline,
-    
+
     // CRUD operations
     refresh,
     create,
     update,
     remove,
     optimisticUpdate,
-    
+
     // Strategy methods
     validateData,
     isOperationAllowed,
     processData,
-    
+
     // Strategy info
     strategy: strategy.current?.getName() || 'No Strategy',
     businessType: getBusinessType(),
-    
+
     // Utility operations
     clearDuplicates,
     clearResourceData,
-    
+
     // Query parameter utilities
     getSupportedQueryParams,
     buildSearchQuery

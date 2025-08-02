@@ -15,8 +15,8 @@ export class ApiClient extends BaseClient {
     this.tenantId = config.tenantId || import.meta.env.VITE_TENANT_ID;
     this.locationId = config.locationId;
     
-    // Two-server architecture support
-    this.businessInfoBaseURL = config.businessInfoURL || import.meta.env.VITE_BUSINESS_INFO_URL || this.baseURL;
+    // Unified architecture support
+    this.baseURL = config.baseURL || import.meta.env.VITE_API_URL || 'http://localhost:3001';
     
     // Inițializează manager-ele
     this.authManager = new AuthManager({
@@ -39,17 +39,12 @@ export class ApiClient extends BaseClient {
    * @returns {string} Base URL to use
    */
   getBaseURLForRequest(url) {
-    // If URL starts with /api/businessInfo, use business info server
-    if (url.startsWith('/api/businessInfo')) {
-      return this.businessInfoBaseURL;
-    }
-    
     // For absolute URLs, return as is (they already contain the base URL)
     if (url.startsWith('http://') || url.startsWith('https://')) {
       return '';
     }
     
-    // Default to main API server
+    // Default to main API server (unified architecture)
     return this.baseURL;
   }
 

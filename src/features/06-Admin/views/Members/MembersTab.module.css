@@ -1,12 +1,12 @@
 .container {
   width: 100%;
+  height: calc(100vh - 64px);
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
 }
 
 .header h2 {
@@ -22,7 +22,6 @@
 }
 
 .filterSelect {
-  padding: 0.5rem 1rem;
   border-radius: 8px;
   border: 1px solid var(--border-color);
   background-color: var(--bg-secondary);

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { tenantUtils } from '../config/tenant.js';
 import GeneralService from '../api/services/GeneralService.js';
+import TenantSelector from '../components/TenantSelector.jsx';
 import styles from './LocationsPage.module.css';
 
 // Mock user data for demonstration
@@ -165,13 +166,23 @@ const LocationsPage = () => {
             </div>
           </div>
           
-          <div className={styles.userInfo}>
-            <div className={styles.userAvatar}>
-              {mockUser.name.charAt(0).toUpperCase()}
-            </div>
-            <div className={styles.userDetails}>
-              <p className={styles.userName}>{mockUser.name}</p>
-              <p className={styles.userEmail}>{mockUser.email}</p>
+          <div className={styles.headerActions}>
+            <TenantSelector 
+              currentTenantId={currentTenantId}
+              currentBusinessType={currentBusinessType}
+              onTenantChange={(tenant) => {
+                console.log('Tenant changed to:', tenant);
+              }}
+            />
+            
+            <div className={styles.userInfo}>
+              <div className={styles.userAvatar}>
+                {mockUser.name.charAt(0).toUpperCase()}
+              </div>
+              <div className={styles.userDetails}>
+                <p className={styles.userName}>{mockUser.name}</p>
+                <p className={styles.userEmail}>{mockUser.email}</p>
+              </div>
             </div>
           </div>
         </header>

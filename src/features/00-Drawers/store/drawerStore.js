@@ -172,12 +172,15 @@ const useDrawerStore = create((set, get) => ({
       return null;
     }
     
-    // Close existing drawer if not AI assistant
-    if (type !== DRAWER_TYPES.AI_ASSISTANT && state.drawers.length > 0) {
+    // Allow stacked drawers - only close if it's the same type (to prevent duplicates)
+    // or if it's not an AI assistant and we want to limit stacking
+    const existingDrawerOfSameType = state.drawers.find(d => d.type === type);
+    if (existingDrawerOfSameType && type !== DRAWER_TYPES.AI_ASSISTANT) {
+      // Close the existing drawer of the same type
       set(state => ({
-        drawers: [],
-        activeDrawerId: null,
-        isOpen: false
+        drawers: state.drawers.filter(d => d.type !== type),
+        activeDrawerId: state.drawers.find(d => d.type !== type)?.id || null,
+        isOpen: state.drawers.filter(d => d.type !== type).length > 0
       }));
     }
     
@@ -256,6 +259,16 @@ const useDrawerStore = create((set, get) => ({
   getActiveDrawer: () => {
     const state = get();
     return state.drawers.find(d => d.id === state.activeDrawerId);
+  },
+  
+  // Get active drawer size
+  getActiveDrawerSize: () => {
+    const state = get();
+    if (state.drawers.length === 0) return 'medium';
+    
+    // For stacked drawers, use the size of the top drawer (last in array)
+    const topDrawer = state.drawers[state.drawers.length - 1];
+    return topDrawer?.size || 'medium';
   },
   
   // Check if drawer is open
@@ -337,6 +350,37 @@ const useDrawerStore = create((set, get) => ({
   getQueryResults: (fieldName) => {
     const state = get();
     return state.queryResults?.[fieldName] || [];
+  },
+  
+  // Stacked drawer helpers
+  getTotalDrawers: () => {
+    const state = get();
+    return state.drawers.length;
+  },
+  
+  getDrawerIndex: (drawerId) => {
+    const state = get();
+    return state.drawers.findIndex(d => d.id === drawerId);
+  },
+  
+  isTopDrawer: (drawerId) => {
+    const state = get();
+    const index = state.drawers.findIndex(d => d.id === drawerId);
+    return index === state.drawers.length - 1;
+  },
+  
+  bringToFront: (drawerId) => {
+    const state = get();
+    const drawerIndex = state.drawers.findIndex(d => d.id === drawerId);
+    if (drawerIndex === -1) return;
+    
+    const drawer = state.drawers[drawerIndex];
+    const otherDrawers = state.drawers.filter(d => d.id !== drawerId);
+    
+    set({
+      drawers: [...otherDrawers, drawer],
+      activeDrawerId: drawerId
+    });
   },
   
   getSearchResults: (fieldName) => {
