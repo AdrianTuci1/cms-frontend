@@ -42,82 +42,30 @@
 }
 
 /* Drawer offset styles for different sizes */
-.dashboardMain.mainWithDrawerSmall .mainContent {
+.dashboardMain.mainWithDrawerStandard .mainContent {
   flex: 0 0 calc(100% - 320px);
   width: calc(100% - 320px);
   min-width: 0;
 }
 
-.dashboardMain.mainExpanded.mainWithDrawerSmall .mainContent {
+.dashboardMain.mainExpanded.mainWithDrawerStandard .mainContent {
   flex: 0 0 calc(100% - 320px);
   width: calc(100% - 320px);
   min-width: 0;
-}
-
-.dashboardMain.mainWithDrawerMedium .mainContent {
-  flex: 0 0 calc(100% - 480px);
-  width: calc(100% - 480px);
-  min-width: 0;
-}
-
-.dashboardMain.mainExpanded.mainWithDrawerMedium .mainContent {
-  flex: 0 0 calc(100% - 480px);
-  width: calc(100% - 480px);
-  min-width: 0;
-}
-
-.dashboardMain.mainWithDrawerLarge .mainContent {
-  flex: 0 0 calc(100% - 640px);
-  width: calc(100% - 640px);
-  min-width: 0;
-}
-
-.dashboardMain.mainExpanded.mainWithDrawerLarge .mainContent {
-  flex: 0 0 calc(100% - 640px);
-  width: calc(100% - 640px);
-  min-width: 0;
-}
-
-.dashboardMain.mainWithDrawerFull .mainContent {
-  flex: 0 0 0;
-  width: 0;
-  overflow: hidden;
-}
-
-.dashboardMain.mainExpanded.mainWithDrawerFull .mainContent {
-  flex: 0 0 0;
-  width: 0;
-  overflow: hidden;
 }
 
 /* Responsive adjustments for smaller screens */
-@media (max-width: 1200px) {
-  .dashboardMain.mainWithDrawerLarge .mainContent {
-    flex: 0 0 calc(100% - 480px);
-    width: calc(100% - 480px);
-  }
-  
-  .dashboardMain.mainExpanded.mainWithDrawerLarge .mainContent {
-    flex: 0 0 calc(100% - 480px);
-    width: calc(100% - 480px);
-  }
-}
-
 @media (max-width: 768px) {
   .dashboardMain {
     display: block;
   }
   
-  .dashboardMain.mainWithDrawerSmall .mainContent,
-  .dashboardMain.mainWithDrawerMedium .mainContent,
-  .dashboardMain.mainWithDrawerLarge .mainContent {
+  .dashboardMain.mainWithDrawerStandard .mainContent {
     flex: none;
     width: 100%;
   }
   
-  .dashboardMain.mainExpanded.mainWithDrawerSmall .mainContent,
-  .dashboardMain.mainExpanded.mainWithDrawerMedium .mainContent,
-  .dashboardMain.mainExpanded.mainWithDrawerLarge .mainContent {
+  .dashboardMain.mainExpanded.mainWithDrawerStandard .mainContent {
     flex: none;
     width: 100%;
   }

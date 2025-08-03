@@ -5,6 +5,7 @@ import TimelineForm from './forms/TimelineForm';
 import ServiceForm from './forms/ServiceForm';
 import StockForm from './forms/StockForm';
 import MemberForm from './forms/MemberForm';
+import PatientForm from './forms/PatientForm';
 import PermissionsForm from './forms/PermissionsForm';
 import UserDrawer from './forms/UserDrawer';
 import styles from './DrawerManager.module.css';
@@ -87,6 +88,9 @@ const DrawerManager = () => {
       case DRAWER_TYPES.MEMBER:
         return <MemberForm {...formProps} />;
         
+      case DRAWER_TYPES.PATIENT:
+        return <PatientForm {...formProps} />;
+        
       case DRAWER_TYPES.PERMISSIONS:
         return <PermissionsForm {...formProps} />;
         
@@ -115,7 +119,6 @@ const DrawerManager = () => {
             onClose={() => closeDrawer(drawer.id)}
             title={drawer.title}
             isLoading={isLoading}
-            size={drawer.size || 'medium'}
             drawerIndex={drawerIndex}
             totalDrawers={getTotalDrawers()}
             isActive={isActive}

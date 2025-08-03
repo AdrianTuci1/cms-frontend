@@ -77,7 +77,6 @@ const DrawerExample = () => {
   // Open drawer functions using the new API
   const openTimelineEdit = () => {
     openDrawer('edit', 'timeline', sampleTimeline, {
-      size: 'medium',
       onSave: handleSave,
       onDelete: handleDelete,
       onCancel: handleCancel
@@ -86,7 +85,6 @@ const DrawerExample = () => {
 
   const openTimelineCreate = () => {
     openDrawer('create', 'timeline', null, {
-      size: 'small',
       onSave: handleSave,
       onCancel: handleCancel
     });
@@ -94,7 +92,6 @@ const DrawerExample = () => {
 
   const openStockEdit = () => {
     openDrawer('edit', 'stock', sampleStock, {
-      size: 'large',
       onSave: handleSave,
       onDelete: handleDelete,
       onCancel: handleCancel
@@ -103,7 +100,6 @@ const DrawerExample = () => {
 
   const openStockCreate = () => {
     openDrawer('create', 'stock', null, {
-      size: 'full',
       onSave: handleSave,
       onCancel: handleCancel
     });
@@ -217,28 +213,6 @@ const DrawerExample = () => {
           These buttons demonstrate stacked drawers functionality. Each drawer will be positioned 
           with a slight offset and show a counter (e.g., "1/3") in the header indicating the drawer 
           position in the stack.
-        </p>
-      </div>
-
-      <div className={styles.section}>
-        <h3>📏 Drawer Size Testing (Outlet Resizing)</h3>
-        <div className={styles.buttonGroup}>
-          <button onClick={() => openDrawer('create', 'timeline', null, { size: 'small', onSave: handleSave, onCancel: handleCancel })} className={styles.button}>
-            Small Drawer (320px)
-          </button>
-          <button onClick={() => openDrawer('create', 'timeline', null, { size: 'medium', onSave: handleSave, onCancel: handleCancel })} className={styles.button}>
-            Medium Drawer (480px)
-          </button>
-          <button onClick={() => openDrawer('create', 'timeline', null, { size: 'large', onSave: handleSave, onCancel: handleCancel })} className={styles.button}>
-            Large Drawer (640px)
-          </button>
-          <button onClick={() => openDrawer('create', 'timeline', null, { size: 'full', onSave: handleSave, onCancel: handleCancel })} className={styles.button}>
-            Full Drawer (100%)
-          </button>
-        </div>
-        <p className={styles.description}>
-          Test different drawer sizes to verify that the main content area (outlet) resizes correctly.
-          The outlet should shrink by the drawer width when a drawer opens.
         </p>
       </div>
 

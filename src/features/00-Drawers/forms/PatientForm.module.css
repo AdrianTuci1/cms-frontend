@@ -1,0 +1,342 @@
+.patient-form-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #fff;
+}
+
+.view-toggle {
+  display: flex;
+  background: #fff;
+  padding: 16px;
+  border-bottom: 1px solid #e1e5e9;
+  gap: 4px;
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid #dee2e6;
+  background: #f8f9fa;
+  color: #495057;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 6px;
+  margin: 0 2px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-btn:hover {
+  background: #e9ecef;
+  color: #212529;
+  border-color: #adb5bd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.toggle-btn.active {
+  color: #fff;
+  background: #007bff;
+  border-color: #007bff;
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+}
+
+.toggle-btn:first-child {
+  margin-left: 0;
+}
+
+.toggle-btn:last-child {
+  margin-right: 0;
+}
+
+.appointments-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.appointments-view {
+  height: 100%;
+}
+
+.appointments-view h3 {
+  margin: 0 0 20px 0;
+  color: #212529;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.appointments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.appointment-card {
+  background: #fff;
+  border: 1px solid #e1e5e9;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.appointment-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border-color: #007bff;
+}
+
+.appointment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.appointment-date {
+  color: #495057;
+  font-size: 14px;
+}
+
+.appointment-status {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-completed {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-scheduled {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-confirmed {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.status-cancelled {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-pending {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+.appointment-type {
+  font-weight: 600;
+  color: #212529;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.appointment-doctor {
+  color: #6c757d;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.appointment-notes {
+  background: #f8f9fa;
+  padding: 8px 12px;
+  border-radius: 4px;
+  color: #495057;
+  font-size: 13px;
+  line-height: 1.4;
+  border-left: 3px solid #007bff;
+}
+
+.no-appointments {
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+  padding: 40px 20px;
+}
+
+/* Dental Notes Styles */
+.dental-notes-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.dental-notes-view {
+  height: 100%;
+}
+
+.dental-notes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.dental-notes-header h3 {
+  margin: 0;
+  color: #212529;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.add-note-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.add-note-btn:hover {
+  background: #0056b3;
+}
+
+.dental-notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dental-note-card {
+  background: #fff;
+  border: 1px solid #e1e5e9;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.dental-note-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border-color: #007bff;
+}
+
+.note-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.note-date {
+  color: #495057;
+  font-size: 14px;
+}
+
+.note-category {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.category-treatment-plan {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.category-diagnosis {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.category-follow-up {
+  background: #d4edda;
+  color: #155724;
+}
+
+.category-consultation {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+.note-doctor {
+  color: #6c757d;
+  font-size: 14px;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.note-content {
+  color: #212529;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.note-attachments {
+  background: #f8f9fa;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border-left: 3px solid #28a745;
+}
+
+.note-attachments strong {
+  color: #495057;
+  font-size: 13px;
+  margin-right: 8px;
+}
+
+.attachment-link {
+  display: inline-block;
+  color: #007bff;
+  text-decoration: none;
+  font-size: 13px;
+  margin-right: 12px;
+  cursor: pointer;
+}
+
+.attachment-link:hover {
+  text-decoration: underline;
+}
+
+.no-notes {
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+  padding: 40px 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .appointment-header,
+  .note-header {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .appointment-status,
+  .note-category {
+    align-self: flex-start;
+  }
+  
+  .toggle-btn {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  
+  .dental-notes-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  
+  .add-note-btn {
+    align-self: flex-start;
+  }
+} 

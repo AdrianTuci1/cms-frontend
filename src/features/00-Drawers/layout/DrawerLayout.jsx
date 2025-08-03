@@ -9,7 +9,6 @@ const DrawerLayout = ({
   children, 
   isLoading = false,
   actions = null,
-  size = 'medium', // 'small', 'medium', 'large', 'full'
   drawerIndex = 0,
   totalDrawers = 1,
   isActive = true
@@ -48,7 +47,7 @@ const DrawerLayout = ({
       style={{ zIndex }}
     >
       <div 
-        className={`${styles.drawer} ${styles[size]} ${isActive ? styles.active : ''}`}
+        className={`${styles.drawer} ${styles.standard} ${isActive ? styles.active : ''}`}
         style={{
           zIndex: zIndex + 1 // Drawer should be above its overlay
         }}

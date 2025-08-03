@@ -23,18 +23,6 @@
 }
 
 /* Drawer container widths based on drawer size */
-.drawerContainerSmall {
+.drawerContainerStandard {
   width: 320px;
-}
-
-.drawerContainerMedium {
-  width: 480px;
-}
-
-.drawerContainerLarge {
-  width: 640px;
-}
-
-.drawerContainerFull {
-  width: 100%;
 } 

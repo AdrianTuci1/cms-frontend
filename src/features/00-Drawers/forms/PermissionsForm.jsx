@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaShieldAlt, FaCheck, FaTimes } from 'react-icons/fa';
+import { FaShieldAlt, FaCheck, FaTimes, FaChevronDown, FaChevronRight, FaEye, FaEdit, FaTrash, FaCog } from 'react-icons/fa';
 import styles from './PermissionsForm.module.css';
 
 const PermissionsForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) => {
@@ -10,24 +10,26 @@ const PermissionsForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }
     ...data
   });
 
+  const [expandedResources, setExpandedResources] = useState(new Set());
+
   // Available resources for permissions
   const resources = [
-    { id: 'clients', name: 'Clienți', description: 'Gestionare clienți' },
-    { id: 'appointments', name: 'Programări', description: 'Gestionare programări' },
-    { id: 'services', name: 'Servicii', description: 'Gestionare servicii' },
-    { id: 'invoices', name: 'Facturi', description: 'Gestionare facturi' },
-    { id: 'reports', name: 'Rapoarte', description: 'Vizualizare rapoarte' },
-    { id: 'settings', name: 'Setări', description: 'Configurare sistem' },
-    { id: 'users', name: 'Utilizatori', description: 'Gestionare utilizatori' },
-    { id: 'roles', name: 'Roluri', description: 'Gestionare roluri' }
+    { id: 'clients', name: 'Clienți', description: 'Gestionare clienți', icon: FaShieldAlt },
+    { id: 'appointments', name: 'Programări', description: 'Gestionare programări', icon: FaShieldAlt },
+    { id: 'services', name: 'Servicii', description: 'Gestionare servicii', icon: FaShieldAlt },
+    { id: 'invoices', name: 'Facturi', description: 'Gestionare facturi', icon: FaShieldAlt },
+    { id: 'reports', name: 'Rapoarte', description: 'Vizualizare rapoarte', icon: FaShieldAlt },
+    { id: 'settings', name: 'Setări', description: 'Configurare sistem', icon: FaCog },
+    { id: 'users', name: 'Utilizatori', description: 'Gestionare utilizatori', icon: FaShieldAlt },
+    { id: 'roles', name: 'Roluri', description: 'Gestionare roluri', icon: FaShieldAlt }
   ];
 
-  // Available permissions
+  // Available permissions with icons
   const permissions = [
-    { id: 'read', name: 'Citire', description: 'Vizualizare date' },
-    { id: 'write', name: 'Scriere', description: 'Creare și editare' },
-    { id: 'delete', name: 'Ștergere', description: 'Eliminare date' },
-    { id: 'admin', name: 'Administrare', description: 'Acces complet' }
+    { id: 'read', name: 'Citire', description: 'Vizualizare date', icon: FaEye },
+    { id: 'write', name: 'Scriere', description: 'Creare și editare', icon: FaEdit },
+    { id: 'delete', name: 'Ștergere', description: 'Eliminare date', icon: FaTrash },
+    { id: 'admin', name: 'Administrare', description: 'Acces complet', icon: FaCog }
   ];
 
   useEffect(() => {
@@ -78,6 +80,18 @@ const PermissionsForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }
     return roleData.permissions[resourceId]?.includes(permissionId) || false;
   };
 
+  const toggleResource = (resourceId) => {
+    setExpandedResources(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(resourceId)) {
+        newSet.delete(resourceId);
+      } else {
+        newSet.add(resourceId);
+      }
+      return newSet;
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -111,10 +125,9 @@ const PermissionsForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }
 
   return (
     <div className={styles.permissionsForm}>
-
-      <form onSubmit={handleSubmit} className={styles.form}>
-        {/* Basic Role Information */}
-        <div className={styles.basicInfo}>
+      <div className={styles.scrollableContent}>
+        <form onSubmit={handleSubmit} className={styles.form}>
+          {/* Basic Role Information */}
           <div className={styles.inputGroup}>
             <label htmlFor="name">Nume Rol *</label>
             <input
@@ -139,84 +152,112 @@ const PermissionsForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }
               disabled={isLoading}
             />
           </div>
-        </div>
 
-        {/* Permissions Section */}
-        <div className={styles.permissionsSection}>
-          <h3>Permisiuni</h3>
-          <p className={styles.permissionsDescription}>
-            Selectați permisiunile pe care le va avea acest rol pentru fiecare resursă
-          </p>
+          {/* Permissions Section */}
+          <div className={styles.permissionsSection}>
+            <h3>Permisiuni</h3>
+            <p className={styles.permissionsDescription}>
+              Selectați permisiunile pe care le va avea acest rol pentru fiecare resursă
+            </p>
 
-          <div className={styles.permissionsGrid}>
-            <div className={styles.permissionsHeader}>
-              <div className={styles.resourceHeader}>Resursă</div>
-              {permissions.map(permission => (
-                <div key={permission.id} className={styles.permissionHeader}>
-                  <span className={styles.permissionName}>{permission.name}</span>
-                  <span className={styles.permissionTooltip}>{permission.description}</span>
-                </div>
-              ))}
-            </div>
-            
-            {resources.map(resource => (
-              <div key={resource.id} className={styles.permissionRow}>
-                <div className={styles.resourceName}>
-                  <span className={styles.resourceTitle}>{resource.name}</span>
-                  <span className={styles.resourceDescription}>{resource.description}</span>
-                  {getPermissionCount(resource.id) > 0 && (
-                    <span className={styles.permissionCount}>
-                      {getPermissionCount(resource.id)} permisiuni
-                    </span>
-                  )}
-                </div>
-                {permissions.map(permission => (
-                  <div key={permission.id} className={styles.permissionCell}>
-                    <input
-                      type="checkbox"
-                      checked={hasPermission(resource.id, permission.id)}
-                      onChange={(e) => handlePermissionChange(resource.id, permission.id, e.target.checked)}
-                      className={styles.permissionCheckbox}
-                      disabled={isLoading}
-                    />
+            <div className={styles.resourcesAccordion}>
+              {resources.map(resource => {
+                const ResourceIcon = resource.icon;
+                const isExpanded = expandedResources.has(resource.id);
+                const permissionCount = getPermissionCount(resource.id);
+                
+                return (
+                  <div key={resource.id} className={styles.resourceAccordion}>
+                    <div 
+                      className={styles.resourceHeader}
+                      onClick={() => toggleResource(resource.id)}
+                    >
+                      <div className={styles.resourceInfo}>
+                        <ResourceIcon className={styles.resourceIcon} />
+                        <div className={styles.resourceDetails}>
+                          <span className={styles.resourceTitle}>{resource.name}</span>
+                          <span className={styles.resourceDescription}>{resource.description}</span>
+                        </div>
+                      </div>
+                      <div className={styles.resourceActions}>
+                        {permissionCount > 0 && (
+                          <span className={styles.permissionCount}>
+                            {permissionCount} permisiuni
+                          </span>
+                        )}
+                        {isExpanded ? <FaChevronDown /> : <FaChevronRight />}
+                      </div>
+                    </div>
+                    
+                    {isExpanded && (
+                      <div className={styles.permissionsCards}>
+                        {permissions.map(permission => {
+                          const PermissionIcon = permission.icon;
+                          const isChecked = hasPermission(resource.id, permission.id);
+                          
+                          return (
+                            <div 
+                              key={permission.id} 
+                              className={`${styles.permissionCard} ${isChecked ? styles.permissionCardActive : ''}`}
+                              onClick={() => handlePermissionChange(resource.id, permission.id, !isChecked)}
+                            >
+                              <div className={styles.permissionCardHeader}>
+                                <PermissionIcon className={styles.permissionIcon} />
+                                <span className={styles.permissionName}>{permission.name}</span>
+                                <input
+                                  type="checkbox"
+                                  checked={isChecked}
+                                  onChange={(e) => handlePermissionChange(resource.id, permission.id, e.target.checked)}
+                                  className={styles.permissionCheckbox}
+                                  disabled={isLoading}
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                              </div>
+                              <p className={styles.permissionDescription}>{permission.description}</p>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
-                ))}
-              </div>
-            ))}
+                );
+              })}
+            </div>
           </div>
-        </div>
+        </form>
+      </div>
 
-        {/* Form Actions */}
-        <div className={styles.formActions}>
+      {/* Fixed Form Actions */}
+      <div className={styles.formActions}>
+        <button
+          type="button"
+          onClick={onCancel}
+          className={styles.cancelButton}
+          disabled={isLoading}
+        >
+          <FaTimes /> Anulează
+        </button>
+        
+        {mode === 'edit' && (
           <button
             type="button"
-            onClick={onCancel}
-            className={styles.cancelButton}
+            onClick={handleDelete}
+            className={styles.deleteButton}
             disabled={isLoading}
           >
-            <FaTimes /> Anulează
+            Șterge Rol
           </button>
-          
-          {mode === 'edit' && (
-            <button
-              type="button"
-              onClick={handleDelete}
-              className={styles.deleteButton}
-              disabled={isLoading}
-            >
-              Șterge Rol
-            </button>
-          )}
-          
-          <button
-            type="submit"
-            className={styles.submitButton}
-            disabled={isLoading}
-          >
-            <FaCheck /> {mode === 'create' ? 'Creează Rol' : 'Salvează Modificările'}
-          </button>
-        </div>
-      </form>
+        )}
+        
+        <button
+          type="submit"
+          onClick={handleSubmit}
+          className={styles.submitButton}
+          disabled={isLoading}
+        >
+          <FaCheck /> {mode === 'create' ? 'Creează Rol' : 'Salvează Modificările'}
+        </button>
+      </div>
     </div>
   );
 };

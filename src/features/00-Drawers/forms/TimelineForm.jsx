@@ -342,7 +342,10 @@ const TimelineForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) =
       // Add other relevant fields based on business type
     };
 
-    openDrawer('edit', DRAWER_TYPES.MEMBER, memberData, {
+    // Use PATIENT drawer for dental clinics, MEMBER for others
+    const drawerType = businessType.name === 'Dental Clinic' ? DRAWER_TYPES.PATIENT : DRAWER_TYPES.MEMBER;
+
+    openDrawer('edit', drawerType, memberData, {
       title: `Edit ${businessType.name === 'Dental Clinic' ? 'Patient' : businessType.name === 'Gym' ? 'Member' : 'Guest'}`,
       onSave: async (memberData) => {
         console.log('Member data saved:', memberData);

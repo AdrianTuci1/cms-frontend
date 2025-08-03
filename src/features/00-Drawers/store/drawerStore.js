@@ -8,6 +8,7 @@ export const DRAWER_TYPES = {
   TIMELINE: 'timeline',
   STOCK: 'stock',
   MEMBER: 'member',
+  PATIENT: 'patient',
   SERVICE: 'service',
   AI_ASSISTANT: 'ai-assistant',
   PERMISSIONS: 'permissions',
@@ -40,6 +41,29 @@ const BUSINESS_TYPE_CONFIGS = {
       required: ['clientName', 'displayTreatment', 'medicName', 'date', 'duration'],
       queryFields: ['phoneNumber', 'email'],
       searchFields: ['displayTreatment', 'medicName']
+    },
+    patient: {
+      title: 'Patient',
+      fields: [
+        { name: 'name', type: 'text', label: 'Full Name', required: true },
+        { name: 'phoneNumber', type: 'tel', label: 'Phone Number', required: true },
+        { name: 'email', type: 'email', label: 'Email Address' },
+        { name: 'dateOfBirth', type: 'date', label: 'Date of Birth' },
+        { name: 'gender', type: 'select', label: 'Gender', options: [
+          { value: 'male', label: 'Male' },
+          { value: 'female', label: 'Female' },
+          { value: 'other', label: 'Other' }
+        ]},
+        { name: 'address', type: 'textarea', label: 'Address', placeholder: 'Enter patient address...' },
+        { name: 'emergencyContact', type: 'text', label: 'Emergency Contact Name' },
+        { name: 'emergencyPhone', type: 'tel', label: 'Emergency Contact Phone' },
+        { name: 'medicalHistory', type: 'textarea', label: 'Medical History', placeholder: 'Enter relevant medical history...' },
+        { name: 'allergies', type: 'textarea', label: 'Allergies', placeholder: 'Enter any allergies...' },
+        { name: 'notes', type: 'textarea', label: 'Notes', placeholder: 'Additional notes about the patient...' }
+      ],
+      required: ['name', 'phoneNumber'],
+      queryFields: ['phoneNumber', 'email'],
+      searchFields: ['name', 'medicalHistory']
     },
     service: {
       title: 'Treatment',
@@ -152,7 +176,6 @@ const useDrawerStore = create((set, get) => ({
   openDrawer: (mode, type, data = null, options = {}) => {
     const {
       title = null,
-      size = 'medium',
       onSave = null,
       onDelete = null,
       onCancel = null
@@ -199,7 +222,7 @@ const useDrawerStore = create((set, get) => ({
       mode,
       title: drawerTitle,
       data,
-      size,
+      size: 'standard', // Always use standard size
       onSave,
       onDelete,
       onCancel,
@@ -263,12 +286,7 @@ const useDrawerStore = create((set, get) => ({
   
   // Get active drawer size
   getActiveDrawerSize: () => {
-    const state = get();
-    if (state.drawers.length === 0) return 'medium';
-    
-    // For stacked drawers, use the size of the top drawer (last in array)
-    const topDrawer = state.drawers[state.drawers.length - 1];
-    return topDrawer?.size || 'medium';
+    return 'standard'; // Always return standard size
   },
   
   // Check if drawer is open

@@ -82,7 +82,10 @@ const ClientsView = () => {
       role: client.role || 'client'
     };
 
-    openDrawer('edit', DRAWER_TYPES.MEMBER, clientData, {
+    // Use PATIENT drawer for dental clinics, MEMBER for others
+    const drawerType = currentBusinessType === 'dental' ? DRAWER_TYPES.PATIENT : DRAWER_TYPES.MEMBER;
+
+    openDrawer('edit', drawerType, clientData, {
       title: `Edit ${currentBusinessType === 'dental' ? 'Patient' : currentBusinessType === 'gym' ? 'Member' : 'Guest'}`,
       onSave: async (data, mode) => {
         console.log('Updating client:', data);
@@ -123,7 +126,10 @@ const ClientsView = () => {
       role: 'client'
     };
 
-    openDrawer('create', DRAWER_TYPES.MEMBER, newClient, {
+    // Use PATIENT drawer for dental clinics, MEMBER for others
+    const drawerType = currentBusinessType === 'dental' ? DRAWER_TYPES.PATIENT : DRAWER_TYPES.MEMBER;
+
+    openDrawer('create', drawerType, newClient, {
       title: `New ${currentBusinessType === 'dental' ? 'Patient' : currentBusinessType === 'gym' ? 'Member' : 'Guest'}`,
       onSave: async (data, mode) => {
         console.log('Creating client:', data);

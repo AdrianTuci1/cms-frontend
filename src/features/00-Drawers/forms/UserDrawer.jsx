@@ -100,26 +100,6 @@ const UserDrawer = ({ onClose }) => {
         </div>
       ) : (
         <>
-          {/* Data sync status indicator */}
-          <div className={styles.syncStatus}>
-            <div className={styles.syncInfo}>
-              {isOnline ? (
-                <FaCheckCircle className={styles.onlineIcon} />
-              ) : (
-                <FaExclamationTriangle className={styles.offlineIcon} />
-              )}
-              <span className={styles.syncText}>
-                {isOnline ? 'Online' : 'Offline'} • Last updated: {formatLastUpdated(lastUpdated)}
-              </span>
-            </div>
-            <button 
-              onClick={refreshUserData} 
-              className={styles.refreshBtn}
-              disabled={userDataLoading}
-            >
-              <FaSync className={userDataLoading ? styles.spinning : ''} />
-            </button>
-          </div>
 
           <div className={styles.profileHeader}>
             <div className={styles.avatarContainer}>
@@ -238,12 +218,6 @@ const UserDrawer = ({ onClose }) => {
 
   return (
     <div className={styles.userDrawer}>
-      <div className={styles.drawerHeader}>
-        <h2>User Profile</h2>
-        <button className={styles.closeBtn} onClick={onClose}>
-          ×
-        </button>
-      </div>
 
       <div className={styles.tabNavigation}>
         <button 
