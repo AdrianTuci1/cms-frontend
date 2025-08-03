@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useWorkflowsStore } from '../../store/workflowsStore';
 import styles from './styles/AssistantsView.module.css';
-import SystemHealth from '../../components/SystemHealth';
+import SystemControls from '../../components/SystemControls';
+import Graph from '../../components/Graph';
 import AutomationSections from '../../components/AutomationSections';
 import RecentActivities from '../../components/RecentActivities';
 
@@ -10,21 +11,18 @@ const AssistantsView = () => {
   
   const { 
     assistants, 
-    systemHealth, 
     recentActivities, 
     isLoading, 
     error,
     toggleAssistant, 
     updateAssistantConfig,
-    fetchSystemHealth,
     fetchRecentActivities
   } = useWorkflowsStore();
 
   // Fetch data on component mount
   useEffect(() => {
-    fetchSystemHealth();
     fetchRecentActivities();
-  }, [fetchSystemHealth, fetchRecentActivities]);
+  }, [fetchRecentActivities]);
 
   const handleSettingsClick = () => {
     setShowAutomationSettings(true);
@@ -47,13 +45,17 @@ const AssistantsView = () => {
   return (
     <div className={styles.container}>
       <div className={styles.layout}>
-        {/* Left Column */}
+        {/* Left Column - Graph with absolute positioned controls */}
         <div className={styles.leftColumn}>
-          <SystemHealth 
-            systemHealth={systemHealth}
-            isLoading={isLoading}
-            onSettingsClick={handleSettingsClick}
-          />
+          {/* System Controls positioned absolutely in top-left corner */}
+          <div className={styles.controlsOverlay}>
+            <SystemControls 
+              onSettingsClick={handleSettingsClick}
+            />
+          </div>
+          
+          {/* Graph Component - occupies entire left column */}
+          <Graph />
           
           {/* Automation Settings Overlay */}
           {showAutomationSettings && (
@@ -79,7 +81,7 @@ const AssistantsView = () => {
           )}
         </div>
 
-        {/* Right Column - Automation Events */}
+        {/* Right Column - Recent Activities */}
         <div className={styles.rightColumn}>
           <RecentActivities 
             activities={recentActivities}

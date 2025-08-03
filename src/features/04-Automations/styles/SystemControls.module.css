@@ -1,0 +1,67 @@
+.controlsContainer {
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  padding: 8px;
+
+  min-width: auto;
+}
+
+.controlButtons {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+}
+
+.controlButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.startButton {
+  background: #10b981;
+  color: #ffffff;
+}
+
+.startButton:hover {
+  background: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.stopButton {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.stopButton:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.settingsButton {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.settingsButton:hover {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.controlButton:active {
+  transform: translateY(0);
+}

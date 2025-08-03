@@ -17,6 +17,20 @@
   height: 100%;
   overflow: hidden;
   position: relative;
+  min-height: 0; /* Allow flex item to shrink */
+}
+
+/* Controls Overlay - positioned absolutely in top-left corner */
+.controlsOverlay {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.controlsOverlay > * {
+  pointer-events: auto;
 }
 
 /* Right Column Styles */
