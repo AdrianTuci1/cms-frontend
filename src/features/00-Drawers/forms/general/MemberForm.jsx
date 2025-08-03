@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { getBusinessTypeKey, getBusinessTypeKeyForSync } from '../../../../src/config/businessTypes';
-import BaseForm from './BaseForm';
+import { getBusinessTypeKey, getBusinessTypeKeyForSync } from '../../../../../src/config/businessTypes';
+import BaseForm from '../BaseForm';
 import styles from './MemberForm.module.css';
-import useRolesStore from '../../06-Admin/store/rolesStore';
+import useRolesStore from '../../../06-Admin/store/rolesStore';
 
 const MemberForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) => {
   const businessTypeKey = getBusinessTypeKey();

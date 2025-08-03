@@ -12,8 +12,6 @@ const BaseForm = ({
   onDelete,
   onCancel,
   isLoading = false,
-  title = '',
-  businessType = '',
   children
 }) => {
   const { 

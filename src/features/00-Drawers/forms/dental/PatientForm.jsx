@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { getBusinessTypeKey, getBusinessTypeKeyForSync } from '../../../../src/config/businessTypes';
-import BaseForm from './BaseForm';
+import { getBusinessTypeKey, getBusinessTypeKeyForSync } from '../../../../../src/config/businessTypes';
+import BaseForm from '../BaseForm';
 import styles from './PatientForm.module.css';
 
 const PatientForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) => {

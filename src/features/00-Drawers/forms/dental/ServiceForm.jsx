@@ -1,6 +1,6 @@
 import React from 'react';
-import { getBusinessType } from '../../../../src/config/businessTypes';
-import BaseForm from './BaseForm';
+import { getBusinessType } from '../../../../../src/config/businessTypes';
+import BaseForm from '../BaseForm';
 
 const ServiceForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) => {
   const businessType = getBusinessType();

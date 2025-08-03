@@ -2,14 +2,19 @@
 export { default as DrawerManager } from './DrawerManager';
 export { default as useDrawerStore, DRAWER_TYPES, DRAWER_MODES } from './store/drawerStore';
 
-// Forms exports
+// Base form export
 export { default as BaseForm } from './forms/BaseForm';
-export { default as TimelineForm } from './forms/TimelineForm';
-export { default as ServiceForm } from './forms/ServiceForm';
-export { default as StockForm } from './forms/StockForm';
-export { default as MemberForm } from './forms/MemberForm';
-export { default as PermissionsForm } from './forms/PermissionsForm';
-export { default as UserDrawer } from './forms/UserDrawer';
+
+// General forms (same for all business types)
+export { default as StockForm } from './forms/general/StockForm';
+export { default as MemberForm } from './forms/general/MemberForm';
+export { default as PermissionsForm } from './forms/general/PermissionsForm';
+export { default as UserDrawer } from './forms/general/UserDrawer';
+
+// Business-specific forms (using dental as default)
+export { default as TimelineForm } from './forms/dental/TimelineForm';
+export { default as ServiceForm } from './forms/dental/ServiceForm';
+export { default as PatientForm } from './forms/dental/PatientForm';
 
 // Hooks exports
 export { useDrawer, useTimelineDrawerActions, useGenericDrawerActions } from './hooks';

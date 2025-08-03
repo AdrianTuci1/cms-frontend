@@ -1,19 +1,24 @@
 import React from 'react';
 import useDrawerStore, { DRAWER_TYPES, DRAWER_MODES } from './store/drawerStore';
 import DrawerLayout from './layout/DrawerLayout';
-import TimelineForm from './forms/TimelineForm';
-import ServiceForm from './forms/ServiceForm';
-import StockForm from './forms/StockForm';
-import MemberForm from './forms/MemberForm';
-import PatientForm from './forms/PatientForm';
-import PermissionsForm from './forms/PermissionsForm';
-import UserDrawer from './forms/UserDrawer';
 import styles from './DrawerManager.module.css';
+
+// General forms
+import UserDrawer from './forms/general/UserDrawer';
+import MemberForm from './forms/general/MemberForm';
+import PermissionsForm from './forms/general/PermissionsForm';
+import StockForm from './forms/general/StockForm';
+
+// Business-specific forms (using dental as default)
+import TimelineForm from './forms/dental/TimelineForm';
+import ServiceForm from './forms/dental/ServiceForm';
+import PatientForm from './forms/dental/PatientForm';
+
+
 
 const DrawerManager = () => {
   const {
     drawers,
-    activeDrawerId,
     isOpen,
     closeDrawer,
     isLoading,
@@ -76,26 +81,28 @@ const DrawerManager = () => {
     };
 
     switch (drawer.type) {
-      case DRAWER_TYPES.TIMELINE:
-        return <TimelineForm {...formProps} />;
-        
-      case DRAWER_TYPES.SERVICE:
-        return <ServiceForm {...formProps} />;
-        
+      // General forms (same for all business types)
       case DRAWER_TYPES.STOCK:
         return <StockForm {...formProps} />;
         
       case DRAWER_TYPES.MEMBER:
         return <MemberForm {...formProps} />;
         
-      case DRAWER_TYPES.PATIENT:
-        return <PatientForm {...formProps} />;
-        
       case DRAWER_TYPES.PERMISSIONS:
         return <PermissionsForm {...formProps} />;
         
       case DRAWER_TYPES.USER:
         return <UserDrawer onClose={() => closeDrawer(drawer.id)} />;
+        
+      // Business-specific forms - using dental as default
+      case DRAWER_TYPES.TIMELINE:
+        return <TimelineForm {...formProps} />;
+        
+      case DRAWER_TYPES.SERVICE:
+        return <ServiceForm {...formProps} />;
+        
+      case DRAWER_TYPES.PATIENT:
+        return <PatientForm {...formProps} />;
         
       case DRAWER_TYPES.AI_ASSISTANT:
         // AI Assistant drawer - don't touch as requested
