@@ -13,6 +13,8 @@ import StockForm from './forms/general/StockForm';
 import TimelineForm from './forms/dental/TimelineForm';
 import ServiceForm from './forms/dental/ServiceForm';
 import PatientForm from './forms/dental/PatientForm';
+import OperativeDetailsForm from './forms/dental/OperativeDetailsForm';
+import GalleryForm from './forms/dental/GalleryForm';
 
 
 
@@ -103,6 +105,12 @@ const DrawerManager = () => {
         
       case DRAWER_TYPES.PATIENT:
         return <PatientForm {...formProps} />;
+        
+      case DRAWER_TYPES.OPERATIVE_DETAILS:
+        return <OperativeDetailsForm {...formProps} />;
+        
+      case DRAWER_TYPES.GALLERY:
+        return <GalleryForm {...formProps} />;
         
       case DRAWER_TYPES.AI_ASSISTANT:
         // AI Assistant drawer - don't touch as requested

@@ -15,6 +15,8 @@ export { default as UserDrawer } from './forms/general/UserDrawer';
 export { default as TimelineForm } from './forms/dental/TimelineForm';
 export { default as ServiceForm } from './forms/dental/ServiceForm';
 export { default as PatientForm } from './forms/dental/PatientForm';
+export { default as OperativeDetailsForm } from './forms/dental/OperativeDetailsForm';
+export { default as GalleryForm } from './forms/dental/GalleryForm';
 
 // Hooks exports
 export { useDrawer, useTimelineDrawerActions, useGenericDrawerActions } from './hooks';

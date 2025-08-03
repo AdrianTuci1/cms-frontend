@@ -146,7 +146,7 @@ const BaseForm = ({
     }
 
     // Handle database querying for specific fields
-    const queryFields = ['phoneNumber', 'email'];
+    const queryFields = ['phone', 'email'];
     if (queryFields.includes(field)) {
       debouncedQuery(field, value);
     }
@@ -195,7 +195,7 @@ const BaseForm = ({
       patientName: result.name || formData.patientName,
       clientName: result.name || formData.clientName,
       guestName: result.name || formData.guestName,
-      phoneNumber: result.phoneNumber || formData.phoneNumber,
+              phone: result.phone || formData.phone,
       email: result.email || formData.email
     };
     
@@ -225,8 +225,8 @@ const BaseForm = ({
       newErrors.email = 'Please enter a valid email address';
     }
     
-    if (formData.phoneNumber && !/^[\+]?[1-9][\d]{0,15}$/.test(formData.phoneNumber.replace(/\s/g, ''))) {
-      newErrors.phoneNumber = 'Please enter a valid phone number';
+    if (formData.phone && !/^[\+]?[1-9][\d]{0,15}$/.test(formData.phone.replace(/\s/g, ''))) {
+      newErrors.phone = 'Please enter a valid phone number';
     }
     
     if (formData.price && (isNaN(formData.price) || parseFloat(formData.price) < 0)) {
@@ -629,6 +629,48 @@ const BaseForm = ({
           </div>
         );
         
+      case 'text-with-button':
+        return (
+          <div className={styles.formGroup} key={name}>
+            <label className={`${styles.formLabel} ${isRequired ? styles.requiredLabel : ''}`}>
+              {label || name.charAt(0).toUpperCase() + name.slice(1)}
+            </label>
+            
+            <div className={styles.inputContainer} style={{ display: 'flex', gap: '8px' }}>
+              <input
+                type="text"
+                className={getInputClassName(name)}
+                value={formData[name] || ''}
+                onChange={(e) => handleInputChange(name, e.target.value)}
+                placeholder={placeholder || `Enter ${label || name}`}
+                disabled={mode === 'view' || isLoading}
+                style={{ flex: 1 }}
+                {...props}
+              />
+              
+              <button
+                type="button"
+                className={styles.actionButton}
+                onClick={fieldConfig.onButtonClick}
+                disabled={mode === 'view' || isLoading}
+                style={{ 
+                  whiteSpace: 'nowrap',
+                  padding: '8px 12px',
+                  fontSize: '0.875rem'
+                }}
+              >
+                {fieldConfig.buttonText}
+              </button>
+            </div>
+            
+            {error && (
+              <div className={styles.errorMessage}>
+                {error}
+              </div>
+            )}
+          </div>
+        );
+        
       default:
         return (
           <div className={styles.formGroup} key={name}>
@@ -668,7 +710,7 @@ const BaseForm = ({
                     <div className={styles.resultInfo}>
                       <div className={styles.resultName}>{result.name}</div>
                       <div className={styles.resultDetails}>
-                        {result.phoneNumber && <span>📞 {result.phoneNumber}</span>}
+                        {result.phone && <span>📞 {result.phone}</span>}
                         {result.email && <span>📧 {result.email}</span>}
                       </div>
                     </div>

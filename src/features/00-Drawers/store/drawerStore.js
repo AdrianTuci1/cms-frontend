@@ -10,6 +10,8 @@ export const DRAWER_TYPES = {
   MEMBER: 'member',
   PATIENT: 'patient',
   SERVICE: 'service',
+  OPERATIVE_DETAILS: 'operative-details',
+  GALLERY: 'gallery',
   AI_ASSISTANT: 'ai-assistant',
   PERMISSIONS: 'permissions',
   USER: 'user'
@@ -28,47 +30,57 @@ const BUSINESS_TYPE_CONFIGS = {
       title: 'Appointment',
       fields: [
         { name: 'clientName', type: 'text', label: 'Client Name', required: true },
-        { name: 'phoneNumber', type: 'tel', label: 'Phone Number', required: true },
-        { name: 'email', type: 'email', label: 'Email' },
-        { name: 'displayTreatment', type: 'text', label: 'Treatment Name', required: true },
         { name: 'medicName', type: 'text', label: 'Medic Name', required: true },
-        { name: 'date', type: 'datetime-local', label: 'Appointment Date & Time', required: true },
-        { name: 'duration', type: 'number', label: 'Duration (minutes)', min: 15, max: 180, required: true },
-        { name: 'done', type: 'checkbox', label: 'Done' },
-        { name: 'paid', type: 'checkbox', label: 'Paid' },
-        { name: 'notes', type: 'textarea', label: 'Notes', placeholder: 'Additional notes about the appointment...' }
+        { name: 'displayTreatment', type: 'text', label: 'Treatment Name', required: true },
+        { name: 'date', type: 'date', label: 'Date', required: true },
+        { name: 'time', type: 'time', label: 'Time', required: true }
       ],
-      required: ['clientName', 'displayTreatment', 'medicName', 'date', 'duration'],
-      queryFields: ['phoneNumber', 'email'],
+      required: ['clientName', 'medicName', 'displayTreatment', 'date', 'time'],
+      queryFields: [],
       searchFields: ['displayTreatment', 'medicName']
     },
     patient: {
       title: 'Patient',
       fields: [
-        { name: 'name', type: 'text', label: 'Full Name', required: true },
-        { name: 'phoneNumber', type: 'tel', label: 'Phone Number', required: true },
-        { name: 'email', type: 'email', label: 'Email Address' },
-        { name: 'dateOfBirth', type: 'date', label: 'Date of Birth' },
-        { name: 'gender', type: 'select', label: 'Gender', options: [
+        { name: 'fullName', type: 'text', label: 'Full Name', required: true },
+        { name: 'birthYear', type: 'number', label: 'Birth Year', required: true, min: 1900, max: new Date().getFullYear() },
+        { name: 'gender', type: 'select', label: 'Gender', required: true, options: [
           { value: 'male', label: 'Male' },
           { value: 'female', label: 'Female' },
           { value: 'other', label: 'Other' }
         ]},
+        { name: 'phone', type: 'tel', label: 'Phone Number', required: true },
+        { name: 'email', type: 'email', label: 'Email Address' },
         { name: 'address', type: 'textarea', label: 'Address', placeholder: 'Enter patient address...' },
-        { name: 'emergencyContact', type: 'text', label: 'Emergency Contact Name' },
-        { name: 'emergencyPhone', type: 'tel', label: 'Emergency Contact Phone' },
-        { name: 'medicalHistory', type: 'textarea', label: 'Medical History', placeholder: 'Enter relevant medical history...' },
-        { name: 'allergies', type: 'textarea', label: 'Allergies', placeholder: 'Enter any allergies...' },
-        { name: 'notes', type: 'textarea', label: 'Notes', placeholder: 'Additional notes about the patient...' }
+        { name: 'notes', type: 'textarea', label: 'Notes', placeholder: 'Additional notes about the patient...' },
+        { name: 'tags', type: 'text', label: 'Tags', placeholder: 'Enter tags separated by commas...' }
       ],
-      required: ['name', 'phoneNumber'],
-      queryFields: ['phoneNumber', 'email'],
-      searchFields: ['name', 'medicalHistory']
+      required: ['fullName', 'birthYear', 'gender', 'phone'],
+      queryFields: ['phone', 'email'],
+      searchFields: ['fullName', 'notes']
     },
     service: {
       title: 'Treatment',
       fields: ['name', 'price', 'duration', 'category', 'description'],
       required: ['name', 'price', 'duration']
+    },
+    'operative-details': {
+      title: 'Operative Details',
+      fields: [
+        { name: 'postOperativeNotes', type: 'textarea', label: 'Post-Operative Notes', required: true, placeholder: 'Enter post-operative notes and observations...' },
+        { name: 'prescription', type: 'textarea', label: 'Prescription', placeholder: 'Enter prescription details...' },
+        { name: 'price', type: 'number', label: 'Price', required: true, min: 0, step: 0.01, placeholder: 'Enter treatment price...' },
+        { name: 'paid', type: 'checkbox', label: 'Paid', description: 'Mark if the treatment has been paid for' }
+      ],
+      required: ['postOperativeNotes', 'price']
+    },
+    gallery: {
+      title: 'Gallery',
+      fields: [
+        { name: 'images', type: 'file', label: 'Upload Images', multiple: true },
+        { name: 'description', type: 'textarea', label: 'Image Description' }
+      ],
+      required: []
     }
   },
   'Gym': {
