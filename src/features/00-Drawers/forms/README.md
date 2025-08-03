@@ -1,202 +1,130 @@
-# UserDrawer Component
+# Forms Structure
 
-The `UserDrawer` component is a comprehensive user profile drawer that integrates with the `useDataSync` hook to provide real-time data synchronization with the backend API.
+This directory contains all drawer forms organized by business type and separated into logical components.
 
-## Features
+## Directory Structure
 
-- **Real-time Data Sync**: Uses `useDataSync` hook to fetch and sync user data
-- **Offline Support**: Falls back to cached data when offline
-- **Loading States**: Shows loading spinner while fetching data
-- **Error Handling**: Displays error messages with retry functionality
-- **Sync Status**: Shows online/offline status and last update time
-- **Profile Management**: Displays user profile information with edit capabilities
-- **Authentication Integration**: Shows user roles, permissions, and business type
-- **Empty States**: Shows appropriate empty states for notifications and notes
-
-## Integration with useDataSync
-
-The component uses the `useDataSync` hook with the `userData` resource:
-
-```javascript
-const {
-  data: userData,
-  loading: userDataLoading,
-  error: userDataError,
-  update: updateUserData,
-  refresh: refreshUserData,
-  lastUpdated,
-  isOnline
-} = useDataSync('userData', {
-  enableValidation: true,
-  enableBusinessLogic: true
-});
+```
+forms/
+├── dental/
+│   ├── patient/
+│   │   ├── actions/          # Business logic and data processing
+│   │   ├── views/           # UI components for different views
+│   │   ├── form/            # Form-specific components
+│   │   ├── PatientForm.jsx  # Main form component
+│   │   └── index.js         # Export file
+│   ├── appointments/        # Timeline/Appointments management
+│   │   ├── actions/
+│   │   │   ├── appointmentActions.js    # Main appointment logic
+│   │   │   └── operativeDetailsActions.js # Operative details logic
+│   │   ├── views/
+│   │   │   ├── AppointmentViewToggle.jsx
+│   │   │   └── operative-details/
+│   │   │       └── OperativeDetailsView.jsx
+│   │   ├── form/
+│   │   │   ├── AppointmentForm.jsx
+│   │   │   └── TimelineFormActions.jsx
+│   │   ├── TimelineForm.jsx # Main timeline component
+│   │   └── index.js
+│   └── service/
+└── general/
+    ├── member/
+    ├── permissions/
+    ├── stock/
+    └── user/
 ```
 
-### Data Flow
+## Component Separation
 
-1. **Authentication**: User data is initially returned from backend during login
-2. **JWT Token**: Basic user info (id, email, name, roles, permissions) is stored in JWT
-3. **Profile Data**: Additional profile data is fetched via `/api/userData` endpoint
-4. **Fallback**: If API is unavailable, uses cached data from IndexedDB
-5. **Mock Data**: If no cached data, falls back to mock data from `userDataMock`
-6. **Real-time Updates**: Listens for data changes via WebSocket/API events
-7. **Manual Refresh**: Users can manually refresh data
+Each form is separated into three main categories:
 
-### API Endpoints
+### 1. Actions (`/actions/`)
+Contains business logic, validation, and data processing:
+- `*Actions.js` - Main business logic functions
+- `mockData.js` - Mock data for development/testing
+- Validation functions
+- Data transformation functions
+- API interaction handlers
 
-The `userData` resource is configured to use:
-- `GET /api/userData` - Fetch user profile data
-- `PUT /api/userData/:id` - Update user profile data
-- `POST /api/userData` - Create user profile data
-- `DELETE /api/userData/:id` - Delete user profile data
+### 2. Views (`/views/`)
+Contains UI components for different views:
+- View-specific components (e.g., `AppointmentHistoryView.jsx`)
+- Toggle components for switching between views
+- Display-only components
+- Sub-views for complex forms
 
-## Usage
+### 3. Form (`/form/`)
+Contains form-specific components:
+- `*FormFields.jsx` - Field rendering components
+- `*FormActions.jsx` - Action buttons (save, cancel, delete)
+- `*DetailsForm.jsx` - Main form layout
+- Input handling and validation display
 
-### Basic Usage
+## Usage Example
 
-```javascript
-import { openDrawer } from '../index';
+```jsx
+// Import the main form component
+import PatientForm from './dental/patient';
 
-// Open user drawer
-openDrawer('view', 'user', null, {
-  onClose: () => console.log('User drawer closed')
-});
+// Use in your component
+<PatientForm 
+  mode="create" 
+  data={patientData}
+  onSubmit={handleSubmit}
+  onDelete={handleDelete}
+  onCancel={handleCancel}
+  isLoading={false}
+/>
 ```
 
-### With Custom Handlers
+## Benefits of This Structure
 
-```javascript
-openDrawer('view', 'user', null, {
-  onClose: () => {
-    // Handle drawer close
-  },
-  onSave: (data) => {
-    // Handle profile updates
-  }
-});
-```
+1. **Separation of Concerns**: Business logic, UI, and form handling are clearly separated
+2. **Reusability**: Components can be reused across different forms
+3. **Maintainability**: Easy to find and modify specific functionality
+4. **Testability**: Each component can be tested independently
+5. **Scalability**: Easy to add new forms or extend existing ones
 
-## Component Structure
+## Migrated Forms
 
-### Tabs
-- **Profile**: User information and sync status
-- **Notifications**: Empty state (ready for future implementation)
-- **Notes**: Empty state (ready for future implementation)
+### ✅ Completed - All Forms Migrated!
+- `dental/patient/` - Patient management form with multiple views (details, notes, history)
+- `dental/appointments/` - Timeline/Appointment management with sub-views:
+  - Main appointment form
+  - Operative details view
+  - Gallery view with image upload
+- `dental/service/` - Service/treatment management (business-type aware)
+- `general/member/` - Team member management with role integration
+- `general/permissions/` - Role and permissions management with interactive UI
+- `general/stock/` - Inventory management (business-type specific fields)
+- `general/user/` - User profile management with tabs (profile, notifications, notes)
 
-### Profile Section
-- Avatar with edit capability
-- User information (name, roles, department, business type)
-- Contact details (email, phone, location)
-- Last login information
-- Permissions count
-- Sync status indicator
-- Action buttons (Edit Profile, Settings)
+## Adding New Forms
 
-### Sync Status Indicator
-- Shows online/offline status
-- Displays last update time
-- Manual refresh button
-- Loading state during refresh
+1. Create the directory structure:
+   ```bash
+   mkdir -p forms/[business-type]/[form-name]/{actions,views,form}
+   ```
 
-## Data Structure
+2. Create the action files:
+   - `actions/[formName]Actions.js` - Business logic
+   - `actions/mockData.js` - Mock data (if needed)
 
-The component expects the following data structure from `userDataMock`:
+3. Create the view components:
+   - `views/[ViewName]View.jsx` - Individual views
+   - `views/[FormName]ViewToggle.jsx` - View switcher (if multiple views)
 
-```javascript
-{
-  // Basic user info (from JWT token)
-  id: 'user-001',
-  email: 'john.doe@example.com',
-  name: 'John Doe',
-  businessType: 'dental',
-  roles: ['dental_manager'],
-  permissions: ['read:all', 'write:all', 'manage:appointments'],
-  
-  // Profile data (from /api/userData)
-  profile: {
-    phone: '+40 123 456 789',
-    avatar: null,
-    location: 'Bucharest, Romania',
-    department: 'Dental Operations',
-    lastLogin: '2024-01-15 09:30 AM',
-    preferences: {
-      theme: 'light',
-      language: 'ro',
-      notifications: {
-        email: true,
-        sms: false,
-        push: true
-      }
-    }
-  }
-}
-```
+4. Create the form components:
+   - `form/[FormName]FormFields.jsx` - Field rendering
+   - `form/[FormName]FormActions.jsx` - Action buttons
+   - `form/[FormName]DetailsForm.jsx` - Main form layout
 
-### Business Type Support
+5. Create the main component:
+   - `[FormName]Form.jsx` - Main form component
+   - `index.js` - Export file
 
-The mock data can be customized based on business type:
-- **dental**: Dental Manager role with dental-specific permissions
-- **gym**: Gym Manager role with gym-specific permissions  
-- **hotel**: Hotel Manager role with hotel-specific permissions
-
-### Authentication Data
-
-The component also supports the basic authentication data structure:
-
-```javascript
-{
-  id: 'user-001',
-  email: 'john.doe@example.com',
-  name: 'John Doe',
-  businessType: 'dental',
-  roles: ['manager'],
-  permissions: ['read:all', 'write:all']
-}
-```
+6. Update imports in parent components to use the new structure
 
 ## Styling
 
-The component uses CSS modules with the following key classes:
-- `.userDrawer` - Main container
-- `.profileSection` - Profile content area
-- `.syncStatus` - Sync status indicator
-- `.loadingState` - Loading state
-- `.errorState` - Error state
-- `.emptyState` - Empty state for notifications/notes
-- `.profileHeader` - Profile header with avatar
-- `.profileDetails` - User details list
-- `.profileActions` - Action buttons
-- `.businessType` - Business type display
-
-## Mock Data
-
-The component relies entirely on mock data from `src/api/mockData/userDataMock.js` when:
-- API is unavailable
-- No cached data exists
-- Running in test mode
-
-The mock data includes:
-- Complete user profile information
-- Business type-specific customization
-- Authentication data structure
-- Structured data matching component expectations
-
-## Error Handling
-
-The component handles various error scenarios:
-- **Network Errors**: Shows retry button
-- **API Errors**: Displays error message
-- **No Data**: Shows empty state
-- **Validation Errors**: Uses strategy pattern validation
-- **Business Logic Errors**: Uses strategy pattern business rules
-
-## Future Enhancements
-
-Potential improvements:
-- Real notifications system integration
-- Real notes system integration
-- Profile image upload functionality
-- Advanced settings panel
-- Activity history tracking
-- Permission management integration
-- Role-based UI customization 
+All forms use the unified styling system from `../../styles/FormStyles.module.css` which implements the shadcn light theme.
