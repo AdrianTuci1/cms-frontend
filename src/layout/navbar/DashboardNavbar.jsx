@@ -34,6 +34,10 @@ const DashboardNavbar = ({ currentView, setCurrentView, currentSection }) => {
 
   const getNavbarViews = () => {
     switch (currentSection) {
+      case 'blitz':
+        return [
+          { id: 'overview', label: 'Overview', icon: <FaChartLine className={styles.icon} /> }
+        ];
       case 'dashboard':
         const views = [
           { id: 'timeline', label: 'Timeline', icon: <FaCalendarAlt className={styles.icon} /> },

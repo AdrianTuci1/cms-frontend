@@ -126,36 +126,36 @@ const PermissionsForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }
                 <div className={styles.formFields}>
                     {/* Basic Role Information */}
                     <div className={styles.formGroup}>
-                        <label className={`${styles.formLabel} ${styles.requiredLabel}`}>Nume Rol</label>
+                        <label className={`${styles.formLabel} ${styles.requiredLabel}`}>Role Name</label>
                         <input
                             type="text"
                             className={styles.formInput}
                             value={roleData.name}
                             onChange={(e) => handleInputChange('name', e.target.value)}
-                            placeholder="Introduceți numele rolului"
+                            placeholder="Enter the role name"
                             disabled={mode === 'view' || isLoading}
                         />
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label className={styles.formLabel}>Descriere</label>
+                        <label className={styles.formLabel}>Description</label>
                         <textarea
                             className={styles.formTextarea}
                             value={roleData.description}
                             onChange={(e) => handleInputChange('description', e.target.value)}
-                            placeholder="Descrierea rolului și responsabilitățile acestuia"
+                            placeholder="Role description and responsibilities"
                             disabled={mode === 'view' || isLoading}
                         />
                     </div>
 
                     {/* Permissions Section */}
-                    <div className={styles.formSection}>
+                    <div className={styles.formSection} style={{ marginTop: '4rem' }}>
                         <h3 className={styles.formSectionTitle}>
                             <FaShieldAlt />
-                            Permisiuni
+                            Permissions
                         </h3>
-                        <p style={{ fontSize: '0.875rem', color: 'hsl(215.4 16.3% 46.9%)', marginBottom: '1rem' }}>
-                            Selectați permisiunile pe care le va avea acest rol pentru fiecare resursă
+                        <p style={{ fontSize: '0.875rem', color: 'hsl(215.4 16.3% 46.9%)', marginBottom: '1.5rem' }}>
+                            Select the permissions this role will have for each resource
                         </p>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -197,7 +197,7 @@ const PermissionsForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }
                                                         padding: '0.25rem 0.5rem',
                                                         borderRadius: '0.25rem'
                                                     }}>
-                                                        {permissionCount} permisiuni
+                                                        {permissionCount} permissions
                                                     </span>
                                                 )}
                                                 {isExpanded ? <FaChevronDown /> : <FaChevronRight />}
@@ -265,7 +265,7 @@ const PermissionsForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }
                         className={styles.cancelButton}
                         disabled={isSubmitting}
                     >
-                        <FaTimes /> Anulează
+                        <FaTimes /> Cancel
                     </button>
 
                     {mode === 'edit' && onDelete && (
@@ -283,7 +283,7 @@ const PermissionsForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }
                             ) : (
                                 <>
                                     <FaTrash />
-                                    Șterge Rol
+                                    Delete Role
                                 </>
                             )}
                         </button>
@@ -302,7 +302,7 @@ const PermissionsForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }
                         ) : (
                             <>
                                 <FaSave />
-                                {mode === 'create' ? 'Creează Rol' : 'Salvează Modificările'}
+                                {mode === 'create' ? 'Create Role' : 'Save Changes'}
                             </>
                         )}
                     </button>

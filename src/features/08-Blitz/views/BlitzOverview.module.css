@@ -1,0 +1,47 @@
+.overviewContainer {
+  padding: 2rem;
+  height: 100%;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.headerIcon {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.content {
+  height: calc(100% - 5rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.placeholder {
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.placeholderIcon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.placeholder p {
+  font-size: 1.1rem;
+  margin: 0;
+}

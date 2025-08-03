@@ -20,42 +20,13 @@ const StockForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) => {
       { name: 'quantity', type: 'number', label: 'Current Quantity', required: true, min: 0 },
       { name: 'minQuantity', type: 'number', label: 'Minimum Quantity', required: true, min: 0 },
       { name: 'price', type: 'number', label: 'Unit Price ($)', required: true, min: 0, step: 0.01 },
-      { 
-        name: 'category', 
-        type: 'select', 
-        label: 'Category', 
-        required: true,
-        options: [
-          { value: 'supplies', label: 'Supplies' },
-          { value: 'equipment', label: 'Equipment' },
-          { value: 'consumables', label: 'Consumables' },
-          { value: 'tools', label: 'Tools' },
-          { value: 'other', label: 'Other' }
-        ]
-      },
-      { name: 'supplier', type: 'text', label: 'Supplier' },
-      { name: 'description', type: 'textarea', label: 'Description', placeholder: 'Item description...' }
+      { name: 'category', type: 'text', label: 'Category', required: true, placeholder: 'e.g., Supplies, Equipment, Tools' }
     ];
 
     // Add business-specific fields
     switch (businessType.name) {
       case 'Dental Clinic':
-        return [
-          ...baseFields,
-          { 
-            name: 'dentalCategory', 
-            type: 'select', 
-            label: 'Dental Category',
-            options: [
-              { value: 'dental_supplies', label: 'Dental Supplies' },
-              { value: 'instruments', label: 'Instruments' },
-              { value: 'medications', label: 'Medications' },
-              { value: 'protective_gear', label: 'Protective Gear' },
-              { value: 'cleaning_supplies', label: 'Cleaning Supplies' }
-            ]
-          },
-          { name: 'expiryDate', type: 'date', label: 'Expiry Date' }
-        ];
+        return baseFields;
         
       case 'Gym':
         return [

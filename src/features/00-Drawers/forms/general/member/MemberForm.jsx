@@ -4,11 +4,11 @@ import styles from '../../../styles/FormStyles.module.css';
 import useRolesStore from '../../../../06-Admin/store/rolesStore';
 
 // Import actions
-import { 
-  getMemberFields, 
-  validateMemberForm, 
-  handleMemberSubmit, 
-  handleMemberDelete 
+import {
+  getMemberFields,
+  validateMemberForm,
+  handleMemberSubmit,
+  handleMemberDelete
 } from './actions/memberActions';
 
 // Import views
@@ -24,10 +24,10 @@ const MemberForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) => 
   const [formData, setFormData] = useState(data || {});
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // Use useRolesStore to get actual roles data
   const { roles } = useRolesStore();
-  
+
   // Only show for dental clinics
   if (businessTypeKey !== 'DENTAL') {
     return null;
@@ -54,16 +54,16 @@ const MemberForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) => 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const validationErrors = validateMemberForm(formData);
-    
+
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
-    
+
     setIsSubmitting(true);
-    
+
     try {
       await handleMemberSubmit(formData, mode, onSubmit);
     } catch (error) {
@@ -75,7 +75,7 @@ const MemberForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) => 
 
   const handleDelete = async () => {
     if (!onDelete) return;
-    
+
     setIsSubmitting(true);
     try {
       await handleMemberDelete(formData, onDelete);
@@ -113,9 +113,10 @@ const MemberForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) => 
 
   return (
     <div className={styles.formContainer}>
-      <MemberViewToggle 
-        activeView={activeView} 
-        setActiveView={setActiveView} 
+      <MemberViewToggle
+        activeView={activeView}
+        setActiveView={setActiveView}
+        mode={mode}
       />
       {renderFormContent()}
     </div>

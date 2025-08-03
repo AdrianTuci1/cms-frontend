@@ -8,6 +8,7 @@ import SalesView from '../../features/01-Home/views/02-Sales/SalesView';
 import ClientsView from '../../features/01-Home/views/03-Clients/ClientsView';
 import ServicesView from '../../features/01-Home/views/04-Services/ServicesView';
 import InvoicesSection from '../../features/03-Invoices/views/InvoicesSection';
+import BlitzView from '../../features/08-Blitz/BlitzView';
 
 // Component for dashboard views
 const DashboardViews = () => {
@@ -41,6 +42,8 @@ const OtherSections = () => {
 
   const renderSection = () => {
     switch (currentSection) {
+      case 'blitz':
+        return <BlitzView />;
       case 'stocks':
         return <StocksView view={currentView} />;
       case 'automations':
