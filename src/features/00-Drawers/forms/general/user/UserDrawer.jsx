@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FaUser, FaBell, FaStickyNote, FaSignOutAlt, FaEdit, FaCog, FaEnvelope, FaPhone, FaMapMarkerAlt, FaClock, FaSync, FaCheckCircle, FaExclamationTriangle, FaShieldAlt, FaKey } from 'react-icons/fa';
-import { useDataSync } from '../../../../design-patterns/hooks/useDataSync';
+import { useDataSync } from '../../../../../design-patterns/hooks/useDataSync';
 import styles from '../../../styles/FormStyles.module.css';
 
 const UserDrawer = ({ onClose }) => {
@@ -13,8 +13,7 @@ const UserDrawer = ({ onClose }) => {
     error: userDataError,
     update: updateUserData,
     refresh: refreshUserData,
-    lastUpdated,
-    isOnline
+
   } = useDataSync('userData', {
     enableValidation: true,
     enableBusinessLogic: true

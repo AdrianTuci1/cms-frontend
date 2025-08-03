@@ -3,11 +3,11 @@ import { getBusinessTypeKey } from '../../../../../config/businessTypes';
 import styles from '../../../styles/FormStyles.module.css';
 
 // Import actions
-import { 
-  getPatientFields, 
-  validatePatientForm, 
-  handlePatientSubmit, 
-  handlePatientDelete 
+import {
+  getPatientFields,
+  validatePatientForm,
+  handlePatientSubmit,
+  handlePatientDelete
 } from './actions/patientActions';
 
 // Import views
@@ -24,7 +24,7 @@ const PatientForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) =>
   const [formData, setFormData] = useState(data || {});
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // Only show for dental clinics
   if (businessTypeKey !== 'DENTAL') {
     return null;
@@ -51,16 +51,16 @@ const PatientForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) =>
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const validationErrors = validatePatientForm(formData);
-    
+
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
-    
+
     setIsSubmitting(true);
-    
+
     try {
       await handlePatientSubmit(formData, mode, onSubmit);
     } catch (error) {
@@ -72,7 +72,7 @@ const PatientForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) =>
 
   const handleDelete = async () => {
     if (!onDelete) return;
-    
+
     setIsSubmitting(true);
     try {
       await handlePatientDelete(formData, onDelete);
@@ -112,12 +112,14 @@ const PatientForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) =>
 
   return (
     <div className={styles.formContainer}>
-      <ViewToggle 
-        activeView={activeView} 
-        setActiveView={setActiveView} 
-        mode={mode} 
+      <ViewToggle
+        activeView={activeView}
+        setActiveView={setActiveView}
+        mode={mode}
       />
-      {renderFormContent()}
+      <div className={styles.formContent}>
+        {renderFormContent()}
+      </div>
     </div>
   );
 };

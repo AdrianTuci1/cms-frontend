@@ -7,7 +7,7 @@ import {
   validateAppointmentForm 
 } from '../actions/appointmentActions';
 
-const AppointmentForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) => {
+const AppointmentForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading, hideActions = false }) => {
   const { 
     updateCurrentData, 
     queryField,
@@ -368,7 +368,7 @@ const AppointmentForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }
       <div className={styles.formFields}>
         {getAppointmentFields().map(field => renderField(field))}
       </div>
-      {renderFormActions()}
+      {!hideActions && renderFormActions()}
     </form>
   );
 };

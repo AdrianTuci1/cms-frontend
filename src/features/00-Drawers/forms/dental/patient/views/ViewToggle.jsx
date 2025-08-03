@@ -10,12 +10,14 @@ const ViewToggle = ({ activeView, setActiveView, mode }) => {
       <button
         className={`${styles.toggleBtn} ${activeView === 'details' ? styles.active : ''}`}
         onClick={() => setActiveView('details')}
+        title="Patient Details"
       >
         <FaUser className={styles.toggleIcon} />
       </button>
       <button
         className={`${styles.toggleBtn} ${activeView === 'notes' ? styles.active : ''}`}
         onClick={() => setActiveView('notes')}
+        title="Dental Notes"
       >
         <FaStickyNote className={styles.toggleIcon} />
       </button>
@@ -23,6 +25,7 @@ const ViewToggle = ({ activeView, setActiveView, mode }) => {
         className={`${styles.toggleBtn} ${activeView === 'history' ? styles.active : ''} ${isCreateMode ? styles.disabled : ''}`}
         onClick={() => !isCreateMode && setActiveView('history')}
         disabled={isCreateMode}
+        title="Appointment History"
       >
         <FaHistory className={styles.toggleIcon} />
       </button>

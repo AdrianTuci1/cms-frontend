@@ -1,4 +1,5 @@
 import React from 'react';
+import { FaCalendarAlt, FaStethoscope, FaImages } from 'react-icons/fa';
 import styles from '../../../../styles/FormStyles.module.css';
 
 const AppointmentViewToggle = ({ activeMenu, setActiveMenu, mode }) => {
@@ -8,22 +9,25 @@ const AppointmentViewToggle = ({ activeMenu, setActiveMenu, mode }) => {
         type="button"
         className={`${styles.toggleBtn} ${activeMenu === 'form' ? styles.active : ''}`}
         onClick={() => setActiveMenu('form')}
+        title="Appointments"
       >
-        Appointments
+        <FaCalendarAlt className={styles.toggleIcon} />
       </button>
       <button
         type="button"
         className={`${styles.toggleBtn} ${activeMenu === 'operative' ? styles.active : ''}`}
         onClick={() => setActiveMenu('operative')}
+        title="Operative Details"
       >
-        Operative Details
+        <FaStethoscope className={styles.toggleIcon} />
       </button>
       <button
         type="button"
         className={`${styles.toggleBtn} ${activeMenu === 'gallery' ? styles.active : ''}`}
         onClick={() => setActiveMenu('gallery')}
+        title="Gallery"
       >
-        Gallery
+        <FaImages className={styles.toggleIcon} />
       </button>
     </div>
   );

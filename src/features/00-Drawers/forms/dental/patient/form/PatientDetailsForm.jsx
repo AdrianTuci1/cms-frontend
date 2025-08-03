@@ -17,25 +17,23 @@ const PatientDetailsForm = ({
   onDelete
 }) => {
   return (
-    <div className={styles.formContent}>
-      <form onSubmit={handleSubmit} className={styles.form}>
-        <PatientFormFields
-          fields={fields}
-          formData={formData}
-          errors={errors}
-          handleInputChange={handleInputChange}
-          mode={mode}
-          isLoading={isLoading}
-        />
-        <PatientFormActions
-          mode={mode}
-          isSubmitting={isSubmitting}
-          onCancel={onCancel}
-          onDelete={onDelete}
-          handleDelete={handleDelete}
-        />
-      </form>
-    </div>
+    <form onSubmit={handleSubmit} className={styles.form}>
+      <PatientFormFields
+        fields={fields}
+        formData={formData}
+        errors={errors}
+        handleInputChange={handleInputChange}
+        mode={mode}
+        isLoading={isLoading}
+      />
+      <PatientFormActions
+        mode={mode}
+        isSubmitting={isSubmitting}
+        onCancel={onCancel}
+        onDelete={onDelete}
+        handleDelete={handleDelete}
+      />
+    </form>
   );
 };
 

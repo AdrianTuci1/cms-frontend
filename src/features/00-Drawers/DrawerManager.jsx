@@ -1,20 +1,18 @@
 import React from 'react';
-import useDrawerStore, { DRAWER_TYPES, DRAWER_MODES } from './store/drawerStore';
+import useDrawerStore, { DRAWER_TYPES } from './store/drawerStore';
 import DrawerLayout from './layout/DrawerLayout';
 import styles from './DrawerManager.module.css';
 
 // General forms
-import UserDrawer from './forms/general/UserDrawer';
-import MemberForm from './forms/general/MemberForm';
-import PermissionsForm from './forms/general/PermissionsForm';
-import StockForm from './forms/general/StockForm';
+import UserDrawer from './forms/general/user';
+import MemberForm from './forms/general/member';
+import PermissionsForm from './forms/general/permissions';
+import StockForm from './forms/general/stock';
 
 // Business-specific forms (using dental as default)
-import TimelineForm from './forms/dental/TimelineForm';
-import ServiceForm from './forms/dental/ServiceForm';
-import PatientForm from './forms/dental/PatientForm';
-import OperativeDetailsForm from './forms/dental/OperativeDetailsForm';
-import GalleryForm from './forms/dental/GalleryForm';
+import TimelineForm from './forms/dental/appointments';
+import ServiceForm from './forms/dental/service';
+import PatientForm from './forms/dental/patient';
 
 
 
@@ -86,36 +84,38 @@ const DrawerManager = () => {
       // General forms (same for all business types)
       case DRAWER_TYPES.STOCK:
         return <StockForm {...formProps} />;
-        
+
       case DRAWER_TYPES.MEMBER:
         return <MemberForm {...formProps} />;
-        
+
       case DRAWER_TYPES.PERMISSIONS:
         return <PermissionsForm {...formProps} />;
-        
+
       case DRAWER_TYPES.USER:
         return <UserDrawer onClose={() => closeDrawer(drawer.id)} />;
-        
+
       // Business-specific forms - using dental as default
       case DRAWER_TYPES.TIMELINE:
         return <TimelineForm {...formProps} />;
-        
+
       case DRAWER_TYPES.SERVICE:
         return <ServiceForm {...formProps} />;
-        
+
       case DRAWER_TYPES.PATIENT:
         return <PatientForm {...formProps} />;
-        
+
       case DRAWER_TYPES.OPERATIVE_DETAILS:
-        return <OperativeDetailsForm {...formProps} />;
-        
+        // OperativeDetailsForm is now a view within TimelineForm
+        return <TimelineForm {...formProps} />;
+
       case DRAWER_TYPES.GALLERY:
-        return <GalleryForm {...formProps} />;
-        
+        // GalleryForm is now a view within TimelineForm
+        return <TimelineForm {...formProps} />;
+
       case DRAWER_TYPES.AI_ASSISTANT:
         // AI Assistant drawer - don't touch as requested
         return drawer.data?.content || <div>AI Assistant Content</div>;
-        
+
       default:
         return <div>Unsupported drawer type: {drawer.type}</div>;
     }
@@ -123,10 +123,10 @@ const DrawerManager = () => {
 
   return (
     <div className={`${styles.drawerContainer} ${styles[containerSizeClass]}`}>
-      {drawers.map((drawer, index) => {
+      {drawers.map((drawer) => {
         const drawerIndex = getDrawerIndex(drawer.id);
         const isActive = isTopDrawer(drawer.id);
-        
+
         return (
           <DrawerLayout
             key={drawer.id}

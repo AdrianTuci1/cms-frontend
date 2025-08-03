@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import useDrawerStore, { DRAWER_TYPES } from '../../../store/drawerStore';
+import useDrawerStore from '../../../store/drawerStore';
 import styles from '../../../styles/FormStyles.module.css';
 
 // Import actions
@@ -15,7 +15,7 @@ import AppointmentForm from './form/AppointmentForm';
 import TimelineFormActions from './form/TimelineFormActions';
 
 const TimelineForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) => {
-  const { openDrawer, hasPendingChanges, isCreateMode, saveDrawer } = useDrawerStore();
+  const { isCreateMode, saveDrawer } = useDrawerStore();
   const [activeMenu, setActiveMenu] = useState('form'); // 'form', 'operative', 'gallery'
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -29,7 +29,7 @@ const TimelineForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) =
 
   const handleDelete = async () => {
     if (!onDelete) return;
-    
+
     setIsSubmitting(true);
     try {
       await handleTimelineDelete(data, onDelete);
@@ -42,7 +42,7 @@ const TimelineForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) =
 
   const handleManualSave = async () => {
     setIsSubmitting(true);
-    
+
     try {
       await saveDrawer();
     } catch (error) {
@@ -62,9 +62,8 @@ const TimelineForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) =
             mode={mode}
             data={data}
             onSubmit={handleSubmit}
-            onDelete={onDelete}
-            onCancel={onCancel}
             isLoading={isLoading}
+            hideActions={true}
           />
         );
       case 'gallery':
@@ -73,9 +72,8 @@ const TimelineForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) =
             mode={mode}
             data={data}
             onSubmit={handleSubmit}
-            onDelete={onDelete}
-            onCancel={onCancel}
             isLoading={isLoading}
+            hideActions={true}
           />
         );
       default:
@@ -84,9 +82,8 @@ const TimelineForm = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) =
             mode={mode}
             data={data}
             onSubmit={handleSubmit}
-            onDelete={onDelete}
-            onCancel={onCancel}
             isLoading={isLoading}
+            hideActions={true}
           />
         );
     }

@@ -6,7 +6,7 @@ import {
   handleOperativeDetailsSubmit 
 } from '../../actions/operativeDetailsActions';
 
-const OperativeDetailsView = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) => {
+const OperativeDetailsView = ({ mode, data, onSubmit, onDelete, onCancel, isLoading, hideActions = false }) => {
   const [formData, setFormData] = useState({
     postOperativeNotes: '',
     prescription: '',
@@ -216,7 +216,7 @@ const OperativeDetailsView = ({ mode, data, onSubmit, onDelete, onCancel, isLoad
           </p>
         </div>
       </div>
-      {renderFormActions()}
+      {!hideActions && renderFormActions()}
     </form>
   );
 };

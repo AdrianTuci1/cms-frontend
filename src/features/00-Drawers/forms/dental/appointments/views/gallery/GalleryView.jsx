@@ -7,7 +7,7 @@ import {
   handleGallerySubmit 
 } from '../../actions/galleryActions';
 
-const GalleryView = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) => {
+const GalleryView = ({ mode, data, onSubmit, onDelete, onCancel, isLoading, hideActions = false }) => {
   const [formData, setFormData] = useState(data || {});
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -262,94 +262,92 @@ const GalleryView = ({ mode, data, onSubmit, onDelete, onCancel, isLoading }) =>
   };
 
   return (
-    <div className={styles.formContainer}>
-      <div className={styles.formSection}>
-        <h3 className={styles.formSectionTitle}>
-          <FaUpload />
-          Upload Images
-        </h3>
-        <input
-          type="file"
-          multiple
-          accept="image/*"
-          onChange={handleImageUpload}
-          className={styles.formInput}
-          disabled={mode === 'view' || isLoading}
-        />
-        <p style={{ fontSize: '0.75rem', color: 'hsl(215.4 16.3% 46.9%)', marginTop: '0.5rem' }}>
-          Select multiple images to upload
-        </p>
-      </div>
-
-      {images.length > 0 && (
+    <div className={styles.form}>
+      <div className={styles.formFields}>
         <div className={styles.formSection}>
-          <h3 className={styles.formSectionTitle}>Gallery Images</h3>
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', 
-            gap: '1rem' 
-          }}>
-            {images.map((image) => (
-              <div key={image.id} style={{ position: 'relative' }}>
-                <img 
-                  src={image.url} 
-                  alt={image.name} 
-                  style={{ 
-                    width: '100%', 
-                    height: '120px', 
-                    objectFit: 'cover', 
-                    borderRadius: '0.375rem',
-                    border: '1px solid hsl(214.3 31.8% 91.4%)'
-                  }} 
-                />
-                {mode !== 'view' && (
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveImage(image.id)}
-                    style={{
-                      position: 'absolute',
-                      top: '0.25rem',
-                      right: '0.25rem',
-                      width: '1.5rem',
-                      height: '1.5rem',
-                      borderRadius: '50%',
-                      border: 'none',
-                      background: 'hsl(0 84.2% 60.2%)',
-                      color: 'white',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '0.875rem',
-                      fontWeight: 'bold'
-                    }}
-                  >
-                    ×
-                  </button>
-                )}
-                <p style={{ 
-                  fontSize: '0.75rem', 
-                  color: 'hsl(215.4 16.3% 46.9%)', 
-                  marginTop: '0.25rem',
-                  textAlign: 'center',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap'
-                }}>
-                  {image.name}
-                </p>
-              </div>
-            ))}
-          </div>
+          <h3 className={styles.formSectionTitle}>
+            <FaUpload />
+            Upload Images
+          </h3>
+          <input
+            type="file"
+            multiple
+            accept="image/*"
+            onChange={handleImageUpload}
+            className={styles.formInput}
+            disabled={mode === 'view' || isLoading}
+          />
+          <p style={{ fontSize: '0.75rem', color: 'hsl(215.4 16.3% 46.9%)', marginTop: '0.5rem' }}>
+            Select multiple images to upload
+          </p>
         </div>
-      )}
 
-      <form onSubmit={handleSubmit} className={styles.form}>
-        <div className={styles.formFields}>
-          {getGalleryFields().filter(field => field.name !== 'images').map(field => renderField(field))}
-        </div>
-        {renderFormActions()}
-      </form>
+        {images.length > 0 && (
+          <div className={styles.formSection}>
+            <h3 className={styles.formSectionTitle}>Gallery Images</h3>
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', 
+              gap: '1rem' 
+            }}>
+              {images.map((image) => (
+                <div key={image.id} style={{ position: 'relative' }}>
+                  <img 
+                    src={image.url} 
+                    alt={image.name} 
+                    style={{ 
+                      width: '100%', 
+                      height: '120px', 
+                      objectFit: 'cover', 
+                      borderRadius: '0.375rem',
+                      border: '1px solid hsl(214.3 31.8% 91.4%)'
+                    }} 
+                  />
+                  {mode !== 'view' && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveImage(image.id)}
+                      style={{
+                        position: 'absolute',
+                        top: '0.25rem',
+                        right: '0.25rem',
+                        width: '1.5rem',
+                        height: '1.5rem',
+                        borderRadius: '50%',
+                        border: 'none',
+                        background: 'hsl(0 84.2% 60.2%)',
+                        color: 'white',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '0.875rem',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      ×
+                    </button>
+                  )}
+                  <p style={{ 
+                    fontSize: '0.75rem', 
+                    color: 'hsl(215.4 16.3% 46.9%)', 
+                    marginTop: '0.25rem',
+                    textAlign: 'center',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
+                  }}>
+                    {image.name}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {getGalleryFields().filter(field => field.name !== 'images').map(field => renderField(field))}
+      </div>
+      {!hideActions && renderFormActions()}
     </div>
   );
 };
