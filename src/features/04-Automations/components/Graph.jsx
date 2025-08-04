@@ -232,7 +232,7 @@ const Graph = () => {
           onConnect={onConnect}
           nodeTypes={nodeTypes}
           fitView={false}
-          defaultViewport={{ x: 0, y: 0, zoom: 1.2 }}
+          defaultViewport={{ x: -70, y: -50, zoom: 1.3 }}
           attributionPosition="bottom-left"
           className={styles.reactFlow}
           nodesDraggable={false}
