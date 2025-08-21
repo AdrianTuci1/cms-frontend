@@ -10,8 +10,20 @@ import { getDemoBusinessInfo, getCurrentDemoUser } from '../mockData/index.js';
 export const ENV_CONFIG = {
   VITE_TENANT_ID: localStorage.getItem('VITE_TENANT_ID') || import.meta.env.VITE_TENANT_ID || 'T0001',
   VITE_BUSINESS_TYPE: localStorage.getItem('VITE_BUSINESS_TYPE') || import.meta.env.VITE_BUSINESS_TYPE || 'dental',
+  VITE_BUSINESS_ID: localStorage.getItem('businessId') || 'B01-00001', // From localStorage
   VITE_TEST_MODE: import.meta.env.VITE_TEST_MODE === 'true'
 };
+
+// Debug logging for tenant configuration
+console.log('🔧 Tenant Config: ENV_CONFIG initialized:', {
+  VITE_TENANT_ID: ENV_CONFIG.VITE_TENANT_ID,
+  VITE_BUSINESS_TYPE: ENV_CONFIG.VITE_BUSINESS_TYPE,
+  VITE_BUSINESS_ID: ENV_CONFIG.VITE_BUSINESS_ID,
+  localStorage_TENANT_ID: localStorage.getItem('VITE_TENANT_ID'),
+  localStorage_BUSINESS_TYPE: localStorage.getItem('VITE_BUSINESS_TYPE'),
+  env_TENANT_ID: import.meta.env.VITE_TENANT_ID,
+  env_BUSINESS_TYPE: import.meta.env.VITE_BUSINESS_TYPE
+});
 
 /**
  * Tenant utilities
@@ -47,14 +59,27 @@ export const tenantUtils = {
    * Get current tenant ID from environment
    */
   getCurrentTenantId() {
-    return ENV_CONFIG.VITE_TENANT_ID;
+    const tenantId = ENV_CONFIG.VITE_BUSINESS_ID;
+    console.log('🔧 Tenant Utils: getCurrentTenantId() returns:', tenantId);
+    return tenantId;
   },
 
   /**
    * Get current business type from environment
    */
   getCurrentBusinessType() {
-    return ENV_CONFIG.VITE_BUSINESS_TYPE;
+    const businessType = ENV_CONFIG.VITE_BUSINESS_TYPE;
+    console.log('🔧 Tenant Utils: getCurrentBusinessType() returns:', businessType);
+    return businessType;
+  },
+
+  /**
+   * Get current business ID from localStorage or fallback
+   */
+  getCurrentBusinessId() {
+    const businessId = ENV_CONFIG.VITE_BUSINESS_ID;
+    console.log('🔧 Tenant Utils: getCurrentBusinessId() returns:', businessId);
+    return businessId;
   },
 
   /**

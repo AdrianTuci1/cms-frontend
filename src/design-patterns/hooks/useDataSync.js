@@ -5,7 +5,7 @@
  * Enhanced cu Strategy Pattern pentru validare și business logic
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import dataSyncManager from '../data-sync/index.js';
 import eventBus from '../observer/base/EventBus';
 import { crudStrategyFactory } from '../strategy/CRUDStrategy.js';
@@ -43,7 +43,7 @@ export const useDataSync = (resource, options = {}) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   const eventListenersRef = useRef([]);
   const resourceRef = useRef(resource);
@@ -165,6 +165,15 @@ export const useDataSync = (resource, options = {}) => {
       if (endDate) requestParams.endDate = endDate;
     }
 
+    // Debug logging for timeline parameters
+    if (resourceRef.current === 'timeline') {
+      console.log('📅 Timeline Parameters Built:', {
+        startDate,
+        endDate,
+        finalParams: { ...requestParams }
+      });
+    }
+
     // Add pagination parameters for resources that support it
     if (config && config.supportsPagination) {
       requestParams.page = page;
@@ -178,6 +187,7 @@ export const useDataSync = (resource, options = {}) => {
    * Funcția principală de preluare date
    */
   const fetchData = useCallback(async () => {
+    let requestParams;
     try {
       setLoading(true);
       setError(null);
@@ -185,7 +195,12 @@ export const useDataSync = (resource, options = {}) => {
       // Wait for DataSyncManager to be initialized
       await dataSyncManager.waitForInitialization();
 
-      const requestParams = buildRequestParams();
+      requestParams = buildRequestParams();
+
+      // Debug logging for timeline fetch
+      if (resourceRef.current === 'timeline') {
+        console.log('🔄 useDataSync fetching timeline with params:', requestParams);
+      }
 
       const fetchOptions = {
         forceRefresh: false, // Try cache first for faster load
@@ -215,6 +230,7 @@ export const useDataSync = (resource, options = {}) => {
 
       setData(processedResult);
       setLastUpdated(new Date().toISOString());
+      setIsDataLoaded(true);
 
       if (onDataUpdateRef.current) {
         onDataUpdateRef.current(processedResult);
@@ -222,7 +238,7 @@ export const useDataSync = (resource, options = {}) => {
 
       // After initial data load, trigger background refresh from server to keep data up to date
       // But only if online and not currently loading fresh data
-      if (navigator.onLine) {
+      if (dataSyncManager.connectivityManager?.isOnline) {
         dataSyncManager.getDataWithFallback(resourceRef.current, {
           forceRefresh: true,
           useCache: false,
@@ -231,14 +247,17 @@ export const useDataSync = (resource, options = {}) => {
       }
 
     } catch (err) {
-      console.error(`Error fetching ${resourceRef.current}:`, err);
+      console.warn(`Error fetching ${resourceRef.current}:`, err.message);
 
       // Încearcă să obțină date din cache ca fallback
       try {
+        // Build request params again in case the first attempt failed before it was built
+        const fallbackRequestParams = requestParams || buildRequestParams();
+        
         const fallbackData = await dataSyncManager.getDataWithFallback(resourceRef.current, {
           forceRefresh: false,
           useCache: true,
-          params: requestParams
+          params: fallbackRequestParams
         });
 
         // For timeline, preserve the structure (reservations array) for dental timeline hook
@@ -260,13 +279,24 @@ export const useDataSync = (resource, options = {}) => {
 
         setData(processedFallbackData);
         setLastUpdated(new Date().toISOString());
+        setIsDataLoaded(true);
 
         if (onDataUpdateRef.current) {
           onDataUpdateRef.current(processedFallbackData);
         }
       } catch (fallbackError) {
-        console.error(`No data available for ${resourceRef.current}:`, fallbackError);
-        setError(new Error(`No data available for resource '${resourceRef.current}'. API is unavailable and no cached data found.`));
+        console.warn(`No data available for ${resourceRef.current}:`, fallbackError.message);
+        
+        // Set empty data instead of error for better UX
+        const emptyData = resourceRef.current === 'timeline' ? { reservations: [] } : [];
+        const processedEmptyData = processData(emptyData, 'read');
+        
+        setData(processedEmptyData);
+        setLastUpdated(new Date().toISOString());
+        setIsDataLoaded(true);
+        
+        // Don't set error state - just log warning
+        console.warn(`Using empty data structure for ${resourceRef.current} due to unavailability`);
       }
     } finally {
       setLoading(false);
@@ -279,6 +309,43 @@ export const useDataSync = (resource, options = {}) => {
   const refresh = useCallback(() => {
     fetchData();
   }, [fetchData]);
+
+  /**
+   * Memoize filters to prevent unnecessary re-renders
+   */
+  const memoizedFilters = useMemo(() => JSON.stringify(filters), [filters]);
+
+  /**
+   * Initial data load on mount
+   */
+  useEffect(() => {
+    const initialLoad = async () => {
+      try {
+        await dataSyncManager.waitForInitialization();
+        fetchData();
+      } catch (error) {
+        console.warn('DataSyncManager not ready for initial load:', error);
+      }
+    };
+    
+    initialLoad();
+  }, []); // Empty dependency array - only run on mount
+
+  /**
+   * Refetch data when parameters change
+   */
+  useEffect(() => {
+    const checkAndFetch = async () => {
+      try {
+        await dataSyncManager.waitForInitialization();
+        fetchData();
+      } catch (error) {
+        console.warn('DataSyncManager not ready yet:', error);
+      }
+    };
+    
+    checkAndFetch();
+  }, [startDate, endDate, page, limit, search, sortBy, sortOrder, memoizedFilters]);
 
   /**
    * Funcție pentru actualizare optimistă
@@ -516,7 +583,7 @@ export const useDataSync = (resource, options = {}) => {
     loading,
     error,
     lastUpdated,
-    isOnline,
+    isDataLoaded,
 
     // CRUD operations
     refresh,

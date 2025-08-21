@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { tenantUtils } from '../config/tenant.js';
 import GeneralService from '../api/services/GeneralService.js';
-import TenantSelector from '../components/TenantSelector.jsx';
+
 import styles from './LocationsPage.module.css';
 
 // Mock user data for demonstration
@@ -23,51 +23,48 @@ const LocationsPage = () => {
   // Get current tenant info
   const currentTenantId = tenantUtils.getCurrentTenantId();
   const currentBusinessType = tenantUtils.getCurrentBusinessType();
+  const currentBusinessId = tenantUtils.getCurrentBusinessId();
 
   useEffect(() => {
+    console.log('useEffect triggered with businessId:', currentBusinessId);
     const fetchBusinessInfo = async () => {
       try {
         setLoading(true);
         
-        // În test mode, folosește datele de demo direct
-        if (tenantUtils.isTestMode()) {
-          console.log('TEST MODE: Using demo business info data');
-          const demoInfo = tenantUtils.getDemoBusinessInfo();
-          setBusinessInfo(demoInfo);
-          return;
+        // Get business info from API using business ID
+        const generalService = new GeneralService();
+        const info = await generalService.getBusinessInfo(currentBusinessId);
+        console.log('API Response:', info);
+        console.log('API Response type:', typeof info);
+        console.log('API Response keys:', Object.keys(info || {}));
+        
+        // Validate API response structure
+        if (!info) {
+          throw new Error('API returned null or undefined response');
         }
         
-        // Try to get business info from API
-        const generalService = new GeneralService();
-        try {
-          const info = await generalService.getBusinessInfo();
-          setBusinessInfo(info);
-        } catch (apiError) {
-          console.warn('Failed to get business info from API, using tenant config:', apiError);
-          
-          // Fallback to tenant configuration
-          const tenantConfig = tenantUtils.getTenantConfig();
-          const fallbackInfo = {
-            business: {
-              id: tenantConfig.tenantId,
-              name: tenantConfig.name,
-              businessType: tenantConfig.businessType,
-              tenantId: tenantConfig.tenantId
-            },
-            location: {
-              id: tenantConfig.defaultLocation,
-              name: `${tenantConfig.name} - Main Location`,
-              address: 'Main Office'
-            },
-            locations: [{
-              id: tenantConfig.defaultLocation,
-              name: `${tenantConfig.name} - Main Location`,
-              address: 'Main Office',
-              isActive: true
-            }]
-          };
-          setBusinessInfo(fallbackInfo);
+        if (!info.companyName) {
+          console.warn('API response missing companyName:', info);
         }
+        
+        if (!info.locations || !Array.isArray(info.locations)) {
+          console.warn('API response missing or invalid locations:', info.locations);
+        }
+        
+        // Transform API response to match expected format
+        const transformedInfo = {
+          business: {
+            id: currentBusinessId,
+            name: info.companyName || 'Business Management System',
+            businessType: currentBusinessType,
+            tenantId: currentTenantId
+          },
+          locations: Array.isArray(info.locations) ? info.locations : []
+        };
+        
+        console.log('Transformed Info:', transformedInfo);
+        console.log('Locations count:', transformedInfo.locations.length);
+        setBusinessInfo(transformedInfo);
       } catch (err) {
         setError('Failed to load business information');
         console.error('Error fetching business info:', err);
@@ -77,7 +74,7 @@ const LocationsPage = () => {
     };
 
     fetchBusinessInfo();
-  }, [currentTenantId]);
+  }, [currentTenantId, currentBusinessId]);
 
   const handleLocationSelect = (location) => {
     setSelectedLocation(location);
@@ -85,27 +82,24 @@ const LocationsPage = () => {
 
   const handleContinue = () => {
     if (selectedLocation) {
-      // Set the selected location in localStorage or context
+      // Set the selected location and business ID in localStorage
       localStorage.setItem('selectedLocation', selectedLocation.id);
+      localStorage.setItem('locationId', selectedLocation.id);
+      localStorage.setItem('businessId', currentBusinessId);
+      
+      console.log('🔧 LocationsPage: Setting localStorage values:', {
+        selectedLocation: selectedLocation.id,
+        locationId: selectedLocation.id,
+        businessId: currentBusinessId,
+        timestamp: new Date().toISOString()
+      });
+      
       // Navigate to dashboard
       navigate('/dashboard');
     }
   };
 
-  const getGreetingMessage = () => {
-    const hour = new Date().getHours();
-    let timeGreeting = '';
-    
-    if (hour < 12) {
-      timeGreeting = 'Good morning';
-    } else if (hour < 18) {
-      timeGreeting = 'Good afternoon';
-    } else {
-      timeGreeting = 'Good evening';
-    }
-    
-    return `${timeGreeting}, ${mockUser.name}! Welcome back to your business management system.`;
-  };
+
 
   const getBusinessTypeIcon = (businessType) => {
     switch (businessType) {
@@ -149,6 +143,14 @@ const LocationsPage = () => {
     );
   }
 
+  // Debug logging
+  console.log('Current businessInfo state:', businessInfo);
+  console.log('Current businessId:', currentBusinessId);
+  console.log('BusinessInfo type:', typeof businessInfo);
+  console.log('BusinessInfo keys:', businessInfo ? Object.keys(businessInfo) : 'null');
+  console.log('Locations in state:', businessInfo?.locations);
+  console.log('Locations array type:', Array.isArray(businessInfo?.locations));
+  
   return (
     <div className={styles.container}>
       <div className={styles.content}>
@@ -163,18 +165,13 @@ const LocationsPage = () => {
               <p className={styles.businessType}>
                 {currentBusinessType.charAt(0).toUpperCase() + currentBusinessType.slice(1)} Management
               </p>
+              {businessInfo?.business?.id && (
+                <p className={styles.businessId}>ID: {businessInfo.business.id}</p>
+              )}
             </div>
           </div>
           
           <div className={styles.headerActions}>
-            <TenantSelector 
-              currentTenantId={currentTenantId}
-              currentBusinessType={currentBusinessType}
-              onTenantChange={(tenant) => {
-                console.log('Tenant changed to:', tenant);
-              }}
-            />
-            
             <div className={styles.userInfo}>
               <div className={styles.userAvatar}>
                 {mockUser.name.charAt(0).toUpperCase()}
@@ -187,17 +184,16 @@ const LocationsPage = () => {
           </div>
         </header>
 
-        {/* Greeting */}
-        <section className={styles.greeting}>
-          <h2>{getGreetingMessage()}</h2>
-          <p>Please select a location to continue to your dashboard.</p>
-        </section>
+
 
         {/* Locations */}
         <section className={styles.locations}>
-          <h3>Available Locations</h3>
+          <h3>Available Locations ({businessInfo?.locations?.length || 0})</h3>
           <div className={styles.locationsGrid}>
-            {businessInfo?.locations?.map((location) => (
+            {businessInfo?.locations && businessInfo.locations.length > 0 ? (
+              businessInfo.locations.map((location, index) => {
+                console.log(`Rendering location ${index}:`, location);
+                return (
               <div
                 key={location.id}
                 className={`${styles.locationCard} ${
@@ -212,7 +208,10 @@ const LocationsPage = () => {
                 
                 <div className={styles.locationDetails}>
                   <p className={styles.locationAddress}>
-                    {location.address?.street}, {location.address?.city}
+                    {typeof location.address === 'string' 
+                      ? location.address 
+                      : `${location.address?.street || ''}${location.address?.street && location.address?.city ? ', ' : ''}${location.address?.city || ''}`
+                    }
                   </p>
                   <p className={styles.locationPhone}>{location.phone}</p>
                   
@@ -239,7 +238,19 @@ const LocationsPage = () => {
                   <div className={styles.defaultBadge}>Default</div>
                 )}
               </div>
-            ))}
+            );
+            })
+            ) : (
+              <div className={styles.noLocations}>
+                <p>No locations available for this business.</p>
+                <details>
+                  <summary>Debug: Raw API Response</summary>
+                  <pre style={{fontSize: '12px', background: '#f5f5f5', padding: '10px', overflow: 'auto'}}>
+                    {JSON.stringify(businessInfo, null, 2)}
+                  </pre>
+                </details>
+              </div>
+            )}
           </div>
         </section>
 
@@ -265,7 +276,7 @@ const LocationsPage = () => {
         {/* Footer */}
         <footer className={styles.footer}>
           <p>© 2024 Business Management System. All rights reserved.</p>
-          <p>Tenant: {currentTenantId} | Environment: {import.meta.env.MODE}</p>
+          <p>Tenant: {currentTenantId} | Business ID: {currentBusinessId || 'Not set'} | Environment: {import.meta.env.MODE}</p>
         </footer>
       </div>
     </div>

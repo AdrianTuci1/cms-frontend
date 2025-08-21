@@ -11,9 +11,9 @@ export class ApiClient extends BaseClient {
   constructor(config = {}) {
     super(config);
     
-    // Multi-tenant support
-    this.tenantId = config.tenantId || import.meta.env.VITE_TENANT_ID;
-    this.locationId = config.locationId;
+    // Multi-tenant support - tenantId is actually businessId
+    this.tenantId = config.tenantId || import.meta.env.VITE_BUSINESS_ID;
+    this.locationId = config.locationId || localStorage.getItem('locationId');
     
     // Unified architecture support
     this.baseURL = config.baseURL || import.meta.env.VITE_API_URL || 'http://localhost:3001';
@@ -59,14 +59,9 @@ export class ApiClient extends BaseClient {
         config.headers = {};
       }
 
-      // Adaugă tenant ID și location ID
-      if (this.tenantId) {
-        config.headers['X-Tenant-ID'] = this.tenantId;
-      }
-      
-      if (this.locationId) {
-        config.headers['X-Location-ID'] = this.locationId;
-      }
+      // Nu mai adăugăm automat X-Tenant-ID și X-Location-ID ca headers
+      // Acestea sunt deja în URL (ex: /api/resources/b1-loc1/...)
+      // Doar adăugăm auth header
 
       // Adaugă auth header
       const authHeader = this.authManager.getAuthHeader();
@@ -116,6 +111,17 @@ export class ApiClient extends BaseClient {
    */
   setLocationId(locationId) {
     this.locationId = locationId;
+    // Also update localStorage
+    if (locationId) {
+      localStorage.setItem('locationId', locationId);
+    }
+  }
+
+  /**
+   * Update location ID from localStorage
+   */
+  updateLocationIdFromStorage() {
+    this.locationId = localStorage.getItem('locationId');
   }
 
   /**

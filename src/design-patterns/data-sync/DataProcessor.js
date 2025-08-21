@@ -329,9 +329,21 @@ class DataProcessor {
   addMetadata(data, resource, source = 'api') {
     const timestamp = new Date().toISOString();
     
+    console.log(`🔧 DataProcessor: Adding metadata for ${resource}:`, {
+      hasData: !!data,
+      dataType: typeof data,
+      isArray: Array.isArray(data),
+      source: source,
+      dataKeys: data ? Object.keys(data) : 'no data',
+      dataLength: data && Array.isArray(data) ? data.length : 'not array',
+      firstItem: data && Array.isArray(data) && data.length > 0 ? Object.keys(data[0]) : 'no items'
+    });
+    
+
+    
     // Handle arrays by adding metadata to each item
     if (Array.isArray(data)) {
-      return data.map(item => {
+      const processedItems = data.map(item => {
         // Ensure each item has a valid id
         let itemWithId = item;
         if (!item.id) {
@@ -350,6 +362,9 @@ class DataProcessor {
           _source: source
         };
       });
+      
+      console.log(`🔧 DataProcessor: Processed ${processedItems.length} items for ${resource}`);
+      return processedItems;
     }
     
     // Handle single objects

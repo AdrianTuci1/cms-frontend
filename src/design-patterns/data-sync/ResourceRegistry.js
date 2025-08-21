@@ -128,7 +128,7 @@ class ResourceRegistry {
     // Timeline, clients, packages, members also use single endpoint (will be added when business info is set)
     this.registerResource('timeline', {
       enableOffline: true,
-      requiresAuth: true,
+      requiresAuth: false,  // Timeline doesn't require authentication
       forceServerFetch: true,
       requiresDateRange: true,
       resourceType: 'timeline',
@@ -226,14 +226,69 @@ class ResourceRegistry {
   }
 
   /**
+   * Extract business ID and location ID from URL
+   * URL pattern: /api/resources/{businessId-locationId}/...
+   * @param {string} url - URL to extract from
+   * @returns {Object} Object with businessId and locationId
+   */
+  extractIdsFromUrl(url) {
+    const match = url.match(/\/api\/resources\/([^-]+)-([^\/]+)/);
+    if (match) {
+      return {
+        businessId: match[1],
+        locationId: match[2]
+      };
+    }
+    return null;
+  }
+
+  /**
+   * Set business and location IDs from URL
+   * @param {string} url - URL containing businessId-locationId
+   */
+  setIdsFromUrl(url) {
+    const ids = this.extractIdsFromUrl(url);
+    if (ids) {
+      this.businessId = ids.businessId;
+      this.locationId = ids.locationId;
+      console.log(`IDs extracted from URL - Business ID: ${this.businessId}, Location ID: ${this.locationId}`);
+      eventBus.emit('datasync:ids-set-from-url', { 
+        businessId: this.businessId, 
+        locationId: this.locationId 
+      });
+    }
+  }
+
+  /**
    * Get the single endpoint URL pattern
    * @returns {string} The endpoint URL pattern for resources
    */
   getSingleEndpointUrl() {
-    if (!this.businessId || !this.locationId) {
-      throw new Error('Business ID and Location ID must be set before accessing resources');
+    // Get businessId and locationId from localStorage (same as LocationsPage/DashboardLayout)
+    const businessId = localStorage.getItem('businessId');
+    const locationId = localStorage.getItem('locationId');
+    
+    console.log('🔗 ResourceRegistry: localStorage values (direct access):', {
+      businessId: businessId,
+      locationId: locationId,
+      businessIdType: typeof businessId,
+      locationIdType: typeof locationId,
+      timestamp: new Date().toISOString()
+    });
+    
+    if (!businessId || !locationId) {
+      throw new Error('Business ID and Location ID must be set before accessing resources. Please select a location first.');
     }
-    return `/api/resources/${this.businessId}-${this.locationId}`;
+    
+    // Build endpoint in format: B01-00001-L01-00001
+    const endpoint = `/api/resources/${businessId}-${locationId}`;
+    console.log('🔗 ResourceRegistry: Generated endpoint:', {
+      businessId: businessId,
+      locationId: locationId,
+      endpoint: endpoint
+    });
+    
+    return endpoint;
   }
 
   /**
@@ -241,7 +296,9 @@ class ResourceRegistry {
    * @returns {boolean} True if single endpoint can be used
    */
   isSingleEndpointReady() {
-    return !!(this.businessId && this.locationId);
+    const businessId = localStorage.getItem('businessId');
+    const locationId = localStorage.getItem('locationId');
+    return !!(businessId && locationId);
   }
 
   /**

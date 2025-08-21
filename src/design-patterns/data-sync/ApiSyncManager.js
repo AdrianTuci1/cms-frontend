@@ -27,6 +27,22 @@ class ApiSyncManager {
   }
 
   /**
+   * Get business ID from localStorage (same as LocationsPage)
+   * @returns {string|null} Business ID
+   */
+  getBusinessId() {
+    return localStorage.getItem('businessId');
+  }
+
+  /**
+   * Get location ID from localStorage (same as LocationsPage)
+   * @returns {string|null} Location ID
+   */
+  getLocationId() {
+    return localStorage.getItem('locationId');
+  }
+
+  /**
    * Sync data via API using the new single endpoint pattern
    * @param {string} resource - Resource name
    * @param {Object} data - Data to sync
@@ -83,8 +99,11 @@ class ApiSyncManager {
         }
         
         // Replace business ID placeholder for businessInfo
-        if (resource === 'businessInfo' && url.includes(':businessId') && data.businessId) {
-          url = url.replace(':businessId', data.businessId);
+        if (resource === 'businessInfo' && url.includes(':businessId')) {
+          const businessId = this.getBusinessId();
+          if (businessId) {
+            url = url.replace(':businessId', businessId);
+          }
         }
       }
 
@@ -92,8 +111,9 @@ class ApiSyncManager {
       let response;
       
       if (config.requiresAuth === false) {
-        // Resources that don't require JWT (auth, businessInfo)
-        if (!this.connectivityManager?.isAuthResourcesServerOnline()) {
+        // Resources that don't require JWT (auth, businessInfo, timeline)
+        // Skip connectivity check for timeline as it should work with curl
+        if (resource !== 'timeline' && !this.connectivityManager?.isAuthResourcesServerOnline()) {
           throw new Error('Backend indisponibil - folosind datele din IndexedDB');
         }
         
@@ -152,15 +172,46 @@ class ApiSyncManager {
       let params = { ...options.params };
 
       if (config.useSingleEndpoint) {
-        // Use single endpoint pattern
-        if (!resourceRegistry.isSingleEndpointReady()) {
-          throw new Error('Business ID and Location ID must be set before using single endpoint');
+        // Use single endpoint pattern - get businessId and locationId from localStorage
+        const businessId = this.getBusinessId();
+        const locationId = this.getLocationId();
+        
+        if (resource === 'timeline') {
+          console.log('🔍 Timeline: localStorage values:', {
+            businessId: businessId,
+            locationId: locationId,
+            businessIdLength: businessId ? businessId.length : 0,
+            locationIdLength: locationId ? locationId.length : 0
+          });
         }
         
-        endpoint = resourceRegistry.getSingleEndpointUrl();
+        console.log('🔍 ApiSyncManager: localStorage values:', {
+          businessId: businessId,
+          locationId: locationId,
+          businessIdType: typeof businessId,
+          locationIdType: typeof locationId
+        });
         
-        // Add resource type as parameter
-        params.resourceType = config.resourceType;
+        if (!businessId || !locationId) {
+          throw new Error('Business ID and Location ID must be set before using single endpoint. Please select a location first.');
+        }
+        
+        const baseUrl = `/api/resources/${businessId}-${locationId}`;
+        endpoint = baseUrl;
+        
+        console.log('🔍 ApiSyncManager: Built URL:', {
+          businessId: businessId,
+          locationId: locationId,
+          baseUrl: baseUrl,
+          endpoint: endpoint
+        });
+        
+        // Adaugă /date-range/ pentru timeline
+        if (config.resourceType === 'timeline') {
+          endpoint += '/date-range/';
+        }
+        
+        // Nu mai adăugăm resourceType ca parametru - serverul îl recunoaște din header
       } else {
         // Use traditional endpoint (for auth and businessInfo)
         if (!config || !config.apiEndpoints.get) {
@@ -170,8 +221,11 @@ class ApiSyncManager {
         endpoint = config.apiEndpoints.get;
         
         // Replace business ID placeholder for businessInfo
-        if (resource === 'businessInfo' && endpoint.includes(':businessId') && resourceRegistry.getBusinessId()) {
-          endpoint = endpoint.replace(':businessId', resourceRegistry.getBusinessId());
+        if (resource === 'businessInfo' && endpoint.includes(':businessId')) {
+          const businessId = this.getBusinessId();
+          if (businessId) {
+            endpoint = endpoint.replace(':businessId', businessId);
+          }
         }
       }
 
@@ -183,6 +237,17 @@ class ApiSyncManager {
         const { startDate, endDate } = this.getDefaultDateRange();
         params.startDate = params.startDate || startDate;
         params.endDate = params.endDate || endDate;
+      }
+
+      // Debug logging for timeline requests
+      if (resource === 'timeline') {
+        console.log('🔍 Timeline API Request:', {
+          method: 'GET',
+          url: endpoint,
+          params: { ...params },
+          headers: config.useSingleEndpoint ? { 'X-Resource-Type': config.resourceType } : {},
+          fullUrl: endpoint + (Object.keys(params).length > 0 ? `?${new URLSearchParams(params).toString()}` : '')
+        });
       }
 
       // Add pagination parameters for resources that support it
@@ -206,28 +271,84 @@ class ApiSyncManager {
         endpoint += `?${queryString}`;
       }
 
+      // Prepare headers for single endpoint resources
+      const headers = {};
+      if (config.useSingleEndpoint && config.resourceType) {
+        headers['X-Resource-Type'] = config.resourceType;
+      }
+
       // Determine which API service to use based on server connectivity
       let response;
       
       if (config.requiresAuth === false) {
-        // Resources that don't require JWT (auth, businessInfo)
-        if (!this.connectivityManager?.isAuthResourcesServerOnline()) {
+        // Resources that don't require JWT (auth, businessInfo, timeline)
+        // Skip connectivity check for timeline as it should work with curl
+        if (resource !== 'timeline' && !this.connectivityManager?.isAuthResourcesServerOnline()) {
           throw new Error('Backend indisponibil - folosind datele din IndexedDB');
         }
         
-        response = await this.apiManager.generalRequest('GET', endpoint, null, { noRetry: true });
+        // Final logging before making request
+        if (resource === 'timeline') {
+          console.log('📡 Making generalRequest (no auth):', {
+            method: 'GET',
+            endpoint,
+            headers,
+            requestType: 'generalRequest'
+          });
+        }
+        
+        response = await this.apiManager.generalRequest('GET', endpoint, null, { 
+          noRetry: true,
+          headers
+        });
       } else {
         // Resources that require JWT
         if (!this.connectivityManager?.isAuthResourcesServerOnline()) {
           throw new Error('Backend indisponibil - folosind datele din IndexedDB');
         }
         
-        response = await this.apiManager.secureRequest('GET', endpoint, null, { noRetry: true });
+        // Final logging before making request
+        if (resource === 'timeline') {
+          console.log('📡 Making secureRequest:', {
+            method: 'GET',
+            endpoint,
+            headers,
+            requestType: 'secureRequest'
+          });
+        }
+        
+        response = await this.apiManager.secureRequest('GET', endpoint, null, { 
+          noRetry: true,
+          headers
+        });
       }
 
       eventBus.emit('datasync:api-fetched', { resource, data: response });
+      
+      // Log the response structure for debugging
+      if (resource === 'timeline') {
+        console.log('📦 ApiSyncManager: Timeline API response structure:', {
+          hasResponse: !!response,
+          responseType: typeof response,
+          hasData: !!(response && response.data),
+          dataType: response && response.data ? typeof response.data : 'no data',
+          isDataArray: response && response.data ? Array.isArray(response.data) : 'no data',
+          dataKeys: response && response.data ? Object.keys(response.data) : 'no data',
+          fullResponseKeys: response ? Object.keys(response) : 'no response'
+        });
+      }
+      
       return response;
     } catch (error) {
+      // Timeline specific error logging
+      if (resource === 'timeline') {
+        console.log('❌ Timeline API Error:', {
+          message: error.message,
+          type: error.name,
+          code: error.code
+        });
+      }
+      
       // Check if it's a connectivity error
       const isConnectivityError = error.message.includes('Backend indisponibil') || 
                                  error.message.includes('fetch') ||
@@ -267,6 +388,19 @@ class ApiSyncManager {
    */
   isInitialized() {
     return this.apiManager !== null;
+  }
+
+  /**
+   * Update location ID in ApiClient
+   */
+  updateLocationId(locationId) {
+    if (this.apiManager && this.apiManager.getApiClient) {
+      const apiClient = this.apiManager.getApiClient();
+      if (apiClient) {
+        apiClient.setLocationId(locationId);
+        console.log('ApiSyncManager: Updated location ID in ApiClient:', locationId);
+      }
+    }
   }
 
   /**

@@ -53,27 +53,31 @@ class GeneralService {
 
   /**
    * Obține informațiile despre business și locații (Read-Only)
-   * Endpoint: /api/businessInfo/{businessId}
-   * @param {string} businessId - Business ID
+   * Endpoint: /api/business-info/{businessId}
+   * @param {string} businessId - Business ID (optional, uses VITE_BUSINESS_ID if not provided)
    * @returns {Promise<Object>} Informațiile despre business
    */
-  async getBusinessInfo(businessId) {
+  async getBusinessInfo(businessId = null) {
     try {
-      // În test mode, returnează date de demo
-      if (tenantUtils.isTestMode()) {
-        console.log('TEST MODE: Using demo business info data');
-        const demoData = tenantUtils.getDemoBusinessInfo();
-        return demoData;
+      // Use provided businessId or get from environment variable
+      const targetBusinessId = businessId || tenantUtils.getCurrentBusinessId();
+      
+      if (!targetBusinessId) {
+        throw new Error('Business ID is required. Please set VITE_BUSINESS_ID environment variable or provide businessId parameter.');
       }
 
-      // Construiește cererea folosind utilitarele - noul endpoint
-      const endpoint = businessId ? `/api/businessInfo/${businessId}` : '/api/businessInfo';
-      const requestConfig = requestBuilder.requestUtils.get(endpoint);
+      // Log API client configuration
+      console.log('ApiClient baseURL:', this.apiClient.baseURL);
+      console.log('ApiClient tenantId (businessId):', this.apiClient.tenantId);
+      console.log('Environment VITE_API_URL:', import.meta.env.VITE_API_URL);
+      console.log('Environment VITE_BUSINESS_ID:', import.meta.env.VITE_BUSINESS_ID);
 
-      // Use main API server URL (unified architecture)
-      const fullUrl = requestConfig.url;
-
-      const response = await this.apiClient.get(fullUrl);
+      // Construiește endpoint-ul
+      const endpoint = `/api/business-info/${targetBusinessId}`;
+      
+      console.log(`Fetching business info from: ${endpoint}`);
+      console.log(`Full URL will be: ${this.apiClient.baseURL}${endpoint}`);
+      const response = await this.apiClient.get(endpoint);
       
       return response.data;
     } catch (error) {

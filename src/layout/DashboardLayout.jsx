@@ -78,7 +78,17 @@ const DashboardLayout = () => {
 
           // Initialize data sync manager with business info
           dataSyncManager.setBusinessInfo(businessInfo);
+          
+          // Also set in localStorage for API calls
+          localStorage.setItem('businessId', businessInfo.business.id);
+          localStorage.setItem('locationId', businessInfo.location.id);
+          
           console.log('DataSyncManager initialized with business info:', businessInfo);
+          console.log('localStorage set - businessId:', businessInfo.business.id, 'locationId:', businessInfo.location.id);
+          console.log('🔧 DashboardLayout: Setting localStorage values:', {
+            businessId: businessInfo.business.id,
+            locationId: businessInfo.location.id
+          });
         } catch (error) {
           console.error('Failed to initialize DataSyncManager with business info:', error);
         }

@@ -149,16 +149,80 @@ class DataSyncManager {
       const { forceRefresh = false, useCache = true, params = {} } = options;
 
       // Attempt to get fresh data from API first if not forced to use cache
-      if (!forceRefresh || this.connectivityManager.isOnline()) {
+      if (!forceRefresh || this.connectivityManager.isOnline) {
         try {
-          const apiData = await this.apiSyncManager.fetchResource(resource, params);
+          const config = this.resourceRegistry.getResource(resource);
           
-          if (apiData) {
-            // Process and store data
-            const processedData = this.dataProcessor.addMetadata(apiData, resource, 'api');
-            await this.databaseManager.storeData(resource, processedData);
+          // Debug logging for timeline requests
+          if (resource === 'timeline') {
+            console.log('🚀 DataSyncManager.getData sending to API:', {
+              resource,
+              params,
+              config: {
+                requiresDateRange: config.requiresDateRange,
+                useSingleEndpoint: config.useSingleEndpoint,
+                resourceType: config.resourceType
+              }
+            });
+          }
+          
+          const apiResponse = await this.apiSyncManager.fetchFromAPI(resource, { params }, config, this.resourceRegistry);
+          
+          if (apiResponse) {
+            // Extract only the data from the axios response to avoid AbortSignal cloning issues
+            const apiData = apiResponse.data || apiResponse;
             
-            // Emit update event
+            console.log(`📥 DataSyncManager: Received API response for ${resource}:`, {
+              hasData: !!apiData,
+              dataType: typeof apiData,
+              isArray: Array.isArray(apiData),
+              keys: apiData ? Object.keys(apiData) : 'no data',
+              dataPreview: apiData ? JSON.stringify(apiData).substring(0, 200) + '...' : 'no data'
+            });
+            
+            if (resource === 'timeline') {
+              console.log(`📥 DataSyncManager: Full apiData for timeline:`, apiData);
+            }
+            
+            // Extract the actual data for timeline
+            let dataToProcess = apiData;
+            if (resource === 'timeline' && apiData && apiData.data) {
+              if (Array.isArray(apiData.data)) {
+                // Direct array structure: { data: [reservations] }
+                console.log(`📥 DataSyncManager: Extracting timeline data from apiData.data (direct array) - found ${apiData.data.length} reservations`);
+                console.log(`📥 DataSyncManager: apiData.data content:`, apiData.data);
+                dataToProcess = apiData.data;
+              } else if (typeof apiData.data === 'object' && apiData.data.data && Array.isArray(apiData.data.data)) {
+                // Nested structure: { data: { data: [reservations] } }
+                console.log(`📥 DataSyncManager: Extracting timeline data from apiData.data.data (nested) - found ${apiData.data.data.length} reservations`);
+                dataToProcess = apiData.data.data;
+              } else {
+                console.log(`📥 DataSyncManager: Debug - apiData.data structure:`, {
+                  keys: Object.keys(apiData.data),
+                  hasData: !!(apiData.data && apiData.data.data),
+                  dataType: apiData.data.data ? typeof apiData.data.data : 'no data',
+                  isDataArray: apiData.data.data ? Array.isArray(apiData.data.data) : 'no data',
+                  dataLength: apiData.data.data && Array.isArray(apiData.data.data) ? apiData.data.data.length : 'not array'
+                });
+              }
+            }
+            
+            // Process and store data
+            const processedData = this.dataProcessor.addMetadata(dataToProcess, resource, 'api');
+            
+            console.log(`🔄 DataSyncManager: Processed data for ${resource}:`, {
+              hasProcessedData: !!processedData,
+              processedDataType: typeof processedData,
+              isArray: Array.isArray(processedData),
+              keys: processedData ? Object.keys(processedData) : 'no processed data',
+              processedDataLength: processedData && Array.isArray(processedData) ? processedData.length : 'not array',
+              firstProcessedItem: processedData && Array.isArray(processedData) && processedData.length > 0 ? Object.keys(processedData[0]) : 'no items'
+            });
+            
+            await this.databaseManager.storeData(resource, processedData);
+            console.log(`💾 DataSyncManager: Successfully stored data for ${resource} in IndexedDB`);
+            
+            // Emit update event with the original apiData structure
             this.emitResourceUpdate(resource, apiData, 'api');
             
             return apiData;
@@ -188,12 +252,37 @@ class DataSyncManager {
         }
       }
 
-      // No data available from any source
-      throw new Error(`No data available for resource '${resource}'. API is unavailable and no cached data found.`);
+      // No data available from any source - return empty data instead of throwing
+      console.warn(`No data available for resource '${resource}'. API is unavailable and no cached data found. Returning empty data.`);
+      
+      // Return appropriate empty data structure based on resource type
+      let emptyData;
+      if (resource === 'timeline') {
+        emptyData = { reservations: [] };
+      } else {
+        emptyData = [];
+      }
+      
+      // Emit event with empty data for consistency
+      this.emitResourceUpdate(resource, emptyData, 'empty');
+      
+      return emptyData;
 
     } catch (error) {
-      console.error(`Failed to get data for ${resource}:`, error);
-      throw error;
+      // Only log non-data-availability errors
+      if (!error.message.includes('No data available')) {
+        console.error(`Failed to get data for ${resource}:`, error);
+        throw error;
+      }
+      
+      // For data availability errors, return empty data instead of throwing
+      console.warn(`Data availability issue for ${resource}: ${error.message}. Returning empty data.`);
+      
+      if (resource === 'timeline') {
+        return { reservations: [] };
+      }
+      
+      return [];
     }
   }
 
@@ -218,16 +307,61 @@ class DataSyncManager {
       }
 
       // Try to get data from API first
-      if (!forceRefresh || this.connectivityManager.isOnline()) {
+      if (!forceRefresh || this.connectivityManager.isOnline) {
         try {
-          const apiData = await this.apiSyncManager.fetchResource(resource, params);
+          const config = this.resourceRegistry.getResource(resource);
           
-          if (apiData) {
+          // Debug logging for timeline requests
+          if (resource === 'timeline') {
+            console.log('🚀 DataSyncManager.getDataWithFallback sending to API:', {
+              resource,
+              params,
+              config: {
+                requiresDateRange: config.requiresDateRange,
+                useSingleEndpoint: config.useSingleEndpoint,
+                resourceType: config.resourceType
+              }
+            });
+          }
+          
+          const apiResponse = await this.apiSyncManager.fetchFromAPI(resource, { params }, config, this.resourceRegistry);
+          
+          if (apiResponse) {
+            // Extract only the data from the axios response to avoid AbortSignal cloning issues
+            const apiData = apiResponse.data || apiResponse;
+            
+            if (resource === 'timeline') {
+              console.log(`📥 DataSyncManager: Full apiData for timeline:`, apiData);
+            }
+            
+            // Extract the actual data for timeline
+            let dataToProcess = apiData;
+            if (resource === 'timeline' && apiData && apiData.data) {
+              if (Array.isArray(apiData.data)) {
+                // Direct array structure: { data: [reservations] }
+                console.log(`📥 DataSyncManager: Extracting timeline data from apiData.data (direct array) - found ${apiData.data.length} reservations`);
+                console.log(`📥 DataSyncManager: apiData.data content:`, apiData.data);
+                dataToProcess = apiData.data;
+              } else if (typeof apiData.data === 'object' && apiData.data.data && Array.isArray(apiData.data.data)) {
+                // Nested structure: { data: { data: [reservations] } }
+                console.log(`📥 DataSyncManager: Extracting timeline data from apiData.data.data (nested) - found ${apiData.data.data.length} reservations`);
+                dataToProcess = apiData.data.data;
+              } else {
+                console.log(`📥 DataSyncManager: Debug - apiData.data structure:`, {
+                  keys: Object.keys(apiData.data),
+                  hasData: !!(apiData.data && apiData.data.data),
+                  dataType: apiData.data.data ? typeof apiData.data.data : 'no data',
+                  isDataArray: apiData.data.data ? Array.isArray(apiData.data.data) : 'no data',
+                  dataLength: apiData.data.data && Array.isArray(apiData.data.data) ? apiData.data.data.length : 'not array'
+                });
+              }
+            }
+            
             // Process and store data
-            const processedData = this.dataProcessor.addMetadata(apiData, resource, 'api');
+            const processedData = this.dataProcessor.addMetadata(dataToProcess, resource, 'api');
             await this.databaseManager.storeData(resource, processedData);
             
-            // Emit update event
+            // Emit update event with the original apiData structure
             this.emitResourceUpdate(resource, apiData, 'api');
             
             return apiData;
@@ -255,11 +389,36 @@ class DataSyncManager {
         console.warn(`Cache access failed for ${resource}:`, dbError.message);
       }
 
-      // No data available from any source
-      throw new Error(`No data available for resource '${resource}'. API is unavailable and no cached data found.`);
+      // No data available from any source - return empty data instead of throwing
+      console.warn(`No data available for resource '${resource}'. API is unavailable and no cached data found. Returning empty data.`);
+      
+      // Return appropriate empty data structure based on resource type
+      let emptyData;
+      if (resource === 'timeline') {
+        emptyData = { reservations: [] };
+      } else {
+        emptyData = [];
+      }
+      
+      // Emit event with empty data for consistency
+      this.emitResourceUpdate(resource, emptyData, 'empty');
+      
+      return emptyData;
     } catch (error) {
-      console.error(`Failed to get data with fallback for ${resource}:`, error);
-      throw error;
+      // Only log non-data-availability errors
+      if (!error.message.includes('No data available')) {
+        console.error(`Failed to get data with fallback for ${resource}:`, error);
+        throw error;
+      }
+      
+      // For data availability errors, return empty data instead of throwing
+      console.warn(`Data availability issue for ${resource}: ${error.message}. Returning empty data.`);
+      
+      if (resource === 'timeline') {
+        return { reservations: [] };
+      }
+      
+      return [];
     }
   }
 
@@ -361,6 +520,11 @@ class DataSyncManager {
     if (businessType) {
       this.dataProcessor.setBusinessType(businessType);
     }
+
+    // Update location ID in ApiSyncManager if available
+    if (businessInfo && businessInfo.location && businessInfo.location.id) {
+      this.apiSyncManager.updateLocationId(businessInfo.location.id);
+    }
   }
 
   /**
@@ -391,7 +555,7 @@ class DataSyncManager {
       await this.databaseManager.storeData(resource, processedData);
 
       // Add to sync queue if offline
-      if (!this.isOnline) {
+      if (!this.connectivityManager.isOnline) {
         await this.databaseManager.addToSyncQueue(resource, processedData);
         return;
       }
@@ -536,6 +700,32 @@ class DataSyncManager {
   }
 
   /**
+   * Re-optimize timeline data storage
+   * This method helps transition existing timeline data to the optimized format
+   */
+  async reoptimizeTimelineData() {
+    try {
+      console.log('DataSyncManager: Starting timeline data re-optimization...');
+      
+      // Wait for database to be initialized
+      await this.waitForInitialization();
+      
+      // Trigger re-optimization in database manager
+      const optimizedCount = await this.databaseManager.reoptimizeTimelineData();
+      
+      console.log(`DataSyncManager: Timeline data re-optimization completed. Optimized ${optimizedCount} records.`);
+      
+      // Emit event to notify other components
+      eventBus.emit('datasync:timeline-reoptimized', { count: optimizedCount });
+      
+      return optimizedCount;
+    } catch (error) {
+      console.error('DataSyncManager: Error re-optimizing timeline data:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Check if resource has complete data (no need to add more)
    */
   async hasCompleteData(resource) {
@@ -593,7 +783,7 @@ class DataSyncManager {
    */
   getSyncStatus() {
     return {
-      isOnline: this.isOnline,
+      isOnline: this.connectivityManager.isOnline,
       syncInProgress: this.syncInProgress,
       resources: this.resourceRegistry.getAllResources(),
       queueSize: this.syncQueue.length,

@@ -101,9 +101,7 @@ class ConnectivityManager {
         eventBus.emit('connectivity:offline');
       }
 
-      console.log(`ConnectivityManager: Auth/Resources server: ${authResourcesOnline ? 'online' : 'offline'}`);
-      console.log(`ConnectivityManager: Business info server: ${businessInfoOnline ? 'online' : 'offline'}`);
-      console.log(`ConnectivityManager: Overall status: ${this.offlineMode ? 'offline' : 'online'}`);
+      console.log(`ConnectivityManager: Overall status: ${this.offlineMode ? 'offline' : 'online'}, Auth/Resources server: ${authResourcesOnline ? 'online' : 'offline'}, Business info server: ${businessInfoOnline ? 'online' : 'offline'}`);
 
     } catch (error) {
       console.error('ConnectivityManager: Error checking connectivity:', error);
